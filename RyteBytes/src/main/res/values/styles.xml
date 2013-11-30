@@ -1,0 +1,8 @@
+<resources>
+
+    <style name="EditTextStyle" parent="android:Widget.EditText">
+        <item name="android:background">@drawable/edit_text_holo_light</item>
+        <item name="android:textColor">@android:color/black</item>
+    </style>
+
+</resources>

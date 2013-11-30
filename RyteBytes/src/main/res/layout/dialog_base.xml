@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:rytebytes="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:minWidth="300dp"
+        android:orientation="vertical" >
+
+    <RelativeLayout
+            android:id="@+id/layout_dialog_title"
+            android:layout_width="match_parent"
+            android:layout_height="66dp" >
+
+        <View
+                android:id="@+id/title_divider"
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:layout_alignParentBottom="true"
+                android:background="#FF33b5e5"
+                />
+
+        <ImageView
+                android:id="@+id/img_title_icon"
+                android:layout_width="34dp"
+                android:layout_height="34dp"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="2dp"
+                android:padding="2dp"
+                />
+
+        <com.myrytebytes.widget.AutoResizeTextView
+                android:id="@+id/tv_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="16dp"
+                android:layout_marginRight="16dp"
+                android:layout_toRightOf="@id/img_title_icon"
+                android:textColor="@color/holo_light_blue"
+                android:paddingTop="3dp"
+                android:focusable="true"
+                rytebytes:maxTextSize="22sp"
+                rytebytes:minTextSize="16sp"
+                rytebytes:maxLineCount="1"
+                />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+            android:id="@+id/layout_dialog_view"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:minHeight="64dp"
+            android:layout_weight="1"
+            />
+
+    <View
+            android:id="@+id/dialog_button_divider"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#FFDCDCDC"
+            android:visibility="gone" />
+
+    <LinearLayout
+            android:id="@+id/dialog_buttons"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:visibility="gone" >
+
+        <com.myrytebytes.widget.CustomFontButton
+                android:id="@+id/btn_negative"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:singleLine="true"
+                android:textSize="14sp"
+                android:textColor="@color/light_theme_text"
+                android:minHeight="48dp"
+                android:minWidth="64dp"
+                android:background="@drawable/list_selector_holo_light"
+                android:visibility="gone" />
+
+        <View
+                android:id="@+id/negative_button_divider"
+                android:layout_width="1.0px"
+                android:layout_height="match_parent"
+                android:background="#FFDCDCDC"
+                android:visibility="gone" />
+
+        <com.myrytebytes.widget.CustomFontButton
+                android:id="@+id/btn_neutral"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:singleLine="true"
+                android:textSize="14sp"
+                android:textColor="@color/light_theme_text"
+                android:minHeight="48dp"
+                android:minWidth="64dp"
+                android:background="@drawable/list_selector_holo_light"
+                android:visibility="gone" />
+
+        <View
+                android:id="@+id/positive_button_divider"
+                android:layout_width="1.0px"
+                android:layout_height="match_parent"
+                android:background="#FFDCDCDC"
+                android:visibility="gone" />
+
+        <com.myrytebytes.widget.CustomFontButton
+                android:id="@+id/btn_positive"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:singleLine="true"
+                android:textSize="14sp"
+                android:textColor="@color/light_theme_text"
+                android:minHeight="48dp"
+                android:minWidth="64dp"
+                android:background="@drawable/list_selector_holo_light"
+                android:visibility="gone" />
+    </LinearLayout>
+
+</LinearLayout>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">RyteBytes</string>
+
+    <!-- Navigation drawer -->
+    <string name="open_drawer">Open Drawer</string>
+    <string name="close_drawer">Close Drawer</string>
+    <string name="order">Order</string>
+    <string name="account">Account</string>
+    <string name="about">About</string>
+    <string name="eat_ryte">Eat Ryte</string>
+    <string name="my_account">My Account</string>
+    <string name="heating">Heating</string>
+    <string name="do_ryte">Do Ryte</string>
+
+</resources>

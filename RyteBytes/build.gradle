@@ -1,0 +1,53 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:0.6.+'
+    }
+}
+apply plugin: 'android'
+
+repositories {
+    mavenCentral()
+}
+
+android {
+    compileSdkVersion 19
+    buildToolsVersion "19.0.0"
+
+    defaultConfig {
+        minSdkVersion 9
+        targetSdkVersion 19
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
+    }
+    buildTypes {
+        release {
+            runProguard true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), file('proguard-project.txt')
+        }
+    }
+    productFlavors {
+        defaultFlavor {
+            proguardFile 'proguard-rules.txt'
+        }
+    }
+}
+
+dependencies {
+    repositories {
+        mavenCentral()
+    }
+    compile fileTree(dir: 'src/main/libs', include: '*.jar')
+	compile 'com.android.support:support-v4:19.0.0'
+	compile 'com.android.support:appcompat-v7:19.0.0'
+    compile 'com.spothero.emailvalidator:EmailValidator:1.0.0@aar'
+    compile 'com.fasterxml.jackson.core:jackson-core:2.2.3'
+    compile 'com.nineoldandroids:library:2.4.0'
+    compile 'com.squareup.okhttp:okhttp:1.2.1'
+    compile project(':libraries:volley')
+}

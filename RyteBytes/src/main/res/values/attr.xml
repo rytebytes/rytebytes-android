@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="AutoResizeTextView">
+        <attr name="maxTextSize" format="dimension"/>
+        <attr name="minTextSize" format="dimension"/>
+        <attr name="font" format="string"/>
+        <attr name="resizeHeight" format="boolean"/>
+        <attr name="resizeWidth" format="boolean"/>
+        <attr name="maxLineCount" format="integer"/>
+        <attr name="android:gravity"/>
+        <attr name="android:text"/>
+        <attr name="android:textColor"/>
+    </declare-styleable>
+</resources>
