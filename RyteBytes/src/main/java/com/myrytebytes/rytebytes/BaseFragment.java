@@ -14,12 +14,14 @@ import com.myrytebytes.widget.HoloDialog;
 public abstract class BaseFragment extends Fragment {
 
 	public enum ContentType {
-		MENU(false),
-		MENU_ITEM(false);
+		MENU(false, false),
+		MENU_ITEM(false, false),
+		LOGIN(false, true);
 
 		boolean isModal;
+		boolean requiresLogin;
 
-		private ContentType(boolean isModal) {
+		private ContentType(boolean requiresLogin, boolean isModal) {
 			this.isModal = isModal;
 		}
 	}
@@ -30,8 +32,10 @@ public abstract class BaseFragment extends Fragment {
 		public void displayModalFragment(ContentType contentType, Bundle extras);
 		public void setTitle(int title);
 		public void popToRoot(boolean animated, boolean resetRoot);
-		public void openNavDrawer();
 		public void hideSoftKeyboard();
+		public void displayLoginFragment(boolean popIfUnsuccessful);
+		public boolean isLoginFragmentShowing();
+		public void loginWillFinish(boolean loggedIn);
 	}
 
 	private static final ActivityCallbacks DUMMY_CALLBACKS = new ActivityCallbacks() {
@@ -51,10 +55,16 @@ public abstract class BaseFragment extends Fragment {
 		public void popToRoot(boolean animated, boolean resetRoot) { }
 
 		@Override
-		public void openNavDrawer() { }
+		public void hideSoftKeyboard() { }
 
 		@Override
-		public void hideSoftKeyboard() { }
+		public void displayLoginFragment(boolean popIfUnsuccessful) { }
+
+		@Override
+		public boolean isLoginFragmentShowing() { return false; }
+
+		@Override
+		public void loginWillFinish(boolean loggedIn) { }
 	};
 
 	public static boolean animationsDisabled;

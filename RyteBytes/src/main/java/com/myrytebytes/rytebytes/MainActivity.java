@@ -24,6 +24,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.myrytebytes.datamanagement.LoginController;
 import com.myrytebytes.rytebytes.BaseFragment.ActivityCallbacks;
 import com.myrytebytes.rytebytes.BaseFragment.ContentType;
 
@@ -37,12 +38,26 @@ public class MainActivity extends ActionBarActivity implements ActivityCallbacks
 	private ActionBarDrawerToggle mDrawerToggle;
 	private boolean isDrawerOpen;
 	private InputMethodManager mInputMethodManager;
+	private PostLoginContainer mPostLoginContainer;
+	private boolean isLoggingIn;
 
 	private FragmentManager.OnBackStackChangedListener mOnBackStackChangedListener = new FragmentManager.OnBackStackChangedListener() {
 		@Override
 		public void onBackStackChanged() {
 			FragmentManager fragmentManager = getSupportFragmentManager();
 			final int newBackstackEntryCount = fragmentManager.getBackStackEntryCount();
+
+			if (isLoggingIn) {
+				if (newBackstackEntryCount < mBackstackEntryCount || newBackstackEntryCount == 0) {
+					isLoggingIn = false;
+					if (mPostLoginContainer != null && mPostLoginContainer.popIfUnsuccessful && LoginController.getSessionUser() == null) {
+						BaseFragment.animationsDisabled = true;
+						fragmentManager.popBackStackImmediate();
+						BaseFragment.animationsDisabled = false;
+					}
+					mPostLoginContainer = null;
+				}
+			}
 
 			if (newBackstackEntryCount < mBackstackEntryCount) {
 				BaseFragment fragment = (BaseFragment)fragmentManager.findFragmentById(R.id.container);
@@ -158,7 +173,9 @@ public class MainActivity extends ActionBarActivity implements ActivityCallbacks
 	}
 
 	private void pushFragment(BaseFragment fragment, ContentType fragmentType, Bundle extras) {
-		if (mContent == null || fragmentType != mContent.getContentType()) {
+		if (fragmentType.requiresLogin && LoginController.getSessionUser() == null) {
+			displayLoginFragment(new PostLoginContainer(fragment, fragmentType, extras, false, false));
+		} else if (mContent == null || fragmentType != mContent.getContentType()) {
 			if (fragment == null) {
 				fragment = getFragmentForType(fragmentType);
 			}
@@ -199,7 +216,9 @@ public class MainActivity extends ActionBarActivity implements ActivityCallbacks
 	}
 
 	private void switchContent(ContentType contentType, boolean onLaunch) {
-		if (mContent == null || contentType != mContent.getContentType()) {
+		if (contentType.requiresLogin && LoginController.getSessionUser() == null) {
+			displayLoginFragment(new PostLoginContainer(null, contentType, null, true, false));
+		} else if (mContent == null || contentType != mContent.getContentType()) {
 			if (contentType == ContentType.MENU && mContent != null) {
 				popToRoot(false, false);
 			} else {
@@ -270,6 +289,27 @@ public class MainActivity extends ActionBarActivity implements ActivityCallbacks
 		return handled || super.onKeyUp(keyCode, event);
 	}
 
+	@Override
+	public void loginWillFinish(boolean loggedIn) {
+		// First dismiss the login fragment
+		((BaseFragment)getSupportFragmentManager().findFragmentById(R.id.container)).finish();
+
+		// Now add the view if successful
+		if (mPostLoginContainer != null) {
+			if (loggedIn) {
+				if (mPostLoginContainer.contentType != null) {
+					if (mPostLoginContainer.isSwitch) {
+						switchContent(mPostLoginContainer.contentType, false);
+					} else {
+						pushFragment(mPostLoginContainer.fragment, mPostLoginContainer.contentType, mPostLoginContainer.extras);
+					}
+				}
+			} else if (mPostLoginContainer.popIfUnsuccessful) {
+				getSupportFragmentManager().popBackStack();
+			}
+		}
+	}
+
 	/*package*/ void setContent(BaseFragment content) {
 		if (mDrawerLayout != null) {
 			if (mContent != content) {
@@ -334,10 +374,8 @@ public class MainActivity extends ActionBarActivity implements ActivityCallbacks
 	}
 
 	@Override
-	public void openNavDrawer() {
-		if (mDrawerLayout != null) {
-			mDrawerLayout.openDrawer(Gravity.LEFT);
-		}
+	public boolean isLoginFragmentShowing() {
+		return isLoggingIn;
 	}
 
 	private BaseFragment getFragmentForType(ContentType fragmentType) {
@@ -349,6 +387,22 @@ public class MainActivity extends ActionBarActivity implements ActivityCallbacks
 			default:
 				return null;
 		}
+	}
+
+	public void displayLoginFragment(PostLoginContainer postLoginContainer) {
+		mPostLoginContainer = postLoginContainer;
+		LoginFragment loginFragment = new LoginFragment();
+		FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+		transaction.setCustomAnimations(R.anim.fragment_modal_enter, 0, 0, R.anim.fragment_modal_exit);
+		transaction.add(R.id.container, loginFragment);
+		transaction.addToBackStack(null);
+		transaction.commitAllowingStateLoss();
+		isLoggingIn = true;
+	}
+
+	@Override
+	public void displayLoginFragment(boolean popIfUnsuccessful) {
+		displayLoginFragment(new PostLoginContainer(null, null, null, false, true));
 	}
 
 	@Override
@@ -480,6 +534,22 @@ public class MainActivity extends ActionBarActivity implements ActivityCallbacks
 		public static class ViewHolder {
 			public TextView textView;
 			public ImageView imageView;
+		}
+	}
+
+	private static class PostLoginContainer {
+		public BaseFragment fragment;
+		public ContentType contentType;
+		public Bundle extras;
+		public boolean isSwitch;
+		public boolean popIfUnsuccessful;
+
+		private PostLoginContainer(BaseFragment fragment, ContentType contentType, Bundle extras, boolean isSwitch, boolean popIfUnsuccessful) {
+			this.fragment = fragment;
+			this.contentType = contentType;
+			this.extras = extras;
+			this.isSwitch = isSwitch;
+			this.popIfUnsuccessful = popIfUnsuccessful;
 		}
 	}
 }

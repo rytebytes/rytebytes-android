@@ -7,9 +7,19 @@ import com.android.volley.Request.Method;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.myrytebytes.datamanagement.LoginController;
+import com.myrytebytes.datamodel.Location;
 import com.myrytebytes.datamodel.MenuItem;
+import com.myrytebytes.datamodel.StripeCustomer;
+import com.myrytebytes.remote.ApiListener.CreateAccountListener;
+import com.myrytebytes.remote.ApiListener.GetLocationsListener;
 import com.myrytebytes.remote.ApiListener.GetMenuListener;
+import com.myrytebytes.remote.ApiListener.LoginListener;
 import com.myrytebytes.remote.JsonRequest.JsonRequestListener;
+import com.parse.LogInCallback;
+import com.parse.ParseException;
+import com.parse.ParseUser;
+import com.parse.SignUpCallback;
 
 import java.util.HashMap;
 import java.util.List;
@@ -45,6 +55,40 @@ public class ApiInterface {
 				listener.onComplete(response, statusCode);
 			}
 		}));
+	}
+
+	public static void getLocations(final GetLocationsListener listener) {
+		requestQueue.add(new RyteBytesRequest<>(Method.POST, "location", null, "result", Location.class, new JsonRequestListener<List<Location>>() {
+			@Override
+			public void onResponse(List<Location> response, int statusCode, VolleyError error) {
+				listener.onComplete(response, statusCode);
+			}
+		}));
+	}
+
+	public static void createUser(StripeCustomer customer, String password, final CreateAccountListener listener) {
+		ParseUser parseUser = new ParseUser();
+		parseUser.setEmail(customer.email);
+		parseUser.setUsername(customer.email);
+		parseUser.setPassword(password);
+		parseUser.add("StripeId", customer.id);
+		parseUser.signUpInBackground(new SignUpCallback() {
+			@Override
+			public void done(ParseException e) {
+				LoginController.setUser(ParseUser.getCurrentUser());
+				listener.onComplete(ParseUser.getCurrentUser(), e);
+			}
+		});
+	}
+
+	public static void login(String email, String password, final LoginListener listener) {
+		ParseUser.logInInBackground(email, password, new LogInCallback() {
+			@Override
+			public void done(ParseUser parseUser, ParseException e) {
+				LoginController.setUser(parseUser);
+				listener.onComplete(parseUser, e);
+			}
+		});
 	}
 
 	private static class RyteBytesRequest<T> extends JsonRequest<T> {

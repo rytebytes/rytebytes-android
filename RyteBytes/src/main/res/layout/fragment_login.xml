@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#CCC"
+        android:focusable="true"
+        android:clickable="true" >
+
+    <com.myrytebytes.widget.CustomFontEditText
+            android:id="@+id/et_email"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="100dp"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"
+            android:hint="@string/email"
+            android:inputType="textEmailAddress"
+            />
+
+    <com.myrytebytes.widget.CustomFontEditText
+            android:id="@+id/et_password"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/et_email"
+            android:layout_marginLeft="@dimen/activity_horizontal_margin"
+            android:layout_marginRight="@dimen/activity_horizontal_margin"
+            android:hint="@string/password"
+            android:inputType="textPassword"
+            />
+
+    <com.myrytebytes.widget.CustomFontButton
+            android:id="@+id/btn_login"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/et_password"
+            android:layout_centerHorizontal="true"
+            android:text="@string/sign_in"
+            />
+
+    <com.myrytebytes.widget.CustomFontButton
+            android:id="@+id/btn_create_account"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/btn_login"
+            android:layout_centerHorizontal="true"
+            android:text="@string/create_account"
+            />
+
+    <com.myrytebytes.widget.CustomFontButton
+            android:id="@+id/btn_forgot_password"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/btn_create_account"
+            android:layout_centerHorizontal="true"
+            android:text="@string/forgot_password"
+            />
+
+</RelativeLayout>

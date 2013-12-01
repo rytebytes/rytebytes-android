@@ -13,17 +13,9 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 
-import com.myrytebytes.datamanagement.Log;
 import com.myrytebytes.datamodel.MenuItem;
-import com.myrytebytes.datamodel.StripeCustomer;
 import com.myrytebytes.remote.ApiInterface;
-import com.myrytebytes.remote.ApiListener.CreateStripeAccountListener;
 import com.myrytebytes.remote.ApiListener.GetMenuListener;
-import com.myrytebytes.remote.StripeInterface;
-import com.myrytebytes.widget.HoloDialog;
-import com.parse.ParseException;
-import com.parse.ParseUser;
-import com.parse.SignUpCallback;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -77,37 +69,6 @@ public class MenuFragment extends BaseFragment {
 			public void onComplete(List<MenuItem> menu, int statusCode) {
 				if (menu != null) {
 					mMenuAdapter.setMenu(menu);
-				}
-			}
-		});
-	}
-
-	public void createStripeCustomer() {
-		StripeInterface.createCustomer("test1@yopmail.com", "4242424242424242", 11, 2018, 212, getActivity(), new CreateStripeAccountListener() {
-			@Override
-			public void onComplete(StripeCustomer customer, int statusCode) {
-				createCustomer(customer);
-			}
-		});
-	}
-
-	public void createCustomer(StripeCustomer customer) {
-		ParseUser parseUser = new ParseUser();
-		parseUser.setEmail(customer.email);
-		parseUser.setUsername(customer.email);
-		parseUser.setPassword("     ");
-		parseUser.add("StripeId", customer.id);
-		parseUser.signUpInBackground(new SignUpCallback() {
-			@Override
-			public void done(ParseException e) {
-				if (e == null) {
-					Log.d("created user!");
-				} else {
-					new HoloDialog.Builder(getActivity())
-							.setTitle("Error creating account")
-							.setMessage(e.getMessage())
-							.setPositiveButton(android.R.string.ok, null)
-							.show();
 				}
 			}
 		});
