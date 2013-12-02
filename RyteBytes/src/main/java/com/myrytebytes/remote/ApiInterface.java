@@ -7,6 +7,7 @@ import com.android.volley.Request.Method;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.myrytebytes.datamanagement.Log;
 import com.myrytebytes.datamanagement.LoginController;
 import com.myrytebytes.datamodel.Location;
 import com.myrytebytes.datamodel.MenuItem;
@@ -46,7 +47,9 @@ public class ApiInterface {
 		requestQueue.add(new RyteBytesRequest<>(Method.POST, "retrievemenu", null, "result", MenuItem.class, new JsonRequestListener<List<MenuItem>>() {
 			@Override
 			public Response<List<MenuItem>> onParseResponseComplete(Response<List<MenuItem>> response) {
-				//TODO: add to a database?
+				for (MenuItem menuItem : response.result) {
+					menuItem.insertOrUpdateByUID(context);
+				}
 				return response;
 			}
 

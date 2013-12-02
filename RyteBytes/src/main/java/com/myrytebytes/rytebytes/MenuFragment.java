@@ -2,34 +2,62 @@ package com.myrytebytes.rytebytes;
 
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.drawable.Drawable;
+import android.database.Cursor;
 import android.os.Bundle;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
+import android.support.v4.widget.CursorAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.BaseAdapter;
-import android.widget.ImageView;
 import android.widget.ListView;
 
+import com.myrytebytes.datamanagement.SQLiteCursorLoader;
 import com.myrytebytes.datamodel.MenuItem;
 import com.myrytebytes.remote.ApiInterface;
 import com.myrytebytes.remote.ApiListener.GetMenuListener;
+import com.myrytebytes.widget.MenuItemImageView;
 
-import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.List;
 
 public class MenuFragment extends BaseFragment {
 
 	private ListView mLvMenu;
 	private MenuAdapter mMenuAdapter;
+	private SQLiteCursorLoader mMenuLoader;
+	private boolean isMenuAdapterLoaded;
+
 	private OnItemClickListener mOnItemClickListener = new OnItemClickListener() {
 		@Override
 		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-			MenuItem menuItem = mMenuAdapter.getMenuItem(position);
-			pushFragment(MenuItemFragment.newInstance(menuItem), ContentType.MENU_ITEM);
+			Cursor cursor = (Cursor)mMenuAdapter.getItem(position);
+			if (cursor != null) {
+				MenuItem menuItem = new MenuItem(cursor);
+				pushFragment(MenuItemFragment.newInstance(menuItem), ContentType.MENU_ITEM);
+			}
+		}
+	};
+
+	private final LoaderManager.LoaderCallbacks<Cursor> mLoaderCallbacks = new LoaderManager.LoaderCallbacks<Cursor>() {
+		@Override
+		public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
+			mMenuLoader = new SQLiteCursorLoader(getApplicationContext());
+			mMenuLoader.setQuery(MenuItem.Columns.TABLE_NAME, null, null, null, null, null, null);
+			return mMenuLoader;
+		}
+
+		@Override
+		public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
+			mMenuAdapter.swapCursor(cursor);
+			isMenuAdapterLoaded = true;
+		}
+
+		@Override
+		public void onLoaderReset(Loader<Cursor> cursorLoader) {
+			isMenuAdapterLoaded = false;
+			mMenuAdapter.swapCursor(null);
 		}
 	};
 
@@ -61,82 +89,58 @@ public class MenuFragment extends BaseFragment {
 	}
 
 	@Override
-	protected void onShown() { }
+	protected void onShown() {
+		getLoaderManager().initLoader(1, null, mLoaderCallbacks);
+	}
 
 	public void refreshMenu() {
 		ApiInterface.getMenu(new GetMenuListener() {
 			@Override
 			public void onComplete(List<MenuItem> menu, int statusCode) {
-				if (menu != null) {
-					mMenuAdapter.setMenu(menu);
-				}
+				mMenuLoader.onContentChanged();
 			}
 		});
 	}
 
-	private static class MenuAdapter extends BaseAdapter {
+	private static class MenuAdapter extends CursorAdapter {
 		private final LayoutInflater mLayoutInflater;
-		private final Context mContext;
-		private final List<MenuItem> mMenu;
 
 		public MenuAdapter(Context context) {
-			mContext = context;
+			super(context, null, 0);
 			mLayoutInflater = LayoutInflater.from(context);
-			mMenu = new ArrayList<>();
 		}
 
 		@Override
-		public int getCount() {
-			return mMenu.size();
+		public int getViewTypeCount() {
+			return 1;
 		}
 
 		@Override
-		public Object getItem(int position) {
-			return getMenuItem(position);
-		}
-
-		public MenuItem getMenuItem(int position) {
-			return mMenu.get(position);
+		public int getItemViewType(int position) {
+			return 1;
 		}
 
 		@Override
-		public long getItemId(int position) {
-			return position;
+		public View newView(Context context, Cursor cursor, ViewGroup viewGroup) {
+			ViewHolder viewHolder = new ViewHolder();
+			View view = mLayoutInflater.inflate(R.layout.row_menu_item, viewGroup, false);
+			viewHolder.imageView = (MenuItemImageView)view.findViewById(R.id.img_menu_item);
+			view.setTag(viewHolder);
+			return view;
 		}
 
-		public void setMenu(List<MenuItem> menu) {
-			mMenu.clear();
-			mMenu.addAll(menu);
-			notifyDataSetChanged();
-		}
+		@Override
+		public void bindView(View view, Context context, Cursor c) {
+			ViewHolder holder = (ViewHolder)view.getTag();
 
-		public View getView(int position, View convertView, ViewGroup parent) {
-			final MenuItem item = mMenu.get(position);
-
-			if (convertView == null) {
-				ViewHolder viewHolder = new ViewHolder();
-
-				convertView = mLayoutInflater.inflate(R.layout.row_menu_item, parent, false);
-				viewHolder.imageView = (ImageView)convertView.findViewById(R.id.img_menu_item);
-
-				convertView.setTag(viewHolder);
-			}
-
-			ViewHolder holder = (ViewHolder)convertView.getTag();
-
-			try {
-				InputStream is = mContext.getAssets().open("menuimages/" + item.image);
-				Drawable d = Drawable.createFromStream(is, null);
-				holder.imageView.setImageDrawable(d);
-			} catch (Exception e) {
-				// We don't have this in the assets folder. Fetch remotely?
-			}
-
-			return convertView;
+			MenuItem menuItem = new MenuItem();
+			menuItem.imageName = c.getString(c.getColumnIndex(MenuItem.Columns.IMAGE));
+			menuItem.imageResourceId = c.getInt(c.getColumnIndex(MenuItem.Columns.IMAGE_RES_ID));
+			holder.imageView.setMenuItem(menuItem);
 		}
 
 		public static class ViewHolder {
-			public ImageView imageView;
+			public MenuItemImageView imageView;
 		}
 	}
 }

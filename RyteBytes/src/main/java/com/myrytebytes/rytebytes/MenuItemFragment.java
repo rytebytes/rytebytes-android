@@ -48,7 +48,7 @@ public class MenuItemFragment extends BaseFragment {
 		((TextView)rootView.findViewById(R.id.tv_description)).setText(mMenuItem.description);
 
 		try {
-			InputStream is = getApplicationContext().getAssets().open("menuimages/" + mMenuItem.image);
+			InputStream is = getApplicationContext().getAssets().open("menuimages/" + mMenuItem.imageName);
 			Drawable d = Drawable.createFromStream(is, null);
 			mImgMenuItem.setImageDrawable(d);
 		} catch (Exception e) {

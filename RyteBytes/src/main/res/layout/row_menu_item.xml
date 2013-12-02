@@ -3,12 +3,12 @@
 <RelativeLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
-        android:layout_height="200dp">
+        android:layout_height="wrap_content" >
 
-    <ImageView
+    <com.myrytebytes.widget.MenuItemImageView
             android:id="@+id/img_menu_item"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             />
 
 </RelativeLayout>
