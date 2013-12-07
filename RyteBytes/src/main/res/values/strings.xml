@@ -21,4 +21,11 @@
     <string name="create_account">Create Account</string>
     <string name="forgot_password">Forgot Password</string>
 
+    <!-- MenuItem Fragment -->
+    <string name="how_many">How many would you like?</string>
+    <string name="calories">Calories: </string>
+    <string name="carbs">Carbs: </string>
+    <string name="protein">Protein: </string>
+    <string name="sodium">Sodium: </string>
+
 </resources>
