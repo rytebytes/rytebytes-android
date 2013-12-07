@@ -16,12 +16,16 @@ public abstract class BaseFragment extends Fragment {
 	public enum ContentType {
 		MENU(false, false),
 		MENU_ITEM(false, false),
+		DO_RYTE(false, false),
+		HEATING(false, false),
+		ACCOUNT(true, false),
 		LOGIN(false, true);
 
 		boolean isModal;
 		boolean requiresLogin;
 
 		private ContentType(boolean requiresLogin, boolean isModal) {
+			this.requiresLogin = requiresLogin;
 			this.isModal = isModal;
 		}
 	}

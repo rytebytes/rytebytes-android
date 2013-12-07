@@ -384,6 +384,12 @@ public class MainActivity extends ActionBarActivity implements ActivityCallbacks
 				return new MenuFragment();
 			case MENU_ITEM:
 				return new MenuItemFragment();
+			case ACCOUNT:
+				return new AccountFragment();
+			case DO_RYTE:
+				return new DoRyteFragment();
+			case HEATING:
+				return new HeatingFragment();
 			default:
 				return null;
 		}
@@ -452,10 +458,10 @@ public class MainActivity extends ActionBarActivity implements ActivityCallbacks
 				NavigationDrawerItem.headerItem(R.string.order),
 				NavigationDrawerItem.menuItem(R.string.eat_ryte, 0, ContentType.MENU),
 				NavigationDrawerItem.headerItem(R.string.account),
-//				NavigationDrawerItem.menuItem(R.string.my_account, 0, ContentType.ACCOUNT),
+				NavigationDrawerItem.menuItem(R.string.my_account, 0, ContentType.ACCOUNT),
 				NavigationDrawerItem.headerItem(R.string.about),
-//				NavigationDrawerItem.menuItem(R.string.heating, 0, ContentType.HEATING),
-//				NavigationDrawerItem.menuItem(R.string.do_ryte, 0, ContentType.DO_RYTE),
+				NavigationDrawerItem.menuItem(R.string.heating, 0, ContentType.HEATING),
+				NavigationDrawerItem.menuItem(R.string.do_ryte, 0, ContentType.DO_RYTE),
 		};
 
 		private final LayoutInflater mLayoutInflater;
@@ -516,6 +522,7 @@ public class MainActivity extends ActionBarActivity implements ActivityCallbacks
 				//TODO: temporary!
 				convertView = new TextView(mLayoutInflater.getContext());
 				viewHolder.textView = (TextView)convertView;
+				viewHolder.textView.setTextSize(24);
 
 				convertView.setTag(viewHolder);
 			}

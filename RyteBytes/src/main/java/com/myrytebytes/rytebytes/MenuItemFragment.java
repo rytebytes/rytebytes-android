@@ -1,26 +1,23 @@
 package com.myrytebytes.rytebytes;
 
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.myrytebytes.datamodel.MenuItem;
 import com.myrytebytes.datamodel.Order;
-
-import java.io.InputStream;
+import com.myrytebytes.widget.MenuItemImageView;
 
 public class MenuItemFragment extends BaseFragment {
 
 	public static final String EXTRA_MENU_ITEM = "menu_item";
 
 	private MenuItem mMenuItem;
-	private ImageView mImgMenuItem;
+	private MenuItemImageView mImgMenuItem;
 	private EditText mEtHowMany;
 	private Order mOrder;
 
@@ -66,7 +63,7 @@ public class MenuItemFragment extends BaseFragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View rootView = inflater.inflate(R.layout.fragment_menu_item, container, false);
-		mImgMenuItem = (ImageView)rootView.findViewById(R.id.img_menu_item);
+		mImgMenuItem = (MenuItemImageView)rootView.findViewById(R.id.img_menu_item);
 		((TextView)rootView.findViewById(R.id.tv_description)).setText(mMenuItem.description);
 
 		String caloriesString = mMenuItem.nutritionInfo.calories != null ? ""+mMenuItem.nutritionInfo.calories : "Unknown";
@@ -87,13 +84,7 @@ public class MenuItemFragment extends BaseFragment {
 		mEtHowMany = (EditText)rootView.findViewById(R.id.et_how_many);
 		mEtHowMany.setText(""+mOrder.getQuantity(mMenuItem));
 
-		try {
-			InputStream is = getApplicationContext().getAssets().open("menuimages/" + mMenuItem.imageName);
-			Drawable d = Drawable.createFromStream(is, null);
-			mImgMenuItem.setImageDrawable(d);
-		} catch (Exception e) {
-			// We don't have this in the assets folder. Fetch remotely?
-		}
+		mImgMenuItem.setMenuItem(mMenuItem);
 
 		return rootView;
 	}
