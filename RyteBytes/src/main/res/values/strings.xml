@@ -21,6 +21,9 @@
     <string name="create_account">Create Account</string>
     <string name="forgot_password">Forgot Password</string>
 
+    <!-- Menu Fragment -->
+    <string name="checkout">Checkout</string>
+
     <!-- MenuItem Fragment -->
     <string name="how_many">How many would you like?</string>
     <string name="calories">Calories: </string>

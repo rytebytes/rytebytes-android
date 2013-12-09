@@ -24,9 +24,12 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.myrytebytes.datamanagement.Log;
 import com.myrytebytes.datamanagement.LoginController;
 import com.myrytebytes.rytebytes.BaseFragment.ActivityCallbacks;
 import com.myrytebytes.rytebytes.BaseFragment.ContentType;
+import com.myrytebytes.widget.CheckoutActionItem;
+import com.myrytebytes.widget.CheckoutActionItem.CheckoutActionItemListener;
 
 public class MainActivity extends ActionBarActivity implements ActivityCallbacks {
 
@@ -36,10 +39,18 @@ public class MainActivity extends ActionBarActivity implements ActivityCallbacks
 	private DrawerLayout mDrawerLayout;
 	private ListView mDrawer;
 	private ActionBarDrawerToggle mDrawerToggle;
+	private CheckoutActionItem mCheckoutActionItem;
 	private boolean isDrawerOpen;
 	private InputMethodManager mInputMethodManager;
 	private PostLoginContainer mPostLoginContainer;
 	private boolean isLoggingIn;
+
+	private CheckoutActionItemListener mCheckoutActionItemListener = new CheckoutActionItemListener() {
+		@Override
+		public void onClick() {
+			Log.d("Checkout clicked");
+		}
+	};
 
 	private FragmentManager.OnBackStackChangedListener mOnBackStackChangedListener = new FragmentManager.OnBackStackChangedListener() {
 		@Override
@@ -131,6 +142,14 @@ public class MainActivity extends ActionBarActivity implements ActivityCallbacks
 	protected void onPostCreate(Bundle savedInstanceState) {
 		super.onPostCreate(savedInstanceState);
 		mDrawerToggle.syncState();
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		getMenuInflater().inflate(R.menu.checkout, menu);
+		mCheckoutActionItem = ((CheckoutActionItem)menu.findItem(R.id.btn_checkout).getActionView());
+		mCheckoutActionItem.setListener(mCheckoutActionItemListener);
+		return true;
 	}
 
 	@Override
@@ -250,6 +269,11 @@ public class MainActivity extends ActionBarActivity implements ActivityCallbacks
 				fragmentManager.executePendingTransactions();
 			}
 		}
+	}
+
+	@Override
+	public void updateCheckoutBadge() {
+		mCheckoutActionItem.updateBadge();
 	}
 
 	private void configureUIForModalFragment(BaseFragment fragment) {

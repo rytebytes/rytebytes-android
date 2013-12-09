@@ -61,8 +61,8 @@
             android:layout_below="@id/img_menu_item"
             android:layout_marginLeft="@dimen/activity_horizontal_margin"
             android:layout_marginRight="@dimen/activity_horizontal_margin"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
             android:textSize="18sp"
             />
 
@@ -77,6 +77,7 @@
             <com.myrytebytes.widget.CustomFontTextView
                     android:text="@string/calories"
                     android:textSize="18sp"
+                    android:paddingRight="3dp"
                     />
             <com.myrytebytes.widget.CustomFontTextView
                     android:id="@+id/tv_calories"
@@ -85,6 +86,7 @@
             <com.myrytebytes.widget.CustomFontTextView
                     android:text="@string/carbs"
                     android:textSize="18sp"
+                    android:paddingRight="3dp"
                     />
             <com.myrytebytes.widget.CustomFontTextView
                     android:id="@+id/tv_carbs"
@@ -96,6 +98,7 @@
             <com.myrytebytes.widget.CustomFontTextView
                     android:text="@string/protein"
                     android:textSize="18sp"
+                    android:paddingRight="3dp"
                     />
             <com.myrytebytes.widget.CustomFontTextView
                     android:id="@+id/tv_protein"
@@ -104,6 +107,7 @@
             <com.myrytebytes.widget.CustomFontTextView
                     android:text="@string/sodium"
                     android:textSize="18sp"
+                    android:paddingRight="3dp"
                     />
             <com.myrytebytes.widget.CustomFontTextView
                     android:id="@+id/tv_sodium"

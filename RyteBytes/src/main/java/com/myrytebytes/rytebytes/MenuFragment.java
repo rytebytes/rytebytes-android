@@ -27,7 +27,7 @@ public class MenuFragment extends BaseFragment {
 	private ListView mLvMenu;
 	private MenuAdapter mMenuAdapter;
 	private SQLiteCursorLoader mMenuLoader;
-	private boolean isMenuAdapterLoaded;
+	private boolean isRemoteMenuLoaded;
 
 	private OnItemClickListener mOnItemClickListener = new OnItemClickListener() {
 		@Override
@@ -51,12 +51,10 @@ public class MenuFragment extends BaseFragment {
 		@Override
 		public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
 			mMenuAdapter.swapCursor(cursor);
-			isMenuAdapterLoaded = true;
 		}
 
 		@Override
 		public void onLoaderReset(Loader<Cursor> cursorLoader) {
-			isMenuAdapterLoaded = false;
 			mMenuAdapter.swapCursor(null);
 		}
 	};
@@ -74,8 +72,9 @@ public class MenuFragment extends BaseFragment {
 	@Override
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
-		refreshMenu();
-//		createStripeCustomer();
+		if (!isRemoteMenuLoaded) {
+			refreshMenu();
+		}
 	}
 
 	@Override
@@ -97,6 +96,9 @@ public class MenuFragment extends BaseFragment {
 		ApiInterface.getMenu(new GetMenuListener() {
 			@Override
 			public void onComplete(List<MenuItem> menu, int statusCode) {
+				if (menu != null) {
+					isRemoteMenuLoaded = true;
+				}
 				mMenuLoader.onContentChanged();
 			}
 		});

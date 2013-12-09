@@ -43,19 +43,19 @@ public class Location implements JacksonParser {
 			@Override
 			public void onField(String tag, SafeJsonParser jsonParser) throws IOException {
 				switch (tag) {
-					case "Name":
+					case "name":
 						name = jsonParser.getStringValue();
 						break;
-					case "StreetAddress":
+					case "streetAddress":
 						streetAddress = jsonParser.getStringValue();
 						break;
-					case "City":
+					case "city":
 						city = jsonParser.getStringValue();
 						break;
-					case "State":
+					case "state":
 						state = jsonParser.getStringValue();
 						break;
-					case "Zipcode":
+					case "zipcode":
 						zipcode = jsonParser.getStringValue();
 						break;
 					case "objectId":

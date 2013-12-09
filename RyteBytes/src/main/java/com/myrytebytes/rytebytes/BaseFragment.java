@@ -40,6 +40,7 @@ public abstract class BaseFragment extends Fragment {
 		public void displayLoginFragment(boolean popIfUnsuccessful);
 		public boolean isLoginFragmentShowing();
 		public void loginWillFinish(boolean loggedIn);
+		public void updateCheckoutBadge();
 	}
 
 	private static final ActivityCallbacks DUMMY_CALLBACKS = new ActivityCallbacks() {
@@ -69,6 +70,9 @@ public abstract class BaseFragment extends Fragment {
 
 		@Override
 		public void loginWillFinish(boolean loggedIn) { }
+
+		@Override
+		public void updateCheckoutBadge() { }
 	};
 
 	public static boolean animationsDisabled;

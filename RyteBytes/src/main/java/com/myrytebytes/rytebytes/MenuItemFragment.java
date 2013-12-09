@@ -28,10 +28,12 @@ public class MenuItemFragment extends BaseFragment {
 				case R.id.btn_step_down:
 					mOrder.remove(mMenuItem);
 					mEtHowMany.setText(""+mOrder.getQuantity(mMenuItem));
+					mActivityCallbacks.updateCheckoutBadge();
 					break;
 				case R.id.btn_step_up:
 					mOrder.add(mMenuItem);
 					mEtHowMany.setText(""+mOrder.getQuantity(mMenuItem));
+					mActivityCallbacks.updateCheckoutBadge();
 					break;
 			}
 		}

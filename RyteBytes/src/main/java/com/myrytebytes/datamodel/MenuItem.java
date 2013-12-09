@@ -24,7 +24,7 @@ public class MenuItem extends DAObject implements JacksonParser, Parcelable {
 	public Integer imageResourceId;
 	public String description;
 	public Integer price;
-	public Integer uid;
+	public String objectId;
 
 	public MenuItem() { }
 
@@ -45,13 +45,13 @@ public class MenuItem extends DAObject implements JacksonParser, Parcelable {
 		if (o == null || !(o instanceof MenuItem)) {
 			return false;
 		} else {
-			return uid.equals(((MenuItem)o).uid);
+			return objectId.equals(((MenuItem)o).objectId);
 		}
 	}
 
 	@Override
 	public int hashCode() {
-		return uid.hashCode();
+		return objectId.hashCode();
 	}
 
 	public void fillFromCursor(Cursor c) {
@@ -61,7 +61,7 @@ public class MenuItem extends DAObject implements JacksonParser, Parcelable {
 		imageResourceId = getIntFromCursor(c, Columns.IMAGE_RES_ID);
 		description = getStringFromCursor(c, Columns.DESCRIPTION);
 		price = getIntFromCursor(c, Columns.PRICE);
-		uid = getIntFromCursor(c, Columns.UID);
+		objectId = getStringFromCursor(c, Columns.OBJECT_ID);
 
 		nutritionInfo = new NutritionInformation();
 		nutritionInfo.calories = getIntFromCursor(c, Columns.CALORIES);
@@ -79,7 +79,7 @@ public class MenuItem extends DAObject implements JacksonParser, Parcelable {
 		cv.put(Columns.IMAGE_RES_ID, imageResourceId);
 		cv.put(Columns.DESCRIPTION, description);
 		cv.put(Columns.PRICE, price);
-		cv.put(Columns.UID, uid);
+		cv.put(Columns.OBJECT_ID, objectId);
 		cv.put(Columns.CALORIES, nutritionInfo.calories);
 		cv.put(Columns.PROTEIN, nutritionInfo.protein);
 		cv.put(Columns.SATURATED_FAT, nutritionInfo.saturatedFat);
@@ -93,7 +93,7 @@ public class MenuItem extends DAObject implements JacksonParser, Parcelable {
 		JsonHandler.handleJson(jsonParser, new JsonHandlerListenerAdapter() {
 			@Override
 			public boolean onObject(String tag, SafeJsonParser jsonParser) throws IOException {
-				if (tag.equals("nutritionInfo")) {
+				if (tag.equals("nutritionInfoId")) {
 					nutritionInfo = new NutritionInformation(jsonParser, false);
 					return true;
 				} else {
@@ -113,26 +113,26 @@ public class MenuItem extends DAObject implements JacksonParser, Parcelable {
 					case "picture":
 						imageName = jsonParser.getStringValue();
 						break;
-					case "price":
+					case "cost":
 						price = jsonParser.getIntValue();
 						break;
-					case "uid":
-						uid = jsonParser.getIntValue();
+					case "objectId":
+						objectId = jsonParser.getStringValue();
 						break;
 				}
 			}
 		}, closeWhenComplete);
 	}
 
-	public void insertOrUpdateByUID(Context context) {
+	public void insertOrUpdateByObjectId(Context context) {
 		if (id != null) {
 			update(context);
 		} else {
 			SQLiteDatabase db = RyteBytesSQLiteOpenHelper.getInstance(context).getWritableDatabase();
 
 			MenuItem existingItem;
-			if (uid != null) {
-				Cursor c = db.query(Columns.TABLE_NAME, null, Columns.UID + "=?", new String[] { ""+uid }, null, null, null);
+			if (objectId != null) {
+				Cursor c = db.query(Columns.TABLE_NAME, null, Columns.OBJECT_ID + "=?", new String[] { ""+objectId}, null, null, null);
 				if (c.moveToFirst()) {
 					existingItem = new MenuItem(c);
 				} else {
@@ -177,7 +177,7 @@ public class MenuItem extends DAObject implements JacksonParser, Parcelable {
 		public static final String IMAGE_RES_ID = "image_res_id";
 		public static final String DESCRIPTION = "description";
 		public static final String PRICE = "price";
-		public static final String UID = "uid";
+		public static final String OBJECT_ID = "object_id";
 		public static final String CALORIES = "calories";
 		public static final String PROTEIN = "protein";
 		public static final String SATURATED_FAT = "saturated_fat";
@@ -192,7 +192,7 @@ public class MenuItem extends DAObject implements JacksonParser, Parcelable {
 					IMAGE_RES_ID + " INTEGER," +
 					DESCRIPTION + " TEXT," +
 					PRICE + " INTEGER," +
-					UID + " INTEGER," +
+					OBJECT_ID + " TEXT," +
 					CALORIES + " INTEGER," +
 					PROTEIN + " INTEGER," +
 					SATURATED_FAT + " INTEGER," +

@@ -7,7 +7,6 @@ import com.android.volley.Request.Method;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.myrytebytes.datamanagement.Log;
 import com.myrytebytes.datamanagement.LoginController;
 import com.myrytebytes.datamodel.Location;
 import com.myrytebytes.datamodel.MenuItem;
@@ -48,7 +47,7 @@ public class ApiInterface {
 			@Override
 			public Response<List<MenuItem>> onParseResponseComplete(Response<List<MenuItem>> response) {
 				for (MenuItem menuItem : response.result) {
-					menuItem.insertOrUpdateByUID(context);
+					menuItem.insertOrUpdateByObjectId(context);
 				}
 				return response;
 			}
@@ -74,7 +73,7 @@ public class ApiInterface {
 		parseUser.setEmail(customer.email);
 		parseUser.setUsername(customer.email);
 		parseUser.setPassword(password);
-		parseUser.add("StripeId", customer.id);
+		parseUser.add("stripeId", customer.id);
 		parseUser.signUpInBackground(new SignUpCallback() {
 			@Override
 			public void done(ParseException e) {
