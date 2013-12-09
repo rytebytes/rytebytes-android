@@ -63,4 +63,34 @@ public class Order {
 			}
 		}
 	}
+
+	public String toJson() {
+		StringBuilder sb = new StringBuilder("[");
+		sb.append("[");
+		for (MenuItem menuItem : mOrderItemMap.keySet()) {
+			sb.append("{menuItem:");
+			sb.append(menuItem.toString());
+			sb.append(",quantity:");
+			sb.append(mOrderItemMap.get(menuItem));
+			sb.append("}");
+		}
+		sb.append("]");
+
+		return sb.toString();
+	}
+
+//	private static class OrderItem {
+//		public MenuItem menuItem;
+//		public int quantity;
+//
+//		private OrderItem(MenuItem menuItem, int quantity) {
+//			this.menuItem = menuItem;
+//			this.quantity = quantity;
+//		}
+//
+//		@Override
+//		public String toString() {
+//			return "{menuItem:" + menuItem + ", quantity:" + quantity + '}';
+//		}
+//	}
 }

@@ -7,8 +7,8 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.myrytebytes.datamanagement.Log;
 import com.myrytebytes.datamodel.Order;
+import com.myrytebytes.remote.ApiInterface;
 
 public class CheckoutFragment extends BaseFragment {
 
@@ -21,7 +21,8 @@ public class CheckoutFragment extends BaseFragment {
 		public void onClick(View v) {
 			switch (v.getId()) {
 				case R.id.btn_place_order:
-					Log.d("place order called");
+					//TODO: add locationID
+					ApiInterface.placeOrder(mOrder, "");
 					break;
 			}
 		}

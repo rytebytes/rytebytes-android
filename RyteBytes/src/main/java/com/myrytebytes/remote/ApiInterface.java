@@ -7,15 +7,18 @@ import com.android.volley.Request.Method;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.myrytebytes.datamanagement.Log;
 import com.myrytebytes.datamanagement.LoginController;
 import com.myrytebytes.datamodel.Location;
 import com.myrytebytes.datamodel.MenuItem;
+import com.myrytebytes.datamodel.Order;
 import com.myrytebytes.datamodel.StripeCustomer;
 import com.myrytebytes.remote.ApiListener.CreateAccountListener;
 import com.myrytebytes.remote.ApiListener.GetLocationsListener;
 import com.myrytebytes.remote.ApiListener.GetMenuListener;
 import com.myrytebytes.remote.ApiListener.LoginListener;
 import com.myrytebytes.remote.JsonRequest.JsonRequestListener;
+import com.myrytebytes.remote.JsonRequest.RequestSerialization;
 import com.parse.LogInCallback;
 import com.parse.ParseException;
 import com.parse.ParseUser;
@@ -93,6 +96,21 @@ public class ApiInterface {
 		});
 	}
 
+	public static void placeOrder(Order order, String locationId) {
+		Map<String, String> params = new HashMap<>();
+		params.put("locationId", locationId);
+		params.put("totalInCents", ""+order.getTotalPrice());
+		params.put("userId", "tmp");//TODO: put this back: LoginController.getSessionUser().getObjectId());
+		params.put("orderItems", order.toJson());
+
+		requestQueue.add(new RyteBytesRequest<>(35000, Method.POST, "order", params, null, String.class, RequestSerialization.JSON, new JsonRequestListener<String>() {
+			@Override
+			public void onResponse(String response, int statusCode, VolleyError error) {
+				Log.d("response = " + response + "; sc = " + statusCode);
+			}
+		}));
+	}
+
 	private static class RyteBytesRequest<T> extends JsonRequest<T> {
 		public RyteBytesRequest(int method, String endpoint, Map<String, String> params, String returnTag, Class returnType, JsonRequestListener<T> listener) {
 			super(method, HOST_BASE_URL, endpoint, params, returnTag, returnType, listener);
@@ -100,6 +118,10 @@ public class ApiInterface {
 
 		public RyteBytesRequest(int timeout, int method, String endpoint, Map<String, String> params, String returnTag, Class returnType, JsonRequestListener<T> listener) {
 			super(timeout, method, HOST_BASE_URL, endpoint, params, returnTag, returnType, listener);
+		}
+
+		public RyteBytesRequest(int timeout, int method, String endpoint, Map<String, String> params, String returnTag, Class returnType, RequestSerialization requestSerialization, JsonRequestListener<T> listener) {
+			super(timeout, method, HOST_BASE_URL, endpoint, params, returnTag, returnType, requestSerialization, listener);
 		}
 
 		public RyteBytesRequest(int method, String endpoint, Map<String, String> params, String returnTag, Class returnType, JsonRequestListener<T> listener, Object tag) {

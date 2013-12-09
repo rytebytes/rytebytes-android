@@ -41,6 +41,17 @@ public class MenuItem extends DAObject implements JacksonParser, Parcelable {
 	}
 
 	@Override
+	public String toString() {
+		return "{" +
+				"name:\"" + name + '\"' +
+				",imageName:\"" + imageName + '\"' +
+				",description:\"" + description + '\"' +
+				",price:" + price +
+				",objectId:\"" + objectId + '\"' +
+				'}';
+	}
+
+	@Override
 	public boolean equals(Object o) {
 		if (o == null || !(o instanceof MenuItem)) {
 			return false;
