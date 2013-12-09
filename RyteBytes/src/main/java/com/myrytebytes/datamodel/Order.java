@@ -1,16 +1,16 @@
 package com.myrytebytes.datamodel;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Order {
 
-	private List<OrderItem> mOrderItems;
+	private Map<MenuItem, Integer> mOrderItemMap;
 
 	private static Order sharedOrder;
 
 	public Order() {
-		mOrderItems = new ArrayList<>();
+		mOrderItemMap = new HashMap<>();
 	}
 
 	public static Order getSharedOrder() {
@@ -21,57 +21,37 @@ public class Order {
 	}
 
 	public void clear() {
-		mOrderItems.clear();
+		mOrderItemMap.clear();
 	}
 
 	public int getQuantity(MenuItem menuItem) {
-		for (OrderItem orderItem : mOrderItems) {
-			if (orderItem.menuItem.uid.equals(menuItem.uid)) {
-				return orderItem.quantity;
-			}
-		}
-
-		return 0;
+		Integer quantity = mOrderItemMap.get(menuItem);
+		return quantity != null ? quantity : 0;
 	}
 
 	public int getItemTotal() {
 		int total = 0;
-		for (OrderItem orderItem : mOrderItems) {
-			total += orderItem.quantity;
+		for (Integer itemTotal : mOrderItemMap.values()) {
+			total += itemTotal;
 		}
 		return total;
 	}
 
 	public int getUniqueItemTotal() {
-		return mOrderItems.size();
+		return mOrderItemMap.size();
 	}
 
 	public void add(MenuItem menuItem) {
-		boolean added = false;
-		for (OrderItem orderItem : mOrderItems) {
-			if (orderItem.menuItem.uid.equals(menuItem.uid)) {
-				orderItem.quantity++;
-				added = true;
-				break;
-			}
-		}
-
-		if (!added) {
-			mOrderItems.add(new OrderItem(menuItem, 1));
-		}
+		mOrderItemMap.put(menuItem, getQuantity(menuItem) + 1);
 	}
 
 	public void remove(MenuItem menuItem) {
-		for (int i = mOrderItems.size() - 1; i >= 0; i--) {
-			OrderItem orderItem = mOrderItems.get(i);
-
-			if (orderItem.menuItem.uid.equals(menuItem.uid)) {
-				orderItem.quantity--;
-
-				if (orderItem.quantity == 0) {
-					mOrderItems.remove(i);
-				}
-				break;
+		if (mOrderItemMap.containsKey(menuItem)) {
+			int newQuantity = getQuantity(menuItem) - 1;
+			if (newQuantity <= 0) {
+				mOrderItemMap.remove(menuItem);
+			} else {
+				mOrderItemMap.put(menuItem, newQuantity);
 			}
 		}
 	}

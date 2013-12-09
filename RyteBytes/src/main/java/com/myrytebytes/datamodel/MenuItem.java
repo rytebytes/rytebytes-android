@@ -40,6 +40,20 @@ public class MenuItem extends DAObject implements JacksonParser, Parcelable {
 		}
 	}
 
+	@Override
+	public boolean equals(Object o) {
+		if (o == null || !(o instanceof MenuItem)) {
+			return false;
+		} else {
+			return uid.equals(((MenuItem)o).uid);
+		}
+	}
+
+	@Override
+	public int hashCode() {
+		return uid.hashCode();
+	}
+
 	public void fillFromCursor(Cursor c) {
 		id = c.getLong(c.getColumnIndex(Columns._ID));
 		name = getStringFromCursor(c, Columns.NAME);

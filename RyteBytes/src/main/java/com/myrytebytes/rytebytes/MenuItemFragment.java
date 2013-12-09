@@ -27,7 +27,7 @@ public class MenuItemFragment extends BaseFragment {
 			switch (v.getId()) {
 				case R.id.btn_step_down:
 					mOrder.remove(mMenuItem);
-					mEtHowMany.setText(""+mOrder.getQuantity(mMenuItem));mOrder.remove(mMenuItem);
+					mEtHowMany.setText(""+mOrder.getQuantity(mMenuItem));
 					break;
 				case R.id.btn_step_up:
 					mOrder.add(mMenuItem);
