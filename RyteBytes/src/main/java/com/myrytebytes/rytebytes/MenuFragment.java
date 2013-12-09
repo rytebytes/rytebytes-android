@@ -84,7 +84,7 @@ public class MenuFragment extends BaseFragment {
 
 	@Override
 	protected int getTitle() {
-		return R.string.app_name;
+		return R.string.menu;
 	}
 
 	@Override

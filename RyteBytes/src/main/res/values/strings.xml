@@ -23,6 +23,7 @@
 
     <!-- Menu Fragment -->
     <string name="checkout">Checkout</string>
+    <string name="menu">Menu</string>
 
     <!-- MenuItem Fragment -->
     <string name="how_many">How many would you like?</string>
@@ -30,5 +31,8 @@
     <string name="carbs">Carbs: </string>
     <string name="protein">Protein: </string>
     <string name="sodium">Sodium: </string>
+
+    <!-- Checkout Fragment -->
+    <string name="place_order">Place Order</string>
 
 </resources>

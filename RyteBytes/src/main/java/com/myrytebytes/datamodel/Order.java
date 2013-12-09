@@ -41,6 +41,14 @@ public class Order {
 		return mOrderItemMap.size();
 	}
 
+	public int getTotalPrice() {
+		int total = 0;
+		for (MenuItem menuItem : mOrderItemMap.keySet()) {
+			total += menuItem.price * mOrderItemMap.get(menuItem);
+		}
+		return total;
+	}
+
 	public void add(MenuItem menuItem) {
 		mOrderItemMap.put(menuItem, getQuantity(menuItem) + 1);
 	}

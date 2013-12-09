@@ -16,6 +16,7 @@ public abstract class BaseFragment extends Fragment {
 	public enum ContentType {
 		MENU(false, false),
 		MENU_ITEM(false, false),
+		CHECKOUT(false, false),
 		DO_RYTE(false, false),
 		HEATING(false, false),
 		ACCOUNT(true, false),

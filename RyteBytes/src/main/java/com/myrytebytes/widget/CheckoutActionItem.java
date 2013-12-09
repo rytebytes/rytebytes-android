@@ -3,7 +3,7 @@ package com.myrytebytes.widget;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Canvas;
-import android.graphics.Color;
+import android.graphics.Paint.Align;
 import android.graphics.Rect;
 import android.text.TextPaint;
 import android.util.AttributeSet;
@@ -25,9 +25,11 @@ public class CheckoutActionItem extends ImageView {
 	private CheckoutActionItemListener mListener;
 	private String mItemCountString;
 
-	private final int size;
+	private final int mSize;
 	private final Order mOrder;
 	private final TextPaint mTextPaint;
+	private final int mTextX;
+	private final int mTextY;
 
 	private OnClickListener mOnClickListener = new OnClickListener() {
 		@Override
@@ -48,14 +50,14 @@ public class CheckoutActionItem extends ImageView {
 			getLocationOnScreen(screenPos);
 			getWindowVisibleDisplayFrame(displayFrame);
 
-			final int centerY = screenPos[1] + size / 2;
+			final int centerY = screenPos[1] + mSize / 2;
 			final int screenWidth = context.getResources().getDisplayMetrics().widthPixels;
 
 			Toast toast = Toast.makeText(context, "Checkout", Toast.LENGTH_SHORT);
 			if (centerY < displayFrame.height()) {
-				toast.setGravity(Gravity.TOP | Gravity.RIGHT, screenWidth - screenPos[0] - size / 2, size);
+				toast.setGravity(Gravity.TOP | Gravity.RIGHT, screenWidth - screenPos[0] - mSize / 2, mSize);
 			} else {
-				toast.setGravity(Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL, 0, size);
+				toast.setGravity(Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL, 0, mSize);
 			}
 			toast.show();
 
@@ -74,14 +76,19 @@ public class CheckoutActionItem extends ImageView {
     public CheckoutActionItem(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
 
-		Resources res = context.getResources();
+		setImageResource(R.drawable.ic_checkout);
 
+		Resources res = context.getResources();
+		final float density = res.getDisplayMetrics().density;
 		mOrder = Order.getSharedOrder();
-		size = res.getDimensionPixelSize(R.dimen.abc_action_bar_default_height);
+		mSize = res.getDimensionPixelSize(R.dimen.abc_action_bar_default_height);
+		mTextX = mSize / 2 - (int)(2 * density);
+		mTextY = mSize / 2 + (int)(2 * density);
 		mTextPaint = new TextPaint();
-		mTextPaint.setTextSize((int)(20 * res.getDisplayMetrics().density));
-		mTextPaint.setColor(Color.WHITE);
-		mTextPaint.setTypeface(FontManager.getTypeFace(context, FontManager.DEFAULT_FONT));
+		mTextPaint.setTextSize((int)(20 * density));
+		mTextPaint.setColor(0xFFFBBF2E);
+		mTextPaint.setTypeface(FontManager.getTypeFace(context, FontManager.DEFAULT_FONT_BOLD));
+		mTextPaint.setTextAlign(Align.CENTER);
 
 		setClickable(true);
 		setLongClickable(true);
@@ -93,12 +100,7 @@ public class CheckoutActionItem extends ImageView {
     }
 
     public void updateBadge() {
-		int itemTotal = mOrder.getItemTotal();
-		if (itemTotal == 0) {
-			mItemCountString = null;
-		} else {
-			mItemCountString = ""+itemTotal;
-		}
+		mItemCountString = ""+mOrder.getItemTotal();
         invalidate();
     }
 
@@ -108,7 +110,7 @@ public class CheckoutActionItem extends ImageView {
 
 	@Override
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-		setMeasuredDimension(size, size);
+		setMeasuredDimension(mSize, mSize);
 	}
 
 	@Override
@@ -116,7 +118,7 @@ public class CheckoutActionItem extends ImageView {
 		super.onDraw(canvas);
 
 		if (mItemCountString != null) {
-			canvas.drawText(mItemCountString, 0, size, mTextPaint);
+			canvas.drawText(mItemCountString, mTextX, mTextY, mTextPaint);
 		}
 	}
 }

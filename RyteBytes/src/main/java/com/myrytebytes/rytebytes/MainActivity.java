@@ -48,7 +48,7 @@ public class MainActivity extends ActionBarActivity implements ActivityCallbacks
 	private CheckoutActionItemListener mCheckoutActionItemListener = new CheckoutActionItemListener() {
 		@Override
 		public void onClick() {
-			Log.d("Checkout clicked");
+			pushFragment(CheckoutFragment.newInstance(), ContentType.CHECKOUT);
 		}
 	};
 
@@ -414,6 +414,8 @@ public class MainActivity extends ActionBarActivity implements ActivityCallbacks
 				return new DoRyteFragment();
 			case HEATING:
 				return new HeatingFragment();
+			case CHECKOUT:
+				return new CheckoutFragment();
 			default:
 				return null;
 		}
