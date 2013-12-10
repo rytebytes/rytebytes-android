@@ -26,12 +26,12 @@ public class MenuItemFragment extends BaseFragment {
 		public void onClick(View v) {
 			switch (v.getId()) {
 				case R.id.btn_step_down:
-					mOrder.remove(mMenuItem);
+					mOrder.decrementQuantity(mMenuItem);
 					mEtHowMany.setText(""+mOrder.getQuantity(mMenuItem));
 					mActivityCallbacks.updateCheckoutBadge();
 					break;
 				case R.id.btn_step_up:
-					mOrder.add(mMenuItem);
+					mOrder.incrementQuantity(mMenuItem);
 					mEtHowMany.setText(""+mOrder.getQuantity(mMenuItem));
 					mActivityCallbacks.updateCheckoutBadge();
 					break;
