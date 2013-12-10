@@ -31,4 +31,11 @@
             android:gravity="center_horizontal"
             />
 
+    <ListView
+            android:id="@+id/lv_checkout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@id/tv_order_total"
+            />
+
 </RelativeLayout>

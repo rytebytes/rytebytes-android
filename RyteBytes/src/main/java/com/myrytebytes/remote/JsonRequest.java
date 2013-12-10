@@ -14,8 +14,6 @@ import com.myrytebytes.datamanagement.Log;
 import com.myrytebytes.datamodel.JacksonParser;
 import com.myrytebytes.remote.JsonHandler.JsonHandlerListenerAdapter;
 
-import org.json.JSONObject;
-
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -25,35 +23,34 @@ import java.util.Map;
 
 public class JsonRequest<T> extends Request<T> {
 
-	public enum RequestSerialization {
-		DEFAULT,
-		JSON
-	}
-
 	private static final int DEFAULT_TIMEOUT = 30000; // 30 seconds
 	public static final JsonFactory JSON_FACTORY = new JsonFactory();
 
-	private Map<String, String> mParams;
+	private Map<String, String> mParamMap;
+	private byte[] mBody;
 	private final JsonRequestListener<T> mListener;
 	private int mStatusCode;
 	private Class mReturnType;
 	private String mReturnTag;
 	private T mResponseObject;
-	private RequestSerialization mRequestSerialization;
 
 	public JsonRequest(int method, String baseUrl, String endpoint, Map<String, String> params, String returnTag, Class returnType, JsonRequestListener<T> listener) {
 		this(DEFAULT_TIMEOUT, method, baseUrl, endpoint, params, returnTag, returnType, listener);
 	}
 
 	public JsonRequest(int timeout, int method, String baseUrl, String endpoint, Map<String, String> params, String returnTag, Class returnType, JsonRequestListener<T> listener) {
-		this(timeout, method, getUrl(method, baseUrl, endpoint, params), params, returnTag, returnType, RequestSerialization.DEFAULT, listener);
+		this(timeout, method, getUrl(method, baseUrl, endpoint, params), params, null, returnTag, returnType, listener);
 	}
 
-	public JsonRequest(int timeout, int method, String baseUrl, String endpoint, Map<String, String> params, String returnTag, Class returnType, RequestSerialization requestSerialization, JsonRequestListener<T> listener) {
-		this(timeout, method, getUrl(method, baseUrl, endpoint, params), params, returnTag, returnType, requestSerialization, listener);
+	public JsonRequest(int method, String baseUrl, String endpoint, byte[] body, String returnTag, Class returnType, JsonRequestListener<T> listener) {
+		this(DEFAULT_TIMEOUT, method, baseUrl, endpoint, body, returnTag, returnType, listener);
 	}
 
-	public JsonRequest(int timeout, int method, String url, Map<String, String> params, String returnTag, Class returnType, RequestSerialization requestSerialization, JsonRequestListener<T> listener) {
+	public JsonRequest(int timeout, int method, String baseUrl, String endpoint, byte[] body, String returnTag, Class returnType, JsonRequestListener<T> listener) {
+		this(timeout, method, getUrl(method, baseUrl, endpoint, null), new HashMap<String, String>(), body, returnTag, returnType, listener);
+	}
+
+	public JsonRequest(int timeout, int method, String url, Map<String, String> params, byte[] body, String returnTag, Class returnType, JsonRequestListener<T> listener) {
 		super(method, url, null);
 
 		setShouldCache(false);
@@ -65,10 +62,9 @@ public class JsonRequest<T> extends Request<T> {
 		setRetryPolicy(new DefaultRetryPolicy(timeout, 1, 1));
 
 		if (method == Method.POST || method == Method.PUT) {
-			mParams = params;
+			mParamMap = params;
+			mBody = body;
 		}
-
-		mRequestSerialization = requestSerialization != null ? requestSerialization : RequestSerialization.DEFAULT;
 	}
 
 	private static String getUrl(int method, String baseUrl, String endpoint, Map<String, String> params) {
@@ -105,16 +101,10 @@ public class JsonRequest<T> extends Request<T> {
 
 	@Override
 	public byte[] getBody() throws AuthFailureError {
-		if (mRequestSerialization == RequestSerialization.DEFAULT) {
-			return super.getBody();
+		if (mBody != null) {
+			return mBody;
 		} else {
-			try {
-				Log.d("body = " + new JSONObject(mParams).toString());
-				return new JSONObject(mParams).toString().getBytes("UTF-8");
-			} catch (Exception e) {
-				Log.e(e);
-				return super.getBody();
-			}
+			return super.getBody();
 		}
 	}
 
@@ -241,8 +231,8 @@ public class JsonRequest<T> extends Request<T> {
 	}
 
 	@Override
-	public Map<String, String> getParams() {
-		return mParams;
+	public Map<String, String> getParamMap() {
+		return mParamMap;
 	}
 
 	public static abstract class JsonRequestListener<T> {

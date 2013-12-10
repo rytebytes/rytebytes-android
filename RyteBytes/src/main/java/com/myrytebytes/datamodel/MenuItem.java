@@ -8,6 +8,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.provider.BaseColumns;
 
+import com.fasterxml.jackson.core.JsonGenerator;
 import com.myrytebytes.datamanagement.Log;
 import com.myrytebytes.remote.JsonHandler;
 import com.myrytebytes.remote.JsonHandler.JsonHandlerListenerAdapter;
@@ -41,17 +42,6 @@ public class MenuItem extends DAObject implements JacksonParser, Parcelable {
 	}
 
 	@Override
-	public String toString() {
-		return "{" +
-				"name:\"" + name + '\"' +
-				",imageName:\"" + imageName + '\"' +
-				",description:\"" + description + '\"' +
-				",price:" + price +
-				",objectId:\"" + objectId + '\"' +
-				'}';
-	}
-
-	@Override
 	public boolean equals(Object o) {
 		if (o == null || !(o instanceof MenuItem)) {
 			return false;
@@ -63,6 +53,19 @@ public class MenuItem extends DAObject implements JacksonParser, Parcelable {
 	@Override
 	public int hashCode() {
 		return objectId.hashCode();
+	}
+
+	public void writeJson(JsonGenerator generator) {
+		try {
+			generator.writeStringField("name", name);
+			generator.writeStringField("picture", imageName);
+			generator.writeStringField("longDescription", description);
+			generator.writeStringField("objectId", objectId);
+			generator.writeNumberField("costInCents", price);
+			generator.writeEndObject();
+		} catch (Exception e) {
+			Log.e(e);
+		}
 	}
 
 	public void fillFromCursor(Cursor c) {
@@ -124,7 +127,7 @@ public class MenuItem extends DAObject implements JacksonParser, Parcelable {
 					case "picture":
 						imageName = jsonParser.getStringValue();
 						break;
-					case "cost":
+					case "costInCents":
 						price = jsonParser.getIntValue();
 						break;
 					case "objectId":

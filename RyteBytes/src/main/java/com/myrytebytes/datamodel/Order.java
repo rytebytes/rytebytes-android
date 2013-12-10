@@ -1,5 +1,8 @@
 package com.myrytebytes.datamodel;
 
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.myrytebytes.datamanagement.Log;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -64,19 +67,20 @@ public class Order {
 		}
 	}
 
-	public String toJson() {
-		StringBuilder sb = new StringBuilder("[");
-		sb.append("[");
-		for (MenuItem menuItem : mOrderItemMap.keySet()) {
-			sb.append("{menuItem:");
-			sb.append(menuItem.toString());
-			sb.append(",quantity:");
-			sb.append(mOrderItemMap.get(menuItem));
-			sb.append("}");
+	public void writeJson(JsonGenerator generator) {
+		try {
+//			generator.writeStartArray();
+			for (MenuItem menuItem : mOrderItemMap.keySet()) {
+				generator.writeStartObject();
+				generator.writeObjectFieldStart("menuItem");
+				menuItem.writeJson(generator);
+				generator.writeNumberField("quantity", mOrderItemMap.get(menuItem));
+				generator.writeEndObject();
+			}
+			generator.writeEndArray();
+		} catch (Exception e) {
+			Log.e(e);
 		}
-		sb.append("]");
-
-		return sb.toString();
 	}
 
 //	private static class OrderItem {
