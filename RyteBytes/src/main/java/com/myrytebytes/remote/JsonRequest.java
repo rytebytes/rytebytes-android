@@ -231,7 +231,7 @@ public class JsonRequest<T> extends Request<T> {
 	}
 
 	@Override
-	public Map<String, String> getParamMap() {
+	public Map<String, String> getParams() {
 		return mParamMap;
 	}
 
