@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<com.myrytebytes.widget.CustomFontTextView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@android:id/text1"
+    android:layout_width="match_parent"
+    android:layout_height="48dp"
+    android:singleLine="true"
+    android:ellipsize="marquee"
+    android:paddingLeft="8dp"
+    android:paddingRight="8dp"
+    android:textColor="#FF111111"
+    android:textSize="18dp"
+    android:background="#AAEEEEEE"
+    android:gravity="center_vertical|left"
+    />

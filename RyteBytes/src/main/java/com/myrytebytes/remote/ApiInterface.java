@@ -21,6 +21,7 @@ import com.myrytebytes.remote.ApiListener.LoginListener;
 import com.myrytebytes.remote.JsonRequest.JsonRequestListener;
 import com.parse.LogInCallback;
 import com.parse.ParseException;
+import com.parse.ParseObject;
 import com.parse.ParseUser;
 import com.parse.SignUpCallback;
 
@@ -72,12 +73,13 @@ public class ApiInterface {
 		}));
 	}
 
-	public static void createUser(StripeCustomer customer, String password, final CreateAccountListener listener) {
+	public static void createUser(StripeCustomer customer, Location location, String password, final CreateAccountListener listener) {
 		ParseUser parseUser = new ParseUser();
 		parseUser.setEmail(customer.email);
 		parseUser.setUsername(customer.email);
 		parseUser.setPassword(password);
-		parseUser.add("stripeId", customer.id);
+		parseUser.put("stripeId", customer.id);
+        parseUser.put("locationId", ParseObject.createWithoutData("Location", location.objectId));
 		parseUser.signUpInBackground(new SignUpCallback() {
 			@Override
 			public void done(ParseException e) {

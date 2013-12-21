@@ -20,17 +20,17 @@ public class StripeInterface {
 
 	private static RequestQueue requestQueue;
 
-	public static void createCustomer(String email, String cardNumber, int expMonth, int expYear, int cvc, Context context, final CreateStripeAccountListener listener) {
+	public static void createCustomer(String email, String cardHolderName, String cardNumber, String expMonth, String expYear, Context context, final CreateStripeAccountListener listener) {
 		if (requestQueue == null) {
 			requestQueue = JsonNetwork.newRequestQueue(context, new OkHttpStack());
 		}
 
 		Map<String, String> customerMap = new HashMap<>();
 		customerMap.put("email", email);
+        customerMap.put("card[name]", cardHolderName);
 		customerMap.put("card[number]", cardNumber);
-		customerMap.put("card[exp_month]", ""+expMonth);
-		customerMap.put("card[exp_year]", ""+expYear);
-		customerMap.put("card[cvc]", ""+cvc);
+		customerMap.put("card[exp_month]", expMonth);
+		customerMap.put("card[exp_year]", expYear);
 
 		requestQueue.add(new StripeRequest<>(Method.POST, "v1/customers", customerMap, null, StripeCustomer.class, new JsonRequestListener<StripeCustomer>() {
 			@Override
