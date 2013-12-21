@@ -1,10 +1,3 @@
-/*
- * CreditCardEntryLayout.java
- * SpotHero
- *
- * Created by erickuck on 7/8/2013.
- */
-
 package com.myrytebytes.widget;
 
 import android.content.Context;
@@ -295,7 +288,7 @@ public class CreditCardEntryLayout extends ViewGroup {
 	}
 
 	private class CardEntryListener {
-		public void onNumberDigitEntered(CardType cardType, boolean newType, boolean complete) {
+		public void onNumberDigitEntered(boolean newType, boolean complete) {
 			if (complete) {
 				boolean valid = validateCardNumber(mEtCardNumber.getText().toString().replaceAll(" ", ""));
 				if (!valid) {
@@ -459,7 +452,7 @@ public class CreditCardEntryLayout extends ViewGroup {
 
 			mEtCardNumber.addTextChangedListener(this);
 
-			mCallback.onNumberDigitEntered(mCardType, isNewCardType, digitCount == mCardType.numberLength);
+			mCallback.onNumberDigitEntered(isNewCardType, digitCount == mCardType.numberLength);
 		}
 
 		private CardType getCardType(Editable s) {
