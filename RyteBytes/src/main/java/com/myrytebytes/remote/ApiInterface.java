@@ -8,6 +8,7 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.fasterxml.jackson.core.JsonGenerator;
+import com.myrytebytes.datamanagement.EncryptedStore;
 import com.myrytebytes.datamanagement.Log;
 import com.myrytebytes.datamanagement.LoginController;
 import com.myrytebytes.datamodel.Location;
@@ -73,27 +74,33 @@ public class ApiInterface {
 		}));
 	}
 
-	public static void createUser(StripeCustomer customer, Location location, String password, final CreateAccountListener listener) {
-		ParseUser parseUser = new ParseUser();
-		parseUser.setEmail(customer.email);
-		parseUser.setUsername(customer.email);
+	public static void createUser(StripeCustomer customer, Location location, final String password, final CreateAccountListener listener) {
+		final String email = customer.email;
+
+        ParseUser parseUser = new ParseUser();
+		parseUser.setEmail(email);
+		parseUser.setUsername(email);
 		parseUser.setPassword(password);
 		parseUser.put("stripeId", customer.id);
         parseUser.put("locationId", ParseObject.createWithoutData("Location", location.objectId));
 		parseUser.signUpInBackground(new SignUpCallback() {
 			@Override
 			public void done(ParseException e) {
+                EncryptedStore.setPassword(email, password, context);
+                EncryptedStore.setAuthenticatedUser(email, context);
 				LoginController.setUser(ParseUser.getCurrentUser());
 				listener.onComplete(ParseUser.getCurrentUser(), e);
 			}
 		});
 	}
 
-	public static void login(String email, String password, final LoginListener listener) {
+	public static void login(final String email, final String password, final LoginListener listener) {
 		ParseUser.logInInBackground(email, password, new LogInCallback() {
 			@Override
 			public void done(ParseUser parseUser, ParseException e) {
-				LoginController.setUser(parseUser);
+                EncryptedStore.setPassword(email, password, context);
+                EncryptedStore.setAuthenticatedUser(email, context);
+                LoginController.setUser(parseUser);
 				listener.onComplete(parseUser, e);
 			}
 		});

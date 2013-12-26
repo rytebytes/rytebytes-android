@@ -25,7 +25,7 @@ public class LoginController {
 		LoginController.context = context;
 		String loggedInUser = EncryptedStore.getAuthenticatedUser(context);
 		if (loggedInUser != null) {
-			ParseUser user = new ParseUser();
+			user = new ParseUser();
 			user.setUsername(loggedInUser);
 			user.setEmail(loggedInUser);
 			user.setPassword(EncryptedStore.getPassword(loggedInUser, context));

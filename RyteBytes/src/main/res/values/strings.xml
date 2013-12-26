@@ -40,4 +40,11 @@
     <!-- Heating Fragment -->
     <string name="heating_instructions">Heating Instructions</string>
 
+    <!-- Account Fragment -->
+    <string name="account_settings">Account Settings</string>
+    <string name="reset_password">Reset Password</string>
+    <string name="change_credit_card">Change Credit Card</string>
+    <string name="change_pickup_location">Change Pickup Location</string>
+    <string name="logout">Logout</string>
+
 </resources>
