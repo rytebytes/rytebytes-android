@@ -84,7 +84,6 @@ public class MenuItemFragment extends BaseFragment {
 		rootView.findViewById(R.id.btn_step_up).setOnClickListener(mOnClickListener);
 
 		mEtHowMany = (EditText)rootView.findViewById(R.id.et_how_many);
-		mEtHowMany.setText(""+mOrder.getQuantity(mMenuItem));
 
 		mImgMenuItem.setMenuItem(mMenuItem);
 
@@ -103,6 +102,6 @@ public class MenuItemFragment extends BaseFragment {
 
 	@Override
 	protected void onShown() {
-
+        mEtHowMany.setText(""+mOrder.getQuantity(mMenuItem));
 	}
 }
