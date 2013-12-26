@@ -81,7 +81,7 @@ public class LoginFragment extends BaseFragment {
 
     private final ButtonSpinnerListener mButtonSpinnerListener = new ButtonSpinnerListener() {
         @Override
-        public String[] getDropdownContents() {
+        public String[] getDropdownContents(ButtonSpinner spinner) {
             String[] contents = new String[mLocations.size()];
             for (int i = 0; i < mLocations.size(); i++) {
                 contents[i] = mLocations.get(i).name;
@@ -90,7 +90,7 @@ public class LoginFragment extends BaseFragment {
         }
 
         @Override
-        public void onItemSelected(int index) {
+        public void onItemSelected(int index, ButtonSpinner spinner) {
             mLocation = mLocations.get(index);
         }
     };

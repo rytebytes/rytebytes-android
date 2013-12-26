@@ -58,6 +58,30 @@ public class Order {
 		return total;
 	}
 
+    public void setQuantity(MenuItem menuItem, int quantity) {
+        OrderItem orderItem = null;
+
+        for (int i = mOrderItems.size() - 1; i >= 0; i--) {
+            OrderItem item = mOrderItems.get(i);
+            if (item.menuItem.equals(menuItem)) {
+                orderItem = item;
+                break;
+            }
+        }
+
+        if (quantity == 0) {
+            if (orderItem != null) {
+                mOrderItems.remove(orderItem);
+            }
+        } else {
+            if (orderItem == null) {
+                mOrderItems.add(new OrderItem(menuItem, quantity));
+            } else {
+                orderItem.quantity = quantity;
+            }
+        }
+    }
+
 	public void decrementQuantity(MenuItem menuItem) {
 		for (int i = mOrderItems.size() - 1; i >= 0; i--) {
 			OrderItem orderItem = mOrderItems.get(i);

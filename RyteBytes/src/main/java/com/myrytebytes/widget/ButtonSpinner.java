@@ -3,7 +3,6 @@ package com.myrytebytes.widget;
 import android.content.Context;
 import android.graphics.Color;
 import android.util.AttributeSet;
-import android.view.Gravity;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.animation.Animation;
@@ -19,8 +18,8 @@ import com.myrytebytes.rytebytes.R;
 public class ButtonSpinner extends CustomFontButton {
 
     public interface ButtonSpinnerListener {
-        public String[] getDropdownContents();
-        public void onItemSelected(int index);
+        public String[] getDropdownContents(ButtonSpinner spinner);
+        public void onItemSelected(int index, ButtonSpinner spinner);
     }
 
     private PopupWindow mPopupWindow;
@@ -30,7 +29,7 @@ public class ButtonSpinner extends CustomFontButton {
     private final OnClickListener mOnClickListener = new OnClickListener() {
         @Override
         public void onClick(View view) {
-            String[] contents = mListener.getDropdownContents();
+            String[] contents = mListener.getDropdownContents(ButtonSpinner.this);
             if (contents != null && contents.length > 0) {
                 mPopupWindow = getPopupWindow(contents);
                 mPopupWindow.showAsDropDown(ButtonSpinner.this);
@@ -44,9 +43,9 @@ public class ButtonSpinner extends CustomFontButton {
     private final OnItemClickListener mOnItemClickListener = new OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-            mListener.onItemSelected(i);
+            mListener.onItemSelected(i, ButtonSpinner.this);
             setTextColor(Color.BLACK);
-            setText(mListener.getDropdownContents()[i]);
+            setText(mListener.getDropdownContents(ButtonSpinner.this)[i]);
 
             Animation fadeAnimation = AnimationUtils.loadAnimation(view.getContext(), android.R.anim.fade_out);
             fadeAnimation.setDuration(10);
@@ -73,7 +72,6 @@ public class ButtonSpinner extends CustomFontButton {
     private void init() {
         setOnClickListener(mOnClickListener);
         setBackgroundResource(R.drawable.spinner_background_holo_light);
-        setGravity(Gravity.LEFT);
         setTextColor(0xFF555555);
 
         float density = getContext().getResources().getDisplayMetrics().density;

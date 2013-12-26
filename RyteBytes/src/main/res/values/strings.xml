@@ -37,4 +37,7 @@
     <!-- Checkout Fragment -->
     <string name="place_order">Place Order</string>
 
+    <!-- Heating Fragment -->
+    <string name="heating_instructions">Heating Instructions</string>
+
 </resources>

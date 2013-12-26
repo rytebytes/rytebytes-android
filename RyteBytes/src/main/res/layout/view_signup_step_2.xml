@@ -21,6 +21,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/select_pickup_location"
+        android:gravity="left"
         />
 
     <com.myrytebytes.widget.CreditCardEntryLayout
