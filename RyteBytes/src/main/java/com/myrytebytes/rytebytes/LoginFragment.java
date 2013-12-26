@@ -53,6 +53,7 @@ public class LoginFragment extends BaseFragment {
     private Button mBtnCreateAccount;
     private Button mBtnForgotPassword;
     private ButtonSpinner mLocationSpinner;
+    private CreditCardEntryLayout mCardEntryLayout;
     private Dialog mProgressDialog;
 
     private List<Location> mLocations;
@@ -76,6 +77,15 @@ public class LoginFragment extends BaseFragment {
             if (mLocation != null) {
                 createStripeUser();
             }
+        }
+
+        @Override
+        public void onCardIOSelected() {
+            Intent scanIntent = new Intent(getApplicationContext(), CardIOActivity.class);
+            scanIntent.putExtra(CardIOActivity.EXTRA_APP_TOKEN, CARD_IO_TOKEN);
+            scanIntent.putExtra(CardIOActivity.EXTRA_REQUIRE_EXPIRY, false);
+            scanIntent.putExtra(CardIOActivity.EXTRA_SUPPRESS_MANUAL_ENTRY, true);
+            startActivityForResult(scanIntent, REQUEST_CODE_CARD_IO);
         }
     };
 
@@ -112,12 +122,6 @@ public class LoginFragment extends BaseFragment {
                 case R.id.btn_forgot_password:
 
                     break;
-//                case R.id.btn_card_io:
-//                    Intent scanIntent = new Intent(getApplicationContext(), CardIOActivity.class);
-//                    scanIntent.putExtra(CardIOActivity.EXTRA_APP_TOKEN, CARD_IO_TOKEN);
-//                    scanIntent.putExtra(CardIOActivity.EXTRA_REQUIRE_EXPIRY, false);
-//                    startActivityForResult(scanIntent, REQUEST_CODE_CARD_IO);
-//                    break;
             }
         }
     };
@@ -164,16 +168,7 @@ public class LoginFragment extends BaseFragment {
     }
 
     @Override
-    protected void onShown() {
-        ApiInterface.getLocations(new GetLocationsListener() {
-            @Override
-            public void onComplete(List<Location> locations, int statusCode) {
-                for (Location location : locations) {
-                    Log.d("location = " + location.objectId + "; " + location.streetAddress + "; " + location.city + "; " + location.state + "; " + location.zipcode + "; " + location.name + "; " + location.charityId);
-                }
-            }
-        });
-    }
+    protected void onShown() { }
 
     public void handleLogin() {
         if (validateInput()) {
@@ -198,10 +193,10 @@ public class LoginFragment extends BaseFragment {
     }
 
     public void createAccountButtonClicked() {
-        if (validateInput()) {
+//        if (validateInput()) {
             View view = LayoutInflater.from(getActivity()).inflate(R.layout.view_signup_step_2, mRootView, false);
-            CreditCardEntryLayout cardEntryLayout = (CreditCardEntryLayout)view.findViewById(R.id.card_entry_layout);
-            cardEntryLayout.setListener(mCreditCardEntryListener);
+            mCardEntryLayout = (CreditCardEntryLayout)view.findViewById(R.id.card_entry_layout);
+            mCardEntryLayout.setListener(mCreditCardEntryListener);
 
             mLocationSpinner = (ButtonSpinner)view.findViewById(R.id.spinner);
             mLocationSpinner.setListener(mButtonSpinnerListener);
@@ -230,7 +225,7 @@ public class LoginFragment extends BaseFragment {
                 }
             });
             animatorSet.setDuration(300).start();
-        }
+//        }
     }
 
     @Override
@@ -240,7 +235,7 @@ public class LoginFragment extends BaseFragment {
         if (requestCode == REQUEST_CODE_CARD_IO) {
             if (data != null && data.hasExtra(CardIOActivity.EXTRA_SCAN_RESULT)) {
                 CreditCard scanResult = data.getParcelableExtra(CardIOActivity.EXTRA_SCAN_RESULT);
-                String cardNumber = scanResult.cardNumber;
+                mCardEntryLayout.setCardNumber(scanResult.cardNumber);
             }
         }
     }

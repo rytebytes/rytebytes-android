@@ -17,7 +17,6 @@ public class MenuItemFragment extends BaseFragment {
 	public static final String EXTRA_MENU_ITEM = "menu_item";
 
 	private MenuItem mMenuItem;
-	private MenuItemImageView mImgMenuItem;
 	private EditText mEtHowMany;
 	private Order mOrder;
 
@@ -65,7 +64,6 @@ public class MenuItemFragment extends BaseFragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View rootView = inflater.inflate(R.layout.fragment_menu_item, container, false);
-		mImgMenuItem = (MenuItemImageView)rootView.findViewById(R.id.img_menu_item);
 		((TextView)rootView.findViewById(R.id.tv_description)).setText(mMenuItem.description);
 
 		String caloriesString = mMenuItem.nutritionInfo.calories != null ? ""+mMenuItem.nutritionInfo.calories : "Unknown";
@@ -85,7 +83,8 @@ public class MenuItemFragment extends BaseFragment {
 
 		mEtHowMany = (EditText)rootView.findViewById(R.id.et_how_many);
 
-		mImgMenuItem.setMenuItem(mMenuItem);
+        MenuItemImageView imgMenuItem = (MenuItemImageView)rootView.findViewById(R.id.img_menu_item);
+        imgMenuItem.setMenuItem(mMenuItem);
 
 		return rootView;
 	}

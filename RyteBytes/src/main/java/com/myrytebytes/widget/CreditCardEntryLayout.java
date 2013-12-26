@@ -10,6 +10,7 @@ import android.util.AttributeSet;
 import android.view.ContextThemeWrapper;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 
 import com.myrytebytes.rytebytes.R;
 import com.nineoldandroids.animation.AnimatorSet;
@@ -21,6 +22,7 @@ public class CreditCardEntryLayout extends ViewGroup {
 
 	public interface CreditCardEntryListener {
 		public void onCardVerified(String name, String cardNumber, String cardExpirationMonth, String cardExpirationYear);
+        public void onCardIOSelected();
 	}
 
 	private int mWidth;
@@ -36,13 +38,19 @@ public class CreditCardEntryLayout extends ViewGroup {
 	private final CustomFontEditText mEtName;
 	private final CustomFontTextView mTvSlash;
 	private final CustomFontButton mBtnSubmit;
+    private final ImageButton mBtnCardIO;
 
 	private final int mPadding;
+    private final int mCardIOBtnWidth;
 
 	private final OnClickListener mOnClickListener = new OnClickListener() {
 		@Override
 		public void onClick(View v) {
-			verifyCard();
+            if (v == mBtnSubmit) {
+                verifyCard();
+            } else if (v == mBtnCardIO) {
+                mListener.onCardIOSelected();
+            }
 		}
 	};
 
@@ -64,6 +72,7 @@ public class CreditCardEntryLayout extends ViewGroup {
 
 		final float density = getResources().getDisplayMetrics().density;
 		mPadding = (int)(density * 8);
+        mCardIOBtnWidth = (int)(density * 40);
 
 		mImgCard = new FlipImageView(themedContext);
 		mEtCardNumber = new CustomFontEditText(themedContext);
@@ -72,6 +81,7 @@ public class CreditCardEntryLayout extends ViewGroup {
 		mEtName = new CustomFontEditText(themedContext);
 		mTvSlash = new CustomFontTextView(themedContext);
 		mBtnSubmit = new CustomFontButton(themedContext);
+        mBtnCardIO = new ImageButton(themedContext);
 
 		mImgCard.setImageResource(getCardRes(mCardType));
 
@@ -98,6 +108,10 @@ public class CreditCardEntryLayout extends ViewGroup {
 		mBtnSubmit.setOnClickListener(mOnClickListener);
 		mTvSlash.setText("/");
 
+        mBtnCardIO.setImageResource(R.drawable.ic_action_camera);
+        mBtnCardIO.setBackgroundDrawable(null);
+        mBtnCardIO.setOnClickListener(mOnClickListener);
+
 		addView(mEtCardNumber);
 		addView(mEtMonth);
 		addView(mEtYear);
@@ -105,11 +119,16 @@ public class CreditCardEntryLayout extends ViewGroup {
 		addView(mTvSlash);
 		addView(mImgCard);
 		addView(mBtnSubmit);
+        addView(mBtnCardIO);
 	}
 
 	public void setListener(CreditCardEntryListener listener) {
 		mListener = listener;
 	}
+
+    public void setCardNumber(String cardNumber) {
+        mEtCardNumber.setText(cardNumber);
+    }
 
 	/*package*/ void verifyCard() {
 		final String name = mEtName.getText().toString();
@@ -144,12 +163,13 @@ public class CreditCardEntryLayout extends ViewGroup {
 		final int width = mWidth = MeasureSpec.getSize(widthMeasureSpec);
 
 		mImgCard.measure(MeasureSpec.UNSPECIFIED, MeasureSpec.UNSPECIFIED);
-		mEtCardNumber.measure(MeasureSpec.makeMeasureSpec(width - mPadding * 3 - mImgCard.getMeasuredWidth(), MeasureSpec.EXACTLY), MeasureSpec.UNSPECIFIED);
+		mEtCardNumber.measure(MeasureSpec.makeMeasureSpec(width - mPadding * 4 - mImgCard.getMeasuredWidth() - mBtnCardIO.getMeasuredWidth(), MeasureSpec.EXACTLY), MeasureSpec.UNSPECIFIED);
 		mEtMonth.measure(MeasureSpec.UNSPECIFIED, MeasureSpec.UNSPECIFIED);
 		mTvSlash.measure(MeasureSpec.UNSPECIFIED, MeasureSpec.UNSPECIFIED);
 		mEtYear.measure(MeasureSpec.UNSPECIFIED, MeasureSpec.UNSPECIFIED);
 		mEtName.measure(MeasureSpec.makeMeasureSpec(width - mPadding * 3 - mEtMonth.getMeasuredWidth() - mTvSlash.getMeasuredWidth() - mEtYear.getMeasuredWidth(), MeasureSpec.EXACTLY), MeasureSpec.UNSPECIFIED);
 		mBtnSubmit.measure(MeasureSpec.makeMeasureSpec(width - mPadding * 2, MeasureSpec.EXACTLY), MeasureSpec.UNSPECIFIED);
+        mBtnCardIO.measure(MeasureSpec.makeMeasureSpec(mCardIOBtnWidth, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(mEtCardNumber.getMeasuredHeight(), MeasureSpec.EXACTLY));
 
 		int height;
 		if (MeasureSpec.getMode(heightMeasureSpec) == MeasureSpec.EXACTLY) {
@@ -167,7 +187,8 @@ public class CreditCardEntryLayout extends ViewGroup {
 			int imageTop = (mEtCardNumber.getMeasuredHeight() - mImgCard.getMeasuredHeight()) / 2;
 			mImgCard.layout(mPadding, imageTop, mPadding + mImgCard.getMeasuredWidth(), imageTop + mImgCard.getMeasuredHeight());
 
-			mEtCardNumber.layout(mPadding * 2 + mImgCard.getMeasuredWidth(), 0, mWidth - mPadding, mEtCardNumber.getMeasuredHeight());
+            mBtnCardIO.layout(mWidth - mPadding - mBtnCardIO.getMeasuredWidth(), 0, mWidth - mPadding, mBtnCardIO.getMeasuredHeight());
+			mEtCardNumber.layout(mPadding * 2 + mImgCard.getMeasuredWidth(), 0, mBtnCardIO.getLeft() - mPadding, mEtCardNumber.getMeasuredHeight());
 
 			if (isSecondRowShown) {
 				final int top = mEtCardNumber.getMeasuredHeight();
