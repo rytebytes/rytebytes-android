@@ -129,8 +129,10 @@ public class LoginFragment extends BaseFragment {
     private final GetLocationsListener mGetLocationsListener = new GetLocationsListener() {
         @Override
         public void onComplete(List<Location> locations, int statusCode) {
-            mLocations.clear();
-            mLocations.addAll(locations);
+            if (locations != null) {
+                mLocations.clear();
+                mLocations.addAll(locations);
+            }
         }
     };
 

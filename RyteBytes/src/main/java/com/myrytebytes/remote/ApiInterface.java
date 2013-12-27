@@ -19,6 +19,7 @@ import com.myrytebytes.remote.ApiListener.CreateAccountListener;
 import com.myrytebytes.remote.ApiListener.GetLocationsListener;
 import com.myrytebytes.remote.ApiListener.GetMenuListener;
 import com.myrytebytes.remote.ApiListener.LoginListener;
+import com.myrytebytes.remote.ApiListener.PurchaseListener;
 import com.myrytebytes.remote.JsonRequest.JsonRequestListener;
 import com.parse.LogInCallback;
 import com.parse.ParseException;
@@ -106,7 +107,7 @@ public class ApiInterface {
 		});
 	}
 
-	public static void placeOrder(Order order, String locationId) {
+	public static void placeOrder(Order order, String locationId, final PurchaseListener listener) {
 		byte[] params;
 		try {
 			ByteArrayOutputStream os = new ByteArrayOutputStream();
@@ -114,10 +115,11 @@ public class ApiInterface {
 			generator.writeStartObject();
 			generator.writeStringField("locationId", locationId);
 			generator.writeNumberField("totalInCents", order.getTotalPrice());
-			generator.writeStringField("userId", "tmp"); //TODO: put this back: LoginController.getSessionUser().getObjectId());
-			generator.writeArrayFieldStart("orderItems");
+			generator.writeStringField("userId", LoginController.getSessionUser().getObjectId());
+			generator.writeObjectFieldStart("orderItemDictionary");
 			order.writeJson(generator);
 			generator.writeEndObject();
+            generator.writeEndObject();
 			generator.close();
 
 			params = os.toByteArray();
@@ -129,7 +131,7 @@ public class ApiInterface {
 		requestQueue.add(new RyteBytesRequest<>(35000, Method.POST, "order", params, null, String.class, new JsonRequestListener<String>() {
 			@Override
 			public void onResponse(String response, int statusCode, VolleyError error) {
-				Log.d("response = " + response + "; sc = " + statusCode);
+				listener.onComplete(statusCode == 200, statusCode);
 			}
 		}));
 	}

@@ -434,7 +434,7 @@ public class MainActivity extends ActionBarActivity implements ActivityCallbacks
 
 	@Override
 	public void displayLoginFragment(boolean popIfUnsuccessful) {
-		displayLoginFragment(new PostLoginContainer(null, null, null, false, true));
+		displayLoginFragment(new PostLoginContainer(null, null, null, false, popIfUnsuccessful));
 	}
 
 	@Override

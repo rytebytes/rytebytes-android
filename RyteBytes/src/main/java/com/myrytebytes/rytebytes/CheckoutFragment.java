@@ -1,5 +1,6 @@
 package com.myrytebytes.rytebytes;
 
+import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -10,14 +11,17 @@ import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.myrytebytes.datamanagement.LoginController;
 import com.myrytebytes.datamodel.MenuItem;
 import com.myrytebytes.datamodel.Order;
 import com.myrytebytes.remote.ApiInterface;
+import com.myrytebytes.remote.ApiListener.PurchaseListener;
 import com.myrytebytes.widget.AutoResizeTextView;
 import com.myrytebytes.widget.ButtonSpinner;
 import com.myrytebytes.widget.ButtonSpinner.ButtonSpinnerListener;
 import com.myrytebytes.widget.HoloDialog;
 import com.myrytebytes.widget.MenuItemImageView;
+import com.parse.ParseUser;
 
 public class CheckoutFragment extends BaseFragment {
 
@@ -25,6 +29,7 @@ public class CheckoutFragment extends BaseFragment {
 	private TextView mTvDoRyteDonation;
     private OrderAdapter mOrderAdapter;
 	private Order mOrder;
+    private Dialog mProgressDialog;
 
 	private final OnClickListener mOnClickListener = new OnClickListener() {
 		@Override
@@ -32,7 +37,13 @@ public class CheckoutFragment extends BaseFragment {
 			switch (v.getId()) {
 				case R.id.btn_place_order:
 					//TODO: add locationID
-					ApiInterface.placeOrder(mOrder, "");
+                    ParseUser user = LoginController.getSessionUser();
+                    if (user == null) {
+                        mActivityCallbacks.displayLoginFragment(false);
+                    } else {
+                        mProgressDialog = HoloDialog.showProgressDialog(getActivity(), null, "Placing order...", false);
+                        ApiInterface.placeOrder(mOrder, (String)user.get("locationId"), mPurchaseListener);
+                    }
 					break;
 			}
 		}
@@ -47,6 +58,21 @@ public class CheckoutFragment extends BaseFragment {
                 mOrderAdapter.notifyDataSetChanged();
                 mActivityCallbacks.updateCheckoutBadge();
                 setTotals();
+            }
+        }
+    };
+    private final PurchaseListener mPurchaseListener = new PurchaseListener() {
+        @Override
+        public void onComplete(boolean success, int statusCode) {
+            if (mProgressDialog != null && mProgressDialog.isShowing()) {
+                mProgressDialog.dismiss();
+            }
+
+            if (success) {
+                //TODO:
+                mOrder.clear();
+            } else {
+                //TODO:
             }
         }
     };

@@ -118,13 +118,10 @@ public class Order {
 	public void writeJson(JsonGenerator generator) {
 		try {
 			for (OrderItem orderItem : mOrderItems) {
-				generator.writeStartObject();
-				generator.writeObjectFieldStart("menuItem");
-				orderItem.menuItem.writeJson(generator);
+				generator.writeObjectFieldStart(orderItem.menuItem.objectId);
 				generator.writeNumberField("quantity", orderItem.quantity);
-				generator.writeEndObject();
+                generator.writeEndObject();
 			}
-			generator.writeEndArray();
 		} catch (Exception e) {
 			Log.e(e);
 		}

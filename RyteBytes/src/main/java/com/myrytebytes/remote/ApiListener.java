@@ -30,4 +30,8 @@ public class ApiListener {
 		public void onComplete(ParseUser user, ParseException exception);
 	}
 
+    public interface PurchaseListener {
+        public void onComplete(boolean success, int statusCode);
+    }
+
 }
