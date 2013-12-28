@@ -34,4 +34,7 @@ public class ApiListener {
         public void onComplete(boolean success, int statusCode);
     }
 
+    public interface ResetPasswordListener {
+        public void onComplete(boolean success);
+    }
 }

@@ -5,4 +5,11 @@
         <item name="android:textColor">@android:color/black</item>
     </style>
 
+    <style name="ButtonStyle" parent="android:Widget.Button">
+        <item name="android:textColor">@color/rytebytes_yellow</item>
+        <item name="android:background">@drawable/bkg_button</item>
+        <item name="android:padding">8dp</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+
 </resources>

@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="rytebytes_yellow">#FFFBBF2E</color>
     <color name="holo_light_blue">#FF33b5e5</color>
     <color name="light_theme_text">#FF040404</color>
+
+    <color name="bkg_button_pressed">#FF666666</color>
+    <color name="bkg_button_normal">#FF333333</color>
 </resources>

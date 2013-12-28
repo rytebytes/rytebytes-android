@@ -2,6 +2,7 @@
 
     <style name="Theme.RyteBytes" parent="Theme.AppCompat.Light.DarkActionBar">
         <item name="android:editTextStyle">@style/EditTextStyle</item>
+        <item name="android:buttonStyle">@style/ButtonStyle</item>
     </style>
 
     <style name="Theme.Dialog" parent="android:style/Theme.Dialog">

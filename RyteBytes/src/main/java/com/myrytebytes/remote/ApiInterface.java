@@ -20,11 +20,13 @@ import com.myrytebytes.remote.ApiListener.GetLocationsListener;
 import com.myrytebytes.remote.ApiListener.GetMenuListener;
 import com.myrytebytes.remote.ApiListener.LoginListener;
 import com.myrytebytes.remote.ApiListener.PurchaseListener;
+import com.myrytebytes.remote.ApiListener.ResetPasswordListener;
 import com.myrytebytes.remote.JsonRequest.JsonRequestListener;
 import com.parse.LogInCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
+import com.parse.RequestPasswordResetCallback;
 import com.parse.SignUpCallback;
 
 import java.io.ByteArrayOutputStream;
@@ -135,6 +137,15 @@ public class ApiInterface {
 			}
 		}));
 	}
+
+    public static void resetPassword(String username, final ResetPasswordListener listener) {
+        ParseUser.requestPasswordResetInBackground(username, new RequestPasswordResetCallback() {
+            @Override
+            public void done(ParseException e) {
+                listener.onComplete(e == null);
+            }
+        });
+    }
 
 	private static class RyteBytesRequest<T> extends JsonRequest<T> {
 		public RyteBytesRequest(int method, String endpoint, Map<String, String> params, String returnTag, Class returnType, JsonRequestListener<T> listener) {

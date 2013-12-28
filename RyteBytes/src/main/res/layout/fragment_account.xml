@@ -23,6 +23,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/tv_title"
         android:layout_centerHorizontal="true"
+        android:layout_margin="8dp"
         android:text="@string/reset_password"
         />
 
@@ -32,6 +33,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/btn_reset_password"
         android:layout_centerHorizontal="true"
+        android:layout_margin="8dp"
         android:text="@string/change_credit_card"
         />
 
@@ -41,6 +43,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/btn_change_credit_card"
         android:layout_centerHorizontal="true"
+        android:layout_margin="8dp"
         android:text="@string/change_pickup_location"
         />
 
@@ -50,6 +53,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/btn_change_pickup_location"
         android:layout_centerHorizontal="true"
+        android:layout_margin="8dp"
         android:text="@string/logout"
         />
 </RelativeLayout>
