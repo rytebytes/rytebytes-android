@@ -536,19 +536,14 @@ public class MainActivity extends ActionBarActivity implements ActivityCallbacks
 			if (convertView == null) {
 				ViewHolder viewHolder = new ViewHolder();
 
-//				if (item.isHeader) {
-//					convertView = mLayoutInflater.inflate(R.layout.row_drawer_header, parent, false);
-//					viewHolder.textView = (TextView)convertView.findViewById(R.id.title);
-//				} else {
-//					convertView = mLayoutInflater.inflate(R.layout.row_drawer_menu_item, parent, false);
-//					viewHolder.imageView = (ImageView)convertView.findViewById(R.id.icon);
-//					viewHolder.textView = (TextView)convertView.findViewById(R.id.title);
-//				}
-
-				//TODO: temporary!
-				convertView = new TextView(mLayoutInflater.getContext());
-				viewHolder.textView = (TextView)convertView;
-				viewHolder.textView.setTextSize(24);
+				if (item.isHeader) {
+					convertView = mLayoutInflater.inflate(R.layout.row_drawer_header, parent, false);
+					viewHolder.textView = (TextView)convertView.findViewById(R.id.title);
+				} else {
+					convertView = mLayoutInflater.inflate(R.layout.row_drawer_menu_item, parent, false);
+					viewHolder.imageView = (ImageView)convertView.findViewById(R.id.icon);
+					viewHolder.textView = (TextView)convertView.findViewById(R.id.title);
+				}
 
 				convertView.setTag(viewHolder);
 			}
