@@ -36,6 +36,8 @@
 
     <!-- Checkout Fragment -->
     <string name="place_order">Place Order</string>
+    <string name="order_empty_text">It looks like you haven\'t added any food to your cart yet. Add a few now to start enjoying our delicious meals at home!</string>
+    <string name="add_items">Add Items</string>
 
     <!-- Heating Fragment -->
     <string name="heating_instructions">Heating Instructions</string>

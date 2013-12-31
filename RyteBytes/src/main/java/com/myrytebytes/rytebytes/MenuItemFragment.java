@@ -5,7 +5,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.EditText;
 import android.widget.TextView;
 
 import com.myrytebytes.datamodel.MenuItem;
@@ -17,7 +16,7 @@ public class MenuItemFragment extends BaseFragment {
 	public static final String EXTRA_MENU_ITEM = "menu_item";
 
 	private MenuItem mMenuItem;
-	private EditText mEtHowMany;
+	private TextView mTvItemCount;
 	private Order mOrder;
 
 	private final OnClickListener mOnClickListener = new OnClickListener() {
@@ -26,12 +25,12 @@ public class MenuItemFragment extends BaseFragment {
 			switch (v.getId()) {
 				case R.id.btn_step_down:
 					mOrder.decrementQuantity(mMenuItem);
-					mEtHowMany.setText(""+mOrder.getQuantity(mMenuItem));
+					mTvItemCount.setText("" + mOrder.getQuantity(mMenuItem));
 					mActivityCallbacks.updateCheckoutBadge();
 					break;
 				case R.id.btn_step_up:
 					mOrder.incrementQuantity(mMenuItem);
-					mEtHowMany.setText(""+mOrder.getQuantity(mMenuItem));
+					mTvItemCount.setText("" + mOrder.getQuantity(mMenuItem));
 					mActivityCallbacks.updateCheckoutBadge();
 					break;
 			}
@@ -81,7 +80,7 @@ public class MenuItemFragment extends BaseFragment {
 		rootView.findViewById(R.id.btn_step_down).setOnClickListener(mOnClickListener);
 		rootView.findViewById(R.id.btn_step_up).setOnClickListener(mOnClickListener);
 
-		mEtHowMany = (EditText)rootView.findViewById(R.id.et_how_many);
+		mTvItemCount = (TextView)rootView.findViewById(R.id.tv_item_count);
 
         MenuItemImageView imgMenuItem = (MenuItemImageView)rootView.findViewById(R.id.img_menu_item);
         imgMenuItem.setMenuItem(mMenuItem);
@@ -101,6 +100,6 @@ public class MenuItemFragment extends BaseFragment {
 
 	@Override
 	protected void onShown() {
-        mEtHowMany.setText(""+mOrder.getQuantity(mMenuItem));
+        mTvItemCount.setText("" + mOrder.getQuantity(mMenuItem));
 	}
 }

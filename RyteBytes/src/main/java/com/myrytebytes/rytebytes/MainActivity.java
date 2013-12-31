@@ -238,7 +238,7 @@ public class MainActivity extends ActionBarActivity implements ActivityCallbacks
 			displayLoginFragment(new PostLoginContainer(null, contentType, null, true, false));
 		} else if (mContent == null || contentType != mContent.getContentType()) {
 			if (contentType == ContentType.MENU && mContent != null) {
-				popToRoot(false, false);
+				popToRoot(false);
 			} else {
 				BaseFragment fragment = getFragmentForType(contentType);
 
@@ -256,7 +256,7 @@ public class MainActivity extends ActionBarActivity implements ActivityCallbacks
 
 				if (!onLaunch) {
 					if (fragmentManager.getBackStackEntryCount() > 0) {
-						popToRoot(false, false);
+						popToRoot(false);
 						Fragment rootFragment = fragmentManager.getFragments().get(0);
 						if (rootFragment != null) {
 							transaction.hide(rootFragment);
@@ -385,7 +385,7 @@ public class MainActivity extends ActionBarActivity implements ActivityCallbacks
 	}
 
 	@Override
-	public void popToRoot(boolean animated, boolean resetRoot) {
+	public void popToRoot(boolean animated) {
 		FragmentManager fm = getSupportFragmentManager();
 		if (fm.getBackStackEntryCount() > 0) {
 			if (!animated) {

@@ -38,7 +38,7 @@ public abstract class BaseFragment extends Fragment {
 		public void pushFragment(BaseFragment fragment, ContentType fragmentType);
 		public void displayModalFragment(ContentType contentType, Bundle extras);
 		public void setTitle(int title);
-		public void popToRoot(boolean animated, boolean resetRoot);
+		public void popToRoot(boolean animated);
 		public void hideSoftKeyboard();
 		public void displayLoginFragment(boolean popIfUnsuccessful);
 		public boolean isLoginFragmentShowing();
@@ -60,7 +60,7 @@ public abstract class BaseFragment extends Fragment {
 		public void setTitle(int title) { }
 
 		@Override
-		public void popToRoot(boolean animated, boolean resetRoot) { }
+		public void popToRoot(boolean animated) { }
 
 		@Override
 		public void hideSoftKeyboard() { }

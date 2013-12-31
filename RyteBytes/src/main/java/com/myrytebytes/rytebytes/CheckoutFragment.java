@@ -25,8 +25,10 @@ import com.parse.ParseUser;
 
 public class CheckoutFragment extends BaseFragment {
 
+    private View mEmptyView;
 	private TextView mTvOrderTotal;
 	private TextView mTvDoRyteDonation;
+    private View mBtnPlaceOrder;
     private OrderAdapter mOrderAdapter;
 	private Order mOrder;
     private Dialog mProgressDialog;
@@ -45,6 +47,9 @@ public class CheckoutFragment extends BaseFragment {
                         ApiInterface.placeOrder(mOrder, (String)user.get("locationId"), mPurchaseListener);
                     }
 					break;
+                case R.id.btn_add_items:
+                    mActivityCallbacks.popToRoot(true);
+                    break;
 			}
 		}
 	};
@@ -91,10 +96,14 @@ public class CheckoutFragment extends BaseFragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View rootView = inflater.inflate(R.layout.fragment_checkout, container, false);
 
+        mEmptyView = rootView.findViewById(R.id.empty_view);
+        mEmptyView.findViewById(R.id.btn_add_items).setOnClickListener(mOnClickListener);
+
 		mTvOrderTotal = (TextView)rootView.findViewById(R.id.tv_order_total);
 		mTvDoRyteDonation = (TextView)rootView.findViewById(R.id.tv_do_ryte_donation);
 
-		rootView.findViewById(R.id.btn_place_order).setOnClickListener(mOnClickListener);
+        mBtnPlaceOrder = rootView.findViewById(R.id.btn_place_order);
+		mBtnPlaceOrder.setOnClickListener(mOnClickListener);
 
         mOrderAdapter = new OrderAdapter(mOrder, mOrderAdapterListener, inflater);
 		((ListView)rootView.findViewById(R.id.lv_checkout)).setAdapter(mOrderAdapter);
@@ -105,9 +114,21 @@ public class CheckoutFragment extends BaseFragment {
 	}
 
 	public void setTotals() {
-		final float orderTotal = mOrder.getTotalPrice() / 100f;
-		mTvOrderTotal.setText("Order Total: $" + String.format("%.2f", orderTotal));
-		mTvDoRyteDonation.setText("Do Ryte Donation (Estimated): $" + String.format("%.2f", orderTotal * 0.05));
+        if (mOrder.getItemTotal() == 0) {
+            mEmptyView.setVisibility(View.VISIBLE);
+            mTvOrderTotal.setVisibility(View.GONE);
+            mTvDoRyteDonation.setVisibility(View.GONE);
+            mBtnPlaceOrder.setVisibility(View.GONE);
+        } else {
+            mEmptyView.setVisibility(View.GONE);
+            mTvOrderTotal.setVisibility(View.VISIBLE);
+            mTvDoRyteDonation.setVisibility(View.VISIBLE);
+            mBtnPlaceOrder.setVisibility(View.VISIBLE);
+
+            final float orderTotal = mOrder.getTotalPrice() / 100f;
+            mTvOrderTotal.setText("Order Total: $" + String.format("%.2f", orderTotal));
+            mTvDoRyteDonation.setText("Do Ryte Donation (Estimated): $" + String.format("%.2f", orderTotal * 0.05f));
+        }
 	}
 
 	@Override
@@ -121,9 +142,7 @@ public class CheckoutFragment extends BaseFragment {
 	}
 
 	@Override
-	protected void onShown() {
-
-	}
+	protected void onShown() { }
 
     /*package*/ void displayRemoveItemDialog(final MenuItem menuItem) {
         new HoloDialog.Builder(getActivity())

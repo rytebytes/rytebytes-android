@@ -33,11 +33,12 @@
                 android:text="-"
                 />
 
-        <com.myrytebytes.widget.CustomFontEditText
-                android:id="@+id/et_how_many"
+        <com.myrytebytes.widget.CustomFontTextView
+                android:id="@+id/tv_item_count"
                 android:layout_width="60dp"
                 android:layout_height="44dp"
-                android:gravity="center_horizontal"
+                android:textSize="22dp"
+                android:gravity="center"
                 />
 
         <com.myrytebytes.widget.CustomFontButton
