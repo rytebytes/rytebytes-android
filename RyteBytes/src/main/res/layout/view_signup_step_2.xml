@@ -2,16 +2,18 @@
 
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin">
+    android:layout_height="wrap_content"
+    android:layout_centerInParent="true"
+    android:background="#D7FFFFFF"
+    android:layout_marginLeft="24dp"
+    android:layout_marginRight="24dp"
+    android:orientation="vertical" >
 
     <com.myrytebytes.widget.CustomFontTextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="100dp"
+        android:layout_margin="16dp"
         android:textSize="18dp"
         android:text="@string/credit_card_required"
         />
@@ -22,12 +24,15 @@
         android:layout_height="wrap_content"
         android:text="@string/select_pickup_location"
         android:gravity="left"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
         />
 
     <com.myrytebytes.widget.CreditCardEntryLayout
         android:id="@+id/card_entry_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
         />
 
 </LinearLayout>

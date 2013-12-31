@@ -8,7 +8,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
 
 import com.myrytebytes.datamanagement.Log;
@@ -46,12 +45,9 @@ public class LoginFragment extends BaseFragment {
     private static final int REQUEST_CODE_CARD_IO = 44;
 
     private ViewGroup mRootView;
+    private View mLoginViewStep1;
     private EditText mEtEmail;
     private EditText mEtPassword;
-    private Button mBtnLogin;
-    private Button mBtnCreateAccount;
-    private Button mBtnForgotPassword;
-    private ButtonSpinner mLocationSpinner;
     private CreditCardEntryLayout mCardEntryLayout;
     private Dialog mProgressDialog;
 
@@ -147,15 +143,13 @@ public class LoginFragment extends BaseFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mRootView = (ViewGroup)inflater.inflate(R.layout.fragment_login, container, false);
-        mEtEmail = (EditText)mRootView.findViewById(R.id.et_email);
-        mEtPassword = (EditText)mRootView.findViewById(R.id.et_password);
-        mBtnLogin = (Button)mRootView.findViewById(R.id.btn_login);
-        mBtnCreateAccount = (Button)mRootView.findViewById(R.id.btn_create_account);
-        mBtnForgotPassword = (Button)mRootView.findViewById(R.id.btn_forgot_password);
+        mLoginViewStep1 = mRootView.findViewById(R.id.view_signup_step_1);
+        mEtEmail = (EditText)mLoginViewStep1.findViewById(R.id.et_email);
+        mEtPassword = (EditText)mLoginViewStep1.findViewById(R.id.et_password);
 
-        mBtnLogin.setOnClickListener(mOnClickListener);
-        mBtnCreateAccount.setOnClickListener(mOnClickListener);
-        mBtnForgotPassword.setOnClickListener(mOnClickListener);
+        mLoginViewStep1.findViewById(R.id.btn_login).setOnClickListener(mOnClickListener);
+        mLoginViewStep1.findViewById(R.id.btn_create_account).setOnClickListener(mOnClickListener);
+        mLoginViewStep1.findViewById(R.id.btn_forgot_password).setOnClickListener(mOnClickListener);
 
         return mRootView;
     }
@@ -201,8 +195,7 @@ public class LoginFragment extends BaseFragment {
             mCardEntryLayout = (CreditCardEntryLayout)view.findViewById(R.id.card_entry_layout);
             mCardEntryLayout.setListener(mCreditCardEntryListener);
 
-            mLocationSpinner = (ButtonSpinner)view.findViewById(R.id.spinner);
-            mLocationSpinner.setListener(mButtonSpinnerListener);
+            ((ButtonSpinner)view.findViewById(R.id.spinner)).setListener(mButtonSpinnerListener);
 
             int viewWidth = mRootView.getMeasuredWidth();
             ViewHelper.setTranslationX(view, viewWidth);
@@ -211,20 +204,12 @@ public class LoginFragment extends BaseFragment {
             AnimatorSet animatorSet = new AnimatorSet();
             animatorSet.playTogether(
                     ObjectAnimator.ofFloat(view, "translationX", 0),
-                    ObjectAnimator.ofFloat(mEtEmail, "translationX", -viewWidth),
-                    ObjectAnimator.ofFloat(mEtPassword, "translationX", -viewWidth),
-                    ObjectAnimator.ofFloat(mBtnLogin, "translationX", -viewWidth),
-                    ObjectAnimator.ofFloat(mBtnCreateAccount, "translationX", -viewWidth),
-                    ObjectAnimator.ofFloat(mBtnForgotPassword, "translationX", -viewWidth)
+                    ObjectAnimator.ofFloat(mLoginViewStep1, "translationX", -viewWidth)
             );
             animatorSet.addListener(new AnimatorListenerAdapter() {
                 @Override
                 public void onAnimationEnd(Animator animation) {
-                    mEtEmail.setVisibility(View.GONE);
-                    mEtPassword.setVisibility(View.GONE);
-                    mBtnLogin.setVisibility(View.GONE);
-                    mBtnCreateAccount.setVisibility(View.GONE);
-                    mBtnForgotPassword.setVisibility(View.GONE);
+                    mLoginViewStep1.setVisibility(View.GONE);
                 }
             });
             animatorSet.setDuration(300).start();

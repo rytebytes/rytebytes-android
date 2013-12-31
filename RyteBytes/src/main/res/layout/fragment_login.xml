@@ -9,6 +9,7 @@
     android:clickable="true" >
 
     <LinearLayout
+        android:id="@+id/view_signup_step_1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
