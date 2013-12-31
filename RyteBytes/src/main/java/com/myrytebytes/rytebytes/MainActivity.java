@@ -24,7 +24,6 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.myrytebytes.datamanagement.Log;
 import com.myrytebytes.datamanagement.LoginController;
 import com.myrytebytes.rytebytes.BaseFragment.ActivityCallbacks;
 import com.myrytebytes.rytebytes.BaseFragment.ContentType;
@@ -416,6 +415,10 @@ public class MainActivity extends ActionBarActivity implements ActivityCallbacks
 				return new HeatingFragment();
 			case CHECKOUT:
 				return new CheckoutFragment();
+            case PICKUP_LOCATIONS:
+                return new PickupLocationsFragment();
+            case CHANGE_CREDIT_CARD:
+                return new ChangeCreditCardFragment();
 			default:
 				return null;
 		}

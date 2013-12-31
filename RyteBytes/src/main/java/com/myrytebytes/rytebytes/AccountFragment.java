@@ -1,5 +1,6 @@
 package com.myrytebytes.rytebytes;
 
+import android.app.Dialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -7,26 +8,46 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 
 import com.myrytebytes.datamanagement.LoginController;
+import com.myrytebytes.remote.ApiInterface;
+import com.myrytebytes.remote.ApiListener.ResetPasswordListener;
+import com.myrytebytes.widget.HoloDialog;
 
 public class AccountFragment extends BaseFragment {
+
+    /*package*/ Dialog mProgressDialog;
 
     private final OnClickListener mOnClickListener = new OnClickListener() {
         @Override
         public void onClick(View view) {
             switch (view.getId()) {
                 case R.id.btn_reset_password:
-
+                    mProgressDialog = HoloDialog.showProgressDialog(getActivity(), "Resetting Password", "Please wait...");
+                    ApiInterface.resetPassword(LoginController.getSessionUser().getEmail(), mResetPasswordListener);
                     break;
                 case R.id.btn_change_credit_card:
-
+                    pushFragment(ContentType.CHANGE_CREDIT_CARD, null);
                     break;
                 case R.id.btn_change_pickup_location:
-
+                    pushFragment(ContentType.PICKUP_LOCATIONS, null);
                     break;
                 case R.id.btn_logout:
                     LoginController.logOut(getApplicationContext());
                     mActivityCallbacks.displayLoginFragment(true);
                     break;
+            }
+        }
+    };
+
+    private final ResetPasswordListener mResetPasswordListener = new ResetPasswordListener() {
+        @Override
+        public void onComplete(boolean success) {
+            if (mProgressDialog != null && mProgressDialog.isShowing()) {
+                mProgressDialog.dismiss();
+            }
+            if (success) {
+                showOkDialog("Success!", "You should receive an email with password reset instructions shortly.");
+            } else {
+                showOkDialog("Error", "An error occurred while resetting your password. Please try again soon.");
             }
         }
     };

@@ -1,78 +1,87 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <RelativeLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@drawable/launch_image"
-        android:focusable="true"
-        android:clickable="true" >
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/launch_image"
+    android:focusable="true"
+    android:clickable="true" >
 
-    <ImageView
-        android:id="@+id/img_logo"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="16dp"
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp"
-        android:scaleType="fitCenter"
-        android:src="@drawable/logo"
-        android:background="#AAFFFFFF"
-        />
-    
-    <com.myrytebytes.widget.CustomFontEditText
+        android:layout_centerInParent="true"
+        android:background="#D7FFFFFF"
+        android:layout_marginLeft="24dp"
+        android:layout_marginRight="24dp"
+        android:orientation="vertical" >
+
+
+        <ImageView
+            android:id="@+id/img_logo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/logo"
+            />
+
+        <com.myrytebytes.widget.CustomFontEditText
             android:id="@+id/et_email"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/img_logo"
             android:layout_marginLeft="@dimen/activity_horizontal_margin"
             android:layout_marginRight="@dimen/activity_horizontal_margin"
             android:hint="@string/email"
             android:inputType="textEmailAddress"
             />
 
-    <com.myrytebytes.widget.CustomFontEditText
+        <com.myrytebytes.widget.CustomFontEditText
             android:id="@+id/et_password"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/et_email"
             android:layout_marginLeft="@dimen/activity_horizontal_margin"
             android:layout_marginRight="@dimen/activity_horizontal_margin"
             android:hint="@string/password"
             android:inputType="textPassword"
             />
 
-    <com.myrytebytes.widget.CustomFontButton
+        <com.myrytebytes.widget.CustomFontButton
             android:id="@+id/btn_login"
             android:layout_width="250dp"
             android:layout_height="wrap_content"
-            android:layout_below="@id/et_password"
-            android:layout_centerHorizontal="true"
+            android:layout_gravity="center_horizontal"
             android:layout_margin="8dp"
             android:text="@string/sign_in"
             />
 
-    <com.myrytebytes.widget.CustomFontButton
+        <com.myrytebytes.widget.CustomFontButton
             android:id="@+id/btn_create_account"
             android:layout_width="250dp"
             android:layout_height="wrap_content"
-            android:layout_below="@id/btn_login"
-            android:layout_centerHorizontal="true"
+            android:layout_gravity="center_horizontal"
             android:layout_margin="8dp"
             android:text="@string/create_account"
             />
 
-    <com.myrytebytes.widget.CustomFontButton
+        <com.myrytebytes.widget.CustomFontButton
             android:id="@+id/btn_forgot_password"
             android:layout_width="250dp"
             android:layout_height="wrap_content"
-            android:layout_below="@id/btn_create_account"
-            android:layout_centerHorizontal="true"
-            android:layout_margin="8dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginBottom="16dp"
             android:text="@string/forgot_password"
             />
+
+    </LinearLayout>
 
 </RelativeLayout>

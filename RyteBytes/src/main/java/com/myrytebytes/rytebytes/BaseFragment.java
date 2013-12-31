@@ -20,6 +20,8 @@ public abstract class BaseFragment extends Fragment {
 		DO_RYTE(false, false),
 		HEATING(false, false),
 		ACCOUNT(true, false),
+        PICKUP_LOCATIONS(true, false),
+        CHANGE_CREDIT_CARD(true, false),
 		LOGIN(false, true);
 
 		boolean isModal;

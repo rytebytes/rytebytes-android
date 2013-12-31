@@ -44,7 +44,6 @@ import io.card.payment.CreditCard;
 public class LoginFragment extends BaseFragment {
 
     private static final int REQUEST_CODE_CARD_IO = 44;
-    private static final String CARD_IO_TOKEN = "19f7f219ce8843979fa8c5f99e86d484";
 
     private ViewGroup mRootView;
     private EditText mEtEmail;
@@ -82,7 +81,7 @@ public class LoginFragment extends BaseFragment {
         @Override
         public void onCardIOSelected() {
             Intent scanIntent = new Intent(getApplicationContext(), CardIOActivity.class);
-            scanIntent.putExtra(CardIOActivity.EXTRA_APP_TOKEN, CARD_IO_TOKEN);
+            scanIntent.putExtra(CardIOActivity.EXTRA_APP_TOKEN, Constants.CARD_IO_TOKEN);
             scanIntent.putExtra(CardIOActivity.EXTRA_REQUIRE_EXPIRY, false);
             scanIntent.putExtra(CardIOActivity.EXTRA_SUPPRESS_MANUAL_ENTRY, true);
             startActivityForResult(scanIntent, REQUEST_CODE_CARD_IO);
@@ -132,6 +131,8 @@ public class LoginFragment extends BaseFragment {
             if (locations != null) {
                 mLocations.clear();
                 mLocations.addAll(locations);
+            } else {
+                // TODO:
             }
         }
     };
@@ -195,7 +196,7 @@ public class LoginFragment extends BaseFragment {
     }
 
     public void createAccountButtonClicked() {
-//        if (validateInput()) {
+        if (validateInput()) {
             View view = LayoutInflater.from(getActivity()).inflate(R.layout.view_signup_step_2, mRootView, false);
             mCardEntryLayout = (CreditCardEntryLayout)view.findViewById(R.id.card_entry_layout);
             mCardEntryLayout.setListener(mCreditCardEntryListener);
@@ -227,7 +228,7 @@ public class LoginFragment extends BaseFragment {
                 }
             });
             animatorSet.setDuration(300).start();
-//        }
+        }
     }
 
     @Override
@@ -250,6 +251,7 @@ public class LoginFragment extends BaseFragment {
                 if (customer != null) {
                     createParseUser(customer);
                 } else {
+                    //TODO: error codes
                     if (mProgressDialog.isShowing()) {
                         mProgressDialog.dismiss();
                     }

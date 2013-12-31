@@ -18,6 +18,10 @@ public class ApiListener {
 		public void onComplete(List<Location> locations, int statusCode);
 	}
 
+    public interface UpdateCreditCardListener {
+        public void onComplete(StripeCustomer customer, int statusCode);
+    }
+
 	public interface CreateStripeAccountListener {
 		public void onComplete(StripeCustomer customer, int statusCode);
 	}

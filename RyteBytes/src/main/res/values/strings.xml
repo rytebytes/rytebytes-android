@@ -47,4 +47,12 @@
     <string name="change_pickup_location">Change Pickup Location</string>
     <string name="logout">Logout</string>
 
+    <!-- Pickup locations Fragment -->
+    <string name="pickup_locations">Pickup Locations</string>
+    <string name="select_new_pickup_location">Select New Pickup Location</string>
+    <string name="set_pickup_location">Set Pickup Location</string>
+
+    <!-- Change credit card Fragment -->
+    <string name="credit_card">Credit Card</string>
+
 </resources>
