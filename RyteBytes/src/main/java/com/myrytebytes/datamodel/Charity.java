@@ -7,39 +7,30 @@ import com.myrytebytes.remote.SafeJsonParser;
 
 import java.io.IOException;
 
-public class Location implements JacksonParser {
+public class Charity implements JacksonParser {
 
 	public String name;
 	public String objectId;
-	public Charity charity;
 	public String streetAddress;
 	public String city;
 	public String state;
 	public String zipcode;
+    public int totalDonationsInCents;
+    public String image;
 
-	public Location() { }
+	public Charity() { }
 
-	public Location(SafeJsonParser jsonParser, boolean closeWhenComplete) {
+	public Charity(SafeJsonParser jsonParser, boolean closeWhenComplete) {
 		try {
 			fillFromJSON(jsonParser, closeWhenComplete);
 		} catch (IOException e) {
-			Log.e("Error filling Location", e);
+			Log.e("Error filling Charity", e);
 		}
 	}
 
 	@Override
 	public void fillFromJSON(SafeJsonParser jsonParser, boolean closeWhenComplete) throws IOException {
 		JsonHandler.handleJson(jsonParser, new JsonHandlerListenerAdapter() {
-			@Override
-			public boolean onObject(String tag, SafeJsonParser jsonParser) throws IOException {
-				if (tag.equals("charityId")) {
-					charity = new Charity(jsonParser, false);
-					return true;
-				} else {
-					return false;
-				}
-			}
-
 			@Override
 			public void onField(String tag, SafeJsonParser jsonParser) throws IOException {
 				switch (tag) {
@@ -61,6 +52,12 @@ public class Location implements JacksonParser {
 					case "objectId":
 						objectId = jsonParser.getStringValue();
 						break;
+                    case "totalDonationsInCents":
+                        totalDonationsInCents = jsonParser.getIntValue();
+                        break;
+                    case "picture":
+                        image = jsonParser.getStringValue();
+                        break;
 				}
 			}
 		}, closeWhenComplete);

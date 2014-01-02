@@ -1,7 +1,87 @@
 <RelativeLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/gray_background"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin">
+
+    <com.myrytebytes.widget.CustomFontTextView
+        android:id="@+id/tv_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="24dp"
+        />
+
+    <com.myrytebytes.widget.CustomFontTextView
+        android:id="@+id/tv_info"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:text="@string/do_ryte_info"
+        />
+
+    <LinearLayout
+        android:id="@+id/layout_my_donation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/tv_info" >
+
+        <com.myrytebytes.widget.CustomFontTextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:gravity="right"
+            android:padding="4dp"
+            android:text="@string/because_of_you"
+            android:textSize="18dp"
+            />
+
+        <com.myrytebytes.widget.CustomFontTextView
+            android:id="@+id/tv_my_donation"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:padding="4dp"
+            android:textSize="18dp"
+            />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/layout_total_donation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/layout_my_donation" >
+
+        <com.myrytebytes.widget.CustomFontTextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:gravity="right"
+            android:padding="4dp"
+            android:text="@string/estimated_donations"
+            android:textSize="18dp"
+            />
+
+        <com.myrytebytes.widget.CustomFontTextView
+            android:id="@+id/tv_estimated_donation"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:padding="4dp"
+            android:textSize="18dp"
+            />
+    </LinearLayout>
+
+    <com.myrytebytes.widget.NetworkImageView
+        android:id="@+id/img_charity"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/gray_background">
+        android:layout_above="@id/layout_total_donation"
+        android:layout_below="@id/tv_title"
+        android:scaleType="fitCenter"
+        />
 
 </RelativeLayout>

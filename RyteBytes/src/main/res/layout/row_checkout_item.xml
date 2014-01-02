@@ -33,6 +33,7 @@
         android:layout_height="wrap_content"
         android:layout_toRightOf="@id/img_menu_item"
         android:layout_below="@id/tv_title"
+        android:textSize="18sp"
         android:gravity="center"
         />
 

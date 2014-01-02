@@ -57,4 +57,8 @@
     <!-- Change credit card Fragment -->
     <string name="credit_card">Credit Card</string>
 
+    <!-- Do Ryte Fragment -->
+    <string name="estimated_donations">Estimated Donations:</string>
+    <string name="because_of_you">Because of you!:</string>
+    <string name="do_ryte_info">We want to make life better and healthier for everyone, not just our customers. That\'s why we\'ve committed to donating 5% of our profits to local food charities.</string>
 </resources>
