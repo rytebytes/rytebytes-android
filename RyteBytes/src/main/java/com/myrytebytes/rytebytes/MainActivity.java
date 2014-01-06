@@ -24,7 +24,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.myrytebytes.datamanagement.LoginController;
+import com.myrytebytes.datamanagement.UserController;
 import com.myrytebytes.rytebytes.BaseFragment.ActivityCallbacks;
 import com.myrytebytes.rytebytes.BaseFragment.ContentType;
 import com.myrytebytes.widget.CheckoutActionItem;
@@ -60,7 +60,7 @@ public class MainActivity extends ActionBarActivity implements ActivityCallbacks
 			if (isLoggingIn) {
 				if (newBackstackEntryCount < mBackstackEntryCount || newBackstackEntryCount == 0) {
 					isLoggingIn = false;
-					if (mPostLoginContainer != null && mPostLoginContainer.popIfUnsuccessful && LoginController.getSessionUser() == null) {
+					if (mPostLoginContainer != null && mPostLoginContainer.popIfUnsuccessful && UserController.getActiveUser() == null) {
 						BaseFragment.animationsDisabled = true;
 						fragmentManager.popBackStackImmediate();
 						BaseFragment.animationsDisabled = false;
@@ -191,7 +191,7 @@ public class MainActivity extends ActionBarActivity implements ActivityCallbacks
 	}
 
 	private void pushFragment(BaseFragment fragment, ContentType fragmentType, Bundle extras) {
-		if (fragmentType.requiresLogin && LoginController.getSessionUser() == null) {
+		if (fragmentType.requiresLogin && UserController.getActiveUser() == null) {
 			displayLoginFragment(new PostLoginContainer(fragment, fragmentType, extras, false, false));
 		} else if (mContent == null || fragmentType != mContent.getContentType()) {
 			if (fragment == null) {
@@ -234,7 +234,7 @@ public class MainActivity extends ActionBarActivity implements ActivityCallbacks
 	}
 
 	private void switchContent(ContentType contentType, boolean onLaunch) {
-		if (contentType.requiresLogin && LoginController.getSessionUser() == null) {
+		if (contentType.requiresLogin && UserController.getActiveUser() == null) {
 			displayLoginFragment(new PostLoginContainer(null, contentType, null, true, false));
 		} else if (mContent == null || contentType != mContent.getContentType()) {
 			if (contentType == ContentType.MENU && mContent != null) {

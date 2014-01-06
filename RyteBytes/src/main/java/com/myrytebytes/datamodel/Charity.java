@@ -1,5 +1,6 @@
 package com.myrytebytes.datamodel;
 
+import com.fasterxml.jackson.core.JsonGenerator;
 import com.myrytebytes.datamanagement.Log;
 import com.myrytebytes.remote.JsonHandler;
 import com.myrytebytes.remote.JsonHandler.JsonHandlerListenerAdapter;
@@ -17,6 +18,7 @@ public class Charity implements JacksonParser {
 	public String zipcode;
     public int totalDonationsInCents;
     public String image;
+    public String description;
 
 	public Charity() { }
 
@@ -58,8 +60,26 @@ public class Charity implements JacksonParser {
                     case "picture":
                         image = jsonParser.getStringValue();
                         break;
+                    case "description":
+                        description = jsonParser.getStringValue();
+                        break;
 				}
 			}
 		}, closeWhenComplete);
 	}
+
+    public void writeJson(JsonGenerator generator) {
+        try {
+            generator.writeStringField("name", name);
+            generator.writeStringField("streetAddress", streetAddress);
+            generator.writeStringField("city", city);
+            generator.writeStringField("state", state);
+            generator.writeStringField("zipcode", zipcode);
+            generator.writeNumberField("totalDonationsInCents", totalDonationsInCents);
+            generator.writeStringField("picture", image);
+            generator.writeStringField("description", description);
+        } catch (Exception e) {
+            Log.e(e);
+        }
+    }
 }

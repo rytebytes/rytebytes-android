@@ -11,12 +11,13 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 
 import com.myrytebytes.datamanagement.Log;
-import com.myrytebytes.datamanagement.LoginController;
+import com.myrytebytes.datamanagement.UserController;
 import com.myrytebytes.datamodel.Location;
 import com.myrytebytes.datamodel.StripeCustomer;
 import com.myrytebytes.remote.ApiInterface;
 import com.myrytebytes.remote.ApiListener.CreateAccountListener;
 import com.myrytebytes.remote.ApiListener.CreateStripeAccountListener;
+import com.myrytebytes.remote.ApiListener.GetLocationListener;
 import com.myrytebytes.remote.ApiListener.GetLocationsListener;
 import com.myrytebytes.remote.ApiListener.LoginListener;
 import com.myrytebytes.remote.StripeInterface;
@@ -31,6 +32,7 @@ import com.nineoldandroids.animation.AnimatorSet;
 import com.nineoldandroids.animation.ObjectAnimator;
 import com.nineoldandroids.view.ViewHelper;
 import com.parse.ParseException;
+import com.parse.ParseObject;
 import com.parse.ParseUser;
 
 import java.util.ArrayList;
@@ -173,16 +175,31 @@ public class LoginFragment extends BaseFragment {
             ApiInterface.login(mEmailAddress, mPassword, new LoginListener() {
                 @Override
                 public void onComplete(ParseUser user, ParseException exception) {
-                    if (mProgressDialog.isShowing()) {
-                        mProgressDialog.dismiss();
-                    }
-
-                    if (user != null) {
-                        LoginController.setUser(user);
-                        mActivityCallbacks.loginWillFinish(true);
-                    } else {
+                    if (user == null || user.get("locationId") == null) {
+                        Log.d("null user");
+                        if (mProgressDialog.isShowing()) {
+                            mProgressDialog.dismiss();
+                        }
                         //TODO: better error messages
                         showOkDialog("Error", "An error occurred while logging in. Please try again.");
+                    } else {
+                        ParseObject location = (ParseObject)user.get("locationId");
+                        ApiInterface.getLocation(location.getObjectId(), new GetLocationListener() {
+                            @Override
+                            public void onComplete(Location location, int statusCode) {
+                                if (mProgressDialog.isShowing()) {
+                                    mProgressDialog.dismiss();
+                                }
+
+                                if (location != null) {
+                                    UserController.setActiveUser(ParseUser.getCurrentUser(), location);
+                                    mActivityCallbacks.loginWillFinish(true);
+                                } else {
+                                    //TODO: better error messages
+                                    showOkDialog("Error", "An error occurred while logging in. Please try again.");
+                                }
+                            }
+                        });
                     }
                 }
             });
@@ -255,7 +272,6 @@ public class LoginFragment extends BaseFragment {
                 }
 
                 if (user != null) {
-                    LoginController.setUser(user);
                     mActivityCallbacks.loginWillFinish(true);
                 } else if (exception != null) {
                     switch (exception.getCode()) {

@@ -7,7 +7,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 
-import com.myrytebytes.datamanagement.LoginController;
+import com.myrytebytes.datamanagement.UserController;
 import com.myrytebytes.remote.ApiInterface;
 import com.myrytebytes.remote.ApiListener.ResetPasswordListener;
 import com.myrytebytes.widget.HoloDialog;
@@ -22,7 +22,7 @@ public class AccountFragment extends BaseFragment {
             switch (view.getId()) {
                 case R.id.btn_reset_password:
                     mProgressDialog = HoloDialog.showProgressDialog(getActivity(), "Resetting Password", "Please wait...");
-                    ApiInterface.resetPassword(LoginController.getSessionUser().getEmail(), mResetPasswordListener);
+                    ApiInterface.resetPassword(UserController.getActiveUser().emailAddress, mResetPasswordListener);
                     break;
                 case R.id.btn_change_credit_card:
                     pushFragment(ContentType.CHANGE_CREDIT_CARD, null);
@@ -31,7 +31,7 @@ public class AccountFragment extends BaseFragment {
                     pushFragment(ContentType.PICKUP_LOCATIONS, null);
                     break;
                 case R.id.btn_logout:
-                    LoginController.logOut(getApplicationContext());
+                    UserController.logOut(getApplicationContext());
                     mActivityCallbacks.displayLoginFragment(true);
                     break;
             }

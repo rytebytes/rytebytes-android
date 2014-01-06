@@ -41,4 +41,8 @@ public class ApiListener {
     public interface ResetPasswordListener {
         public void onComplete(boolean success);
     }
+
+    public interface GetLocationListener {
+        public void onComplete(Location location, int statusCode);
+    }
 }

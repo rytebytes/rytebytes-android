@@ -1,5 +1,6 @@
 package com.myrytebytes.datamodel;
 
+import com.fasterxml.jackson.core.JsonGenerator;
 import com.myrytebytes.datamanagement.Log;
 import com.myrytebytes.remote.JsonHandler;
 import com.myrytebytes.remote.JsonHandler.JsonHandlerListenerAdapter;
@@ -65,4 +66,20 @@ public class Location implements JacksonParser {
 			}
 		}, closeWhenComplete);
 	}
+
+    public void writeJson(JsonGenerator generator) {
+        try {
+            generator.writeStringField("name", name);
+            generator.writeStringField("streetAddress", streetAddress);
+            generator.writeStringField("city", city);
+            generator.writeStringField("state", state);
+            generator.writeStringField("zipcode", zipcode);
+            generator.writeStringField("objectId", objectId);
+            generator.writeObjectFieldStart("charityId");
+            charity.writeJson(generator);
+            generator.writeEndObject();
+        } catch (Exception e) {
+            Log.e(e);
+        }
+    }
 }

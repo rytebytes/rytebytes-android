@@ -26,7 +26,7 @@ public class StripeInterface {
             requestQueue = JsonNetwork.newRequestQueue(context, new OkHttpStack());
         }
 
-        Map<String, String> customerMap = new HashMap<>();
+        Map<String, Object> customerMap = new HashMap<>();
         customerMap.put("card[name]", cardholderName);
         customerMap.put("card[number]", cardNumber);
         customerMap.put("card[exp_month]", expMonth);
@@ -45,7 +45,7 @@ public class StripeInterface {
 			requestQueue = JsonNetwork.newRequestQueue(context, new OkHttpStack());
 		}
 
-		Map<String, String> customerMap = new HashMap<>();
+		Map<String, Object> customerMap = new HashMap<>();
 		customerMap.put("email", email);
         customerMap.put("card[name]", cardHolderName);
 		customerMap.put("card[number]", cardNumber);
@@ -61,8 +61,8 @@ public class StripeInterface {
 	}
 
 	private static class StripeRequest<T> extends JsonRequest<T> {
-		public StripeRequest(int method, String endpoint, Map<String, String> params, String returnTag, Class returnType, JsonRequestListener<T> listener) {
-			super(method, API_BASE, endpoint, params, returnTag, returnType, listener);
+		public StripeRequest(int method, String endpoint, Map<String, Object> params, String returnTag, Class returnType, JsonRequestListener<T> listener) {
+			super(method, API_BASE, endpoint, params, returnTag, returnType, false, listener);
 		}
 
 		@Override

@@ -11,6 +11,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.myrytebytes.datamanagement.UserController;
 import com.myrytebytes.datamodel.Location;
 import com.myrytebytes.remote.ApiInterface;
 import com.myrytebytes.remote.ApiListener.GetLocationsListener;
@@ -98,7 +99,9 @@ public class PickupLocationsFragment extends BaseFragment {
         ((ButtonSpinner)view.findViewById(R.id.spinner)).setListener(mButtonSpinnerListener);
         view.findViewById(R.id.btn_set_pickup_location).setOnClickListener(mOnClickListener);
 
-        Spanned htmlText = Html.fromHtml("Your pickup location is currently set to:<br><br><b>Fake Location<br>2000 W. Street</b><br><br>Use the button below to change locations if needed.");
+        Location currentLocation = UserController.getActiveUser().location;
+
+        Spanned htmlText = Html.fromHtml("Your pickup location is currently set to:<br><br><b>" + currentLocation.name + "<br>" + currentLocation.streetAddress + "</b><br><br>Use the button below to change locations if needed.");
         ((TextView)view.findViewById(R.id.tv_current_location)).setText(htmlText);
 
         return view;

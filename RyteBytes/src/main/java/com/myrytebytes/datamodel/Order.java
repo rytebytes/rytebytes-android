@@ -6,7 +6,7 @@ import com.myrytebytes.datamanagement.Log;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Order {
+public class Order implements JacksonWriter {
 
 	private final List<OrderItem> mOrderItems;
 
@@ -115,7 +115,8 @@ public class Order {
 		return mOrderItems.get(position).menuItem;
 	}
 
-	public void writeJson(JsonGenerator generator) {
+    @Override
+	public void writeJSON(JsonGenerator generator) {
 		try {
 			for (OrderItem orderItem : mOrderItems) {
 				generator.writeObjectFieldStart(orderItem.menuItem.objectId);

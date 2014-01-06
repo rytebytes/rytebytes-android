@@ -9,11 +9,14 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.HttpHeaderParser;
 import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonToken;
 import com.myrytebytes.datamanagement.Log;
 import com.myrytebytes.datamodel.JacksonParser;
+import com.myrytebytes.datamodel.JacksonWriter;
 import com.myrytebytes.remote.JsonHandler.JsonHandlerListenerAdapter;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -23,34 +26,26 @@ import java.util.Map;
 
 public class JsonRequest<T> extends Request<T> {
 
-	private static final int DEFAULT_TIMEOUT = 30000; // 30 seconds
+	public static final int DEFAULT_TIMEOUT = 30000; // 30 seconds
 	public static final JsonFactory JSON_FACTORY = new JsonFactory();
 
-	private Map<String, String> mParamMap;
-	private byte[] mBody;
+	private Map<String, Object> mParamMap;
 	private final JsonRequestListener<T> mListener;
 	private int mStatusCode;
 	private Class mReturnType;
 	private String mReturnTag;
 	private T mResponseObject;
+    private boolean mEncodeAsJson;
 
-	public JsonRequest(int method, String baseUrl, String endpoint, Map<String, String> params, String returnTag, Class returnType, JsonRequestListener<T> listener) {
-		this(DEFAULT_TIMEOUT, method, baseUrl, endpoint, params, returnTag, returnType, listener);
+	public JsonRequest(int method, String baseUrl, String endpoint, Map<String, Object> params, String returnTag, Class returnType, boolean encodeAsJson, JsonRequestListener<T> listener) {
+		this(DEFAULT_TIMEOUT, method, baseUrl, endpoint, params, returnTag, returnType, encodeAsJson, listener);
 	}
 
-	public JsonRequest(int timeout, int method, String baseUrl, String endpoint, Map<String, String> params, String returnTag, Class returnType, JsonRequestListener<T> listener) {
-		this(timeout, method, getUrl(method, baseUrl, endpoint, params), params, null, returnTag, returnType, listener);
+	public JsonRequest(int timeout, int method, String baseUrl, String endpoint, Map<String, Object> params, String returnTag, Class returnType, boolean encodeAsJson, JsonRequestListener<T> listener) {
+		this(timeout, method, getUrl(method, baseUrl, endpoint, params), params, returnTag, returnType, encodeAsJson, listener);
 	}
 
-	public JsonRequest(int method, String baseUrl, String endpoint, byte[] body, String returnTag, Class returnType, JsonRequestListener<T> listener) {
-		this(DEFAULT_TIMEOUT, method, baseUrl, endpoint, body, returnTag, returnType, listener);
-	}
-
-	public JsonRequest(int timeout, int method, String baseUrl, String endpoint, byte[] body, String returnTag, Class returnType, JsonRequestListener<T> listener) {
-		this(timeout, method, getUrl(method, baseUrl, endpoint, null), new HashMap<String, String>(), body, returnTag, returnType, listener);
-	}
-
-	public JsonRequest(int timeout, int method, String url, Map<String, String> params, byte[] body, String returnTag, Class returnType, JsonRequestListener<T> listener) {
+	public JsonRequest(int timeout, int method, String url, Map<String, Object> params, String returnTag, Class returnType, boolean encodeAsJson, JsonRequestListener<T> listener) {
 		super(method, url, null);
 
 		setShouldCache(false);
@@ -61,15 +56,16 @@ public class JsonRequest<T> extends Request<T> {
 
 		setRetryPolicy(new DefaultRetryPolicy(timeout, 1, 1));
 
+        mEncodeAsJson = encodeAsJson;
+
 		if (method == Method.POST || method == Method.PUT) {
-			mParamMap = params;
-			mBody = body;
+            mParamMap = params;
 		}
 	}
 
-	private static String getUrl(int method, String baseUrl, String endpoint, Map<String, String> params) {
+	private static String getUrl(int method, String baseUrl, String endpoint, Map<String, Object> params) {
 		if (params != null) {
-			for (Map.Entry<String, String> entry : params.entrySet()) {
+			for (Map.Entry<String, Object> entry : params.entrySet()) {
 				if (entry.getValue() == null || entry.getValue().equals("null")) {
 					entry.setValue("");
 				}
@@ -82,7 +78,7 @@ public class JsonRequest<T> extends Request<T> {
 			for (String key : params.keySet()) {
 				try {
 					final String encodedKey = URLEncoder.encode(key, "UTF-8");
-					final String encodedValue = URLEncoder.encode(params.get(key), "UTF-8");
+					final String encodedValue = URLEncoder.encode((String)params.get(key), "UTF-8");
 					if (result.length() > startLength) {
 						result.append("&");
 					} else {
@@ -101,8 +97,32 @@ public class JsonRequest<T> extends Request<T> {
 
 	@Override
 	public byte[] getBody() throws AuthFailureError {
-		if (mBody != null) {
-			return mBody;
+		if (mParamMap != null && mEncodeAsJson) {
+            byte[] params;
+            try {
+                ByteArrayOutputStream os = new ByteArrayOutputStream();
+                JsonGenerator generator = JsonRequest.JSON_FACTORY.createGenerator(os);
+                generator.writeStartObject();
+
+                for (String key : mParamMap.keySet()) {
+                    Object value = mParamMap.get(key);
+                    if (value instanceof String) {
+                        generator.writeStringField(key, (String)value);
+                    } else if (value instanceof Integer) {
+                        generator.writeNumberField(key, (Integer)value);
+                    } else if (value instanceof JacksonWriter) {
+                        generator.writeObjectFieldStart(key);
+                        ((JacksonWriter)value).writeJSON(generator);
+                        generator.writeEndObject();
+                    }
+                }
+                params = os.toByteArray();
+            } catch (Exception e) {
+                params = null;
+                Log.e(e);
+            }
+
+			return params;
 		} else {
 			return super.getBody();
 		}
@@ -137,7 +157,7 @@ public class JsonRequest<T> extends Request<T> {
 
 					SafeJsonParser jsonParser = new SafeJsonParser(JSON_FACTORY.createParser(((JsonNetworkResponse)networkResponse).inputStream));
 					parseJson(jsonParser);
-				}
+                }
 			} catch (Exception e) {
 				Log.e("An error occurred while parsing network response:", e);
 				e.printStackTrace();
@@ -230,12 +250,20 @@ public class JsonRequest<T> extends Request<T> {
 		return headers;
 	}
 
-	@Override
-	public Map<String, String> getParams() {
-		return mParamMap;
-	}
+    @Override
+    public Map<String, String> getParams() {
+        if (mEncodeAsJson) {
+            return null;
+        } else {
+            Map<String, String> params = new HashMap<>(mParamMap.size());
+            for (String key : mParamMap.keySet()) {
+                params.put(key, mParamMap.get(key).toString());
+            }
+            return params;
+        }
+    }
 
-	public static abstract class JsonRequestListener<T> {
+    public static abstract class JsonRequestListener<T> {
 		public abstract void onResponse(T response, int statusCode, VolleyError error);
 		public Response<T> onParseResponseComplete(Response<T> response) { return response; }
 	}

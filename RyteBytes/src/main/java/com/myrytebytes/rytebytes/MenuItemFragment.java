@@ -54,6 +54,7 @@ public class MenuItemFragment extends BaseFragment {
 		}
 
 		if (savedInstanceState != null) {
+            //TODO: this isn't actually saved in the instance state anywhere
 			mMenuItem = savedInstanceState.getParcelable(EXTRA_MENU_ITEM);
 		}
 

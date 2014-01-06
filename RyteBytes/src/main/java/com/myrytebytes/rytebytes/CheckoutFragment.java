@@ -11,9 +11,10 @@ import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.myrytebytes.datamanagement.LoginController;
+import com.myrytebytes.datamanagement.UserController;
 import com.myrytebytes.datamodel.MenuItem;
 import com.myrytebytes.datamodel.Order;
+import com.myrytebytes.datamodel.User;
 import com.myrytebytes.remote.ApiInterface;
 import com.myrytebytes.remote.ApiListener.PurchaseListener;
 import com.myrytebytes.widget.AutoResizeTextView;
@@ -21,7 +22,6 @@ import com.myrytebytes.widget.ButtonSpinner;
 import com.myrytebytes.widget.ButtonSpinner.ButtonSpinnerListener;
 import com.myrytebytes.widget.HoloDialog;
 import com.myrytebytes.widget.MenuItemImageView;
-import com.parse.ParseUser;
 
 public class CheckoutFragment extends BaseFragment {
 
@@ -39,12 +39,12 @@ public class CheckoutFragment extends BaseFragment {
 			switch (v.getId()) {
 				case R.id.btn_place_order:
 					//TODO: add locationID
-                    ParseUser user = LoginController.getSessionUser();
+                    User user = UserController.getActiveUser();
                     if (user == null) {
                         mActivityCallbacks.displayLoginFragment(false);
                     } else {
                         mProgressDialog = HoloDialog.showProgressDialog(getActivity(), null, "Placing order...", false);
-                        ApiInterface.placeOrder(mOrder, (String)user.get("locationId"), mPurchaseListener);
+                        ApiInterface.placeOrder(mOrder, user.location.objectId, mPurchaseListener);
                     }
 					break;
                 case R.id.btn_add_items:
@@ -178,7 +178,7 @@ public class CheckoutFragment extends BaseFragment {
         private final ButtonSpinnerListener mQuantitySpinnerListener = new ButtonSpinnerListener() {
             @Override
             public String[] getDropdownContents(ButtonSpinner spinner) {
-                return new String[] {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"};
+                return new String[] {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20"};
             }
 
             @Override

@@ -7,15 +7,13 @@ import com.android.volley.Request.Method;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.myrytebytes.datamanagement.EncryptedStore;
-import com.myrytebytes.datamanagement.Log;
-import com.myrytebytes.datamanagement.LoginController;
+import com.myrytebytes.datamanagement.UserController;
 import com.myrytebytes.datamodel.Location;
 import com.myrytebytes.datamodel.MenuItem;
 import com.myrytebytes.datamodel.Order;
 import com.myrytebytes.datamodel.StripeCustomer;
 import com.myrytebytes.remote.ApiListener.CreateAccountListener;
+import com.myrytebytes.remote.ApiListener.GetLocationListener;
 import com.myrytebytes.remote.ApiListener.GetLocationsListener;
 import com.myrytebytes.remote.ApiListener.GetMenuListener;
 import com.myrytebytes.remote.ApiListener.LoginListener;
@@ -29,7 +27,6 @@ import com.parse.ParseUser;
 import com.parse.RequestPasswordResetCallback;
 import com.parse.SignUpCallback;
 
-import java.io.ByteArrayOutputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -77,58 +74,53 @@ public class ApiInterface {
 		}));
 	}
 
-	public static void createUser(StripeCustomer customer, Location location, final String password, final CreateAccountListener listener) {
-		final String email = customer.email;
-
+	public static void createUser(StripeCustomer customer, final Location location, final String password, final CreateAccountListener listener) {
         ParseUser parseUser = new ParseUser();
-		parseUser.setEmail(email);
-		parseUser.setUsername(email);
+		parseUser.setEmail(customer.email);
+		parseUser.setUsername(customer.email);
 		parseUser.setPassword(password);
 		parseUser.put("stripeId", customer.id);
         parseUser.put("locationId", ParseObject.createWithoutData("Location", location.objectId));
 		parseUser.signUpInBackground(new SignUpCallback() {
 			@Override
 			public void done(ParseException e) {
-                EncryptedStore.setPassword(email, password, context);
-                EncryptedStore.setAuthenticatedUser(email, context);
-				LoginController.setUser(ParseUser.getCurrentUser());
+				UserController.setActiveUser(ParseUser.getCurrentUser(), location);
 				listener.onComplete(ParseUser.getCurrentUser(), e);
 			}
 		});
 	}
 
+    public static void getLocation(String objectId, final GetLocationListener listener) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("objectId", objectId);
+
+        requestQueue.add(new RyteBytesRequest<>(Method.POST, "getlocation", params, "result", Location.class, new JsonRequestListener<List<Location>>() {
+            @Override
+            public void onResponse(List<Location> response, int statusCode, VolleyError error) {
+                if (response != null && response.size() > 0) {
+                    listener.onComplete(response.get(0), statusCode);
+                } else {
+                    listener.onComplete(null, statusCode);
+                }
+            }
+        }));
+    }
+
 	public static void login(final String email, final String password, final LoginListener listener) {
 		ParseUser.logInInBackground(email, password, new LogInCallback() {
 			@Override
 			public void done(ParseUser parseUser, ParseException e) {
-                EncryptedStore.setPassword(email, password, context);
-                EncryptedStore.setAuthenticatedUser(email, context);
-                LoginController.setUser(parseUser);
-				listener.onComplete(parseUser, e);
+                listener.onComplete(parseUser, e);
 			}
 		});
 	}
 
 	public static void placeOrder(Order order, String locationId, final PurchaseListener listener) {
-		byte[] params;
-		try {
-			ByteArrayOutputStream os = new ByteArrayOutputStream();
-			JsonGenerator generator = JsonRequest.JSON_FACTORY.createGenerator(os);
-			generator.writeStartObject();
-			generator.writeStringField("locationId", locationId);
-			generator.writeNumberField("totalInCents", order.getTotalPrice());
-			generator.writeStringField("userId", LoginController.getSessionUser().getObjectId());
-			generator.writeObjectFieldStart("orderItemDictionary");
-			order.writeJson(generator);
-			generator.writeEndObject();
-            generator.writeEndObject();
-			generator.close();
-
-			params = os.toByteArray();
-		} catch (Exception e) {
-			params = null;
-			Log.e(e);
-		}
+        Map<String, Object> params = new HashMap<>();
+        params.put("locationId", locationId);
+        params.put("totalInCents", order.getTotalPrice());
+        params.put("userId", UserController.getActiveUser().parseUser.getObjectId());
+        params.put("orderItemDicionary", order);
 
 		requestQueue.add(new RyteBytesRequest<>(35000, Method.POST, "order", params, null, String.class, new JsonRequestListener<String>() {
 			@Override
@@ -148,25 +140,21 @@ public class ApiInterface {
     }
 
 	private static class RyteBytesRequest<T> extends JsonRequest<T> {
-		public RyteBytesRequest(int method, String endpoint, Map<String, String> params, String returnTag, Class returnType, JsonRequestListener<T> listener) {
-			super(method, HOST_BASE_URL, endpoint, params, returnTag, returnType, listener);
+		public RyteBytesRequest(int method, String endpoint, Map<String, Object> params, String returnTag, Class returnType, JsonRequestListener<T> listener) {
+			super(method, HOST_BASE_URL, endpoint, params, returnTag, returnType, true, listener);
 		}
 
-		public RyteBytesRequest(int timeout, int method, String endpoint, Map<String, String> params, String returnTag, Class returnType, JsonRequestListener<T> listener) {
-			super(timeout, method, HOST_BASE_URL, endpoint, params, returnTag, returnType, listener);
+		public RyteBytesRequest(int timeout, int method, String endpoint, Map<String, Object> params, String returnTag, Class returnType, JsonRequestListener<T> listener) {
+			super(timeout, method, HOST_BASE_URL, endpoint, params, returnTag, returnType, true, listener);
 		}
 
-		public RyteBytesRequest(int timeout, int method, String endpoint, byte[] body, String returnTag, Class returnType, JsonRequestListener<T> listener) {
-			super(timeout, method, HOST_BASE_URL, endpoint, body, returnTag, returnType, listener);
-		}
-
-		public RyteBytesRequest(int method, String endpoint, Map<String, String> params, String returnTag, Class returnType, JsonRequestListener<T> listener, Object tag) {
-			super(method, HOST_BASE_URL, endpoint, params, returnTag, returnType, listener);
+		public RyteBytesRequest(int method, String endpoint, Map<String, Object> params, String returnTag, Class returnType, JsonRequestListener<T> listener, Object tag) {
+			super(method, HOST_BASE_URL, endpoint, params, returnTag, returnType, true, listener);
 			setTag(tag);
 		}
 
-		public RyteBytesRequest(int timeout, int method, String endpoint, Map<String, String> params, String returnTag, Class returnType, JsonRequestListener<T> listener, Object tag) {
-			super(timeout, method, HOST_BASE_URL, endpoint, params, returnTag, returnType, listener);
+		public RyteBytesRequest(int timeout, int method, String endpoint, Map<String, Object> params, String returnTag, Class returnType, JsonRequestListener<T> listener, Object tag) {
+			super(timeout, method, HOST_BASE_URL, endpoint, params, returnTag, returnType, true, listener);
 			setTag(tag);
 		}
 
