@@ -208,6 +208,7 @@ public class MenuItem extends DAObject implements JacksonParser, Parcelable {
 
 	public void writeToParcel(Parcel out, int flags) {
 		out.writeString(name);
+        out.writeString(objectId);
 		out.writeString(imageName);
 		out.writeString(description);
 		out.writeInt(price != null ? price : -1);
@@ -226,6 +227,7 @@ public class MenuItem extends DAObject implements JacksonParser, Parcelable {
 
 	private MenuItem(Parcel in) {
 		name = in.readString();
+        objectId = in.readString();
 		imageName = in.readString();
 		description = in.readString();
 		price = in.readInt();
@@ -233,5 +235,6 @@ public class MenuItem extends DAObject implements JacksonParser, Parcelable {
 			price = null;
 		}
 		nutritionInfo = in.readParcelable(NutritionInformation.class.getClassLoader());
+
 	}
 }

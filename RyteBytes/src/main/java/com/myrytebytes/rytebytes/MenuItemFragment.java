@@ -54,7 +54,6 @@ public class MenuItemFragment extends BaseFragment {
 		}
 
 		if (savedInstanceState != null) {
-            //TODO: this isn't actually saved in the instance state anywhere
 			mMenuItem = savedInstanceState.getParcelable(EXTRA_MENU_ITEM);
 		}
 
@@ -89,7 +88,13 @@ public class MenuItemFragment extends BaseFragment {
 		return rootView;
 	}
 
-	@Override
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelable(EXTRA_MENU_ITEM, mMenuItem);
+    }
+
+    @Override
 	protected ContentType getContentType() {
 		return ContentType.MENU_ITEM;
 	}
