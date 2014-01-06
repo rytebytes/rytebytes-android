@@ -10,7 +10,6 @@ import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.ImageLoader.ImageCache;
 import com.android.volley.toolbox.Volley;
-import com.myrytebytes.datamanagement.Log;
 import com.myrytebytes.remote.OkHttpStack;
 
 import java.io.InputStream;
@@ -54,7 +53,6 @@ public class NetworkImageView extends com.android.volley.toolbox.NetworkImageVie
             InputStream is = getContext().getAssets().open(directory + "/" + imageReference);
             Drawable d = Drawable.createFromStream(is, null);
             setImageDrawable(d);
-            Log.d("setimagedrawable to " + d + "; on " + this);
         } catch (Exception e) {
             // We don't have this in the assets folder. Fetch remotely?
         }

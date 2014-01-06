@@ -17,7 +17,7 @@ public abstract class BaseFragment extends Fragment {
 		MENU(false, false),
 		MENU_ITEM(false, false),
 		CHECKOUT(false, false),
-		DO_RYTE(true, false),
+		DO_RYTE(false, false),
 		HEATING(false, false),
 		ACCOUNT(true, false),
         PICKUP_LOCATIONS(true, false),

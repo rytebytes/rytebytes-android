@@ -23,13 +23,24 @@
         android:layout_marginTop="6dp"
         android:gravity="center_horizontal"
         android:textSize="16sp"
+        android:text="@string/checkout_do_ryte_info"
+        />
+
+    <com.myrytebytes.widget.CustomFontTextView
+        android:id="@+id/tv_pickup_location"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/tv_do_ryte_donation"
+        android:layout_marginTop="8dp"
+        android:gravity="center_horizontal"
+        android:textSize="16sp"
         />
 
     <com.myrytebytes.widget.CustomFontTextView
         android:id="@+id/tv_order_total"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@id/tv_do_ryte_donation"
+        android:layout_above="@id/tv_pickup_location"
         android:layout_marginTop="8dp"
         android:gravity="center_horizontal"
         android:textSize="16sp"

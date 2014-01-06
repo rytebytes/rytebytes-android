@@ -27,7 +27,8 @@ public class CheckoutFragment extends BaseFragment {
 
     private View mEmptyView;
 	private TextView mTvOrderTotal;
-	private TextView mTvDoRyteDonation;
+    private TextView mTvPickupLocation;
+    private TextView mTvDoRyte;
     private View mBtnPlaceOrder;
     private OrderAdapter mOrderAdapter;
 	private Order mOrder;
@@ -100,7 +101,8 @@ public class CheckoutFragment extends BaseFragment {
         mEmptyView.findViewById(R.id.btn_add_items).setOnClickListener(mOnClickListener);
 
 		mTvOrderTotal = (TextView)rootView.findViewById(R.id.tv_order_total);
-		mTvDoRyteDonation = (TextView)rootView.findViewById(R.id.tv_do_ryte_donation);
+        mTvPickupLocation = (TextView)rootView.findViewById(R.id.tv_pickup_location);
+        mTvDoRyte = (TextView)rootView.findViewById(R.id.tv_do_ryte_donation);
 
         mBtnPlaceOrder = rootView.findViewById(R.id.btn_place_order);
 		mBtnPlaceOrder.setOnClickListener(mOnClickListener);
@@ -108,7 +110,9 @@ public class CheckoutFragment extends BaseFragment {
         mOrderAdapter = new OrderAdapter(mOrder, mOrderAdapterListener, inflater);
 		((ListView)rootView.findViewById(R.id.lv_checkout)).setAdapter(mOrderAdapter);
 
-		setTotals();
+        mTvPickupLocation.setText("Pickup Location: " + UserController.getActiveUser().location.name);
+
+        setTotals();
 
 		return rootView;
 	}
@@ -117,17 +121,18 @@ public class CheckoutFragment extends BaseFragment {
         if (mOrder.getItemTotal() == 0) {
             mEmptyView.setVisibility(View.VISIBLE);
             mTvOrderTotal.setVisibility(View.GONE);
-            mTvDoRyteDonation.setVisibility(View.GONE);
+            mTvPickupLocation.setVisibility(View.GONE);
+            mTvDoRyte.setVisibility(View.GONE);
             mBtnPlaceOrder.setVisibility(View.GONE);
         } else {
             mEmptyView.setVisibility(View.GONE);
             mTvOrderTotal.setVisibility(View.VISIBLE);
-            mTvDoRyteDonation.setVisibility(View.VISIBLE);
+            mTvPickupLocation.setVisibility(View.VISIBLE);
+            mTvDoRyte.setVisibility(View.VISIBLE);
             mBtnPlaceOrder.setVisibility(View.VISIBLE);
 
             final float orderTotal = mOrder.getTotalPrice() / 100f;
             mTvOrderTotal.setText("Order Total: $" + String.format("%.2f", orderTotal));
-            mTvDoRyteDonation.setText("Do Ryte Donation (Estimated): $" + String.format("%.2f", orderTotal * 0.05f));
         }
 	}
 
