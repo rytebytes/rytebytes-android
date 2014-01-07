@@ -110,7 +110,12 @@ public class CheckoutFragment extends BaseFragment {
         mOrderAdapter = new OrderAdapter(mOrder, mOrderAdapterListener, inflater);
 		((ListView)rootView.findViewById(R.id.lv_checkout)).setAdapter(mOrderAdapter);
 
-        mTvPickupLocation.setText("Pickup Location: " + UserController.getActiveUser().location.name);
+        User user = UserController.getActiveUser();
+        if (user != null) {
+            mTvPickupLocation.setText("Pickup Location: " + user.location.name);
+        } else {
+            mTvPickupLocation.setText("");
+        }
 
         setTotals();
 
