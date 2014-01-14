@@ -30,6 +30,10 @@ public class ApiListener {
 		public void onComplete(ParseUser user, ParseException exception);
 	}
 
+    public interface UpdateUserListener {
+        public void onComplete(boolean success);
+    }
+
 	public interface LoginListener {
 		public void onComplete(ParseUser user, ParseException exception);
 	}

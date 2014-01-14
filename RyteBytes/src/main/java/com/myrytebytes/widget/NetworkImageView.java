@@ -9,6 +9,7 @@ import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.ImageLoader.ImageCache;
 import com.android.volley.toolbox.Volley;
+import com.myrytebytes.datamanagement.Log;
 import com.myrytebytes.remote.OkHttpStack;
 
 public class NetworkImageView extends com.android.volley.toolbox.NetworkImageView {
@@ -45,12 +46,21 @@ public class NetworkImageView extends com.android.volley.toolbox.NetworkImageVie
 		});
 	}
 
-    public void setImageFilename(String imageFilename) {
+    public void setImageFilename(String imageFilename, int width) {
+        if (imageFilename.contains(".")) {
+            imageFilename = imageFilename.substring(0, imageFilename.lastIndexOf('.'));
+        }
         int resId = getResources().getIdentifier(imageFilename, "drawable", getContext().getPackageName());
         if (resId != 0) {
+            Log.d(imageFilename + " from res");
             setImageResource(resId);
         } else {
-            setImageUrl("http://res.cloudinary.com/rytebytes/image/upload/" + imageFilename, sImageLoader);
+            Log.d(imageFilename + " from cloudinary");
+            if (width > 0) {
+                setImageUrl("http://res.cloudinary.com/rytebytes/image/upload/w_" + width + "/" + imageFilename + ".jpg", sImageLoader);
+            } else {
+                setImageUrl("http://res.cloudinary.com/rytebytes/image/upload/" + imageFilename + ".jpg", sImageLoader);
+            }
         }
     }
 

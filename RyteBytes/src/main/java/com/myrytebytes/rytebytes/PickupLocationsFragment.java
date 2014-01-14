@@ -15,6 +15,7 @@ import com.myrytebytes.datamanagement.UserController;
 import com.myrytebytes.datamodel.Location;
 import com.myrytebytes.remote.ApiInterface;
 import com.myrytebytes.remote.ApiListener.GetLocationsListener;
+import com.myrytebytes.remote.ApiListener.UpdateUserListener;
 import com.myrytebytes.widget.ButtonSpinner;
 import com.myrytebytes.widget.ButtonSpinner.ButtonSpinnerListener;
 import com.myrytebytes.widget.HoloDialog;
@@ -67,13 +68,35 @@ public class PickupLocationsFragment extends BaseFragment {
             mLocation = mLocations.get(index);
         }
     };
+    private final UpdateUserListener mUpdateUserListener = new UpdateUserListener() {
+        @Override
+        public void onComplete(boolean success) {
+            if (mProgressDialog != null && mProgressDialog.isShowing()) {
+                mProgressDialog.dismiss();
+            }
+            if (success) {
+                showOkDialog("Location Updated", "Your location has been updated to " + mLocation.name, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        finish();
+                    }
+                });
+            } else {
+                showOkDialog("Error", "An error occurred while updating your location. Please try again.");
+            }
+        }
+    };
     private final OnClickListener mOnClickListener = new OnClickListener() {
         @Override
         public void onClick(View view) {
             switch (view.getId()) {
                 case R.id.btn_set_pickup_location:
-                    mProgressDialog = HoloDialog.showProgressDialog(getActivity(), "Updating Account", "Please wait...");
-                    //TODO:
+                    if (mLocation != null) {
+                        mProgressDialog = HoloDialog.showProgressDialog(getActivity(), "Updating Account", "Please wait...");
+                        ApiInterface.updateUserLocation(mLocation, mUpdateUserListener);
+                    } else {
+                        showOkDialog("No Location Selected", "Please select a location");
+                    }
                     break;
                 case R.id.spinner:
                     if (mLocations.size() == 0) {

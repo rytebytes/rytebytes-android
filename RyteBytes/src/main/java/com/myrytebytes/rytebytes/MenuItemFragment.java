@@ -7,6 +7,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.myrytebytes.datamanagement.MenuQuantityManager;
 import com.myrytebytes.datamodel.MenuItem;
 import com.myrytebytes.datamodel.Order;
 import com.myrytebytes.widget.MenuItemImageView;
@@ -24,14 +25,10 @@ public class MenuItemFragment extends BaseFragment {
 		public void onClick(View v) {
 			switch (v.getId()) {
 				case R.id.btn_step_down:
-					mOrder.decrementQuantity(mMenuItem);
-					mTvItemCount.setText("" + mOrder.getQuantity(mMenuItem));
-					mActivityCallbacks.updateCheckoutBadge();
+                    decrementQuantity();
 					break;
 				case R.id.btn_step_up:
-					mOrder.incrementQuantity(mMenuItem);
-					mTvItemCount.setText("" + mOrder.getQuantity(mMenuItem));
-					mActivityCallbacks.updateCheckoutBadge();
+                    incrementQuantity();
 					break;
 			}
 		}
@@ -92,6 +89,31 @@ public class MenuItemFragment extends BaseFragment {
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putParcelable(EXTRA_MENU_ITEM, mMenuItem);
+    }
+
+    private void setUIForQuantity() {
+        int quantityAvailable = MenuQuantityManager.getAvailableQuantity(mMenuItem);
+        int quantityRequested = mOrder.getQuantity(mMenuItem);
+        if (quantityAvailable < quantityRequested) {
+            if (quantityAvailable == 0) {
+                showOkDialog("Sold Out", mMenuItem.name + " is currently sold out at your location.");
+            } else {
+                showOkDialog("Quantity Unavailable", "There are only " + quantityAvailable + " more " + mMenuItem.name + " currently available at your location.");
+            }
+            mOrder.setQuantity(mMenuItem, quantityAvailable);
+        }
+        mTvItemCount.setText("" + mOrder.getQuantity(mMenuItem));
+        mActivityCallbacks.updateCheckoutBadge();
+    }
+
+    /*package*/ void incrementQuantity() {
+        mOrder.incrementQuantity(mMenuItem);
+        setUIForQuantity();
+    }
+
+    /*package*/ void decrementQuantity() {
+        mOrder.decrementQuantity(mMenuItem);
+        setUIForQuantity();
     }
 
     @Override

@@ -27,7 +27,10 @@ public class User implements JacksonParser {
     public User(SafeJsonParser jsonParser, boolean closeWhenComplete) {
         try {
             fillFromJSON(jsonParser, closeWhenComplete);
-            parseUser = new ParseUser();
+            parseUser = ParseUser.getCurrentUser();
+            if (parseUser == null) {
+                parseUser = new ParseUser();
+            }
             parseUser.setUsername(emailAddress);
             parseUser.setEmail(emailAddress);
             parseUser.put("locationId", ParseObject.createWithoutData("Location", location.objectId));

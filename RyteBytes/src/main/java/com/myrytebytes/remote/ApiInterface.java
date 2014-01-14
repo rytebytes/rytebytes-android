@@ -22,12 +22,14 @@ import com.myrytebytes.remote.ApiListener.GetMenuListener;
 import com.myrytebytes.remote.ApiListener.LoginListener;
 import com.myrytebytes.remote.ApiListener.PurchaseListener;
 import com.myrytebytes.remote.ApiListener.ResetPasswordListener;
+import com.myrytebytes.remote.ApiListener.UpdateUserListener;
 import com.myrytebytes.remote.JsonRequest.JsonRequestListener;
 import com.parse.LogInCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
 import com.parse.RequestPasswordResetCallback;
+import com.parse.SaveCallback;
 import com.parse.SignUpCallback;
 
 import java.util.ArrayList;
@@ -82,7 +84,6 @@ public class ApiInterface {
     }
 
 	public static void getMenu(final GetMenuListener listener) {
-        Map<String, Object> params = null;
         User user = UserController.getActiveUser();
         if (user != null && user.location != null) {
             getMenuAtLocation(listener, user.location.objectId);
@@ -128,6 +129,20 @@ public class ApiInterface {
 			}
 		});
 	}
+
+    public static void updateUserLocation(final Location location, final UpdateUserListener listener) {
+        ParseUser user = UserController.getActiveUser().parseUser;
+        user.put("locationId", ParseObject.createWithoutData("Location", location.objectId));
+        user.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                if (e == null) {
+                    UserController.getActiveUser().location = location;
+                }
+                listener.onComplete(e == null);
+            }
+        });
+    }
 
     public static void getLocation(String objectId, final GetLocationListener listener) {
         Map<String, Object> params = new HashMap<>();

@@ -2,6 +2,7 @@ package com.myrytebytes.rytebytes;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -158,14 +159,18 @@ public abstract class BaseFragment extends Fragment {
 		return mContext;
 	}
 
+    /*package*/ void showOkDialog(String title, String message, DialogInterface.OnClickListener listener) {
+        if (isAttached) {
+            new HoloDialog.Builder(getActivity())
+                    .setTitle(title)
+                    .setMessage(message)
+                    .setPositiveButton(android.R.string.ok, listener)
+                    .show();
+        }
+    }
+
 	/*package*/ void showOkDialog(String title, String message) {
-		if (isAttached) {
-			new HoloDialog.Builder(getActivity())
-					.setTitle(title)
-					.setMessage(message)
-					.setPositiveButton(android.R.string.ok, null)
-					.show();
-		}
+		showOkDialog(title, message, null);
 	}
 
 	protected abstract ContentType getContentType();
