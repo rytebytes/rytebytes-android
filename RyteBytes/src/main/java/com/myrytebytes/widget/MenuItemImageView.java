@@ -62,7 +62,7 @@ public class MenuItemImageView extends NetworkImageView {
         mItemName = menuItem.name;
         resetTextSize();
         resizeText(getMeasuredWidth() - mTextPadding * 2);
-        setImageReference("menuimages", menuItem.imageName);
+        setImageFilename(menuItem.imageName);
         invalidate();
     }
 

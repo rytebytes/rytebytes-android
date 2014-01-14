@@ -53,11 +53,8 @@ public class ApiInterface {
 	}
 
     public static void getMenuAtLocation(final GetMenuListener listener, String locationId) {
-        Map<String, Object> params = null;
-        User user = UserController.getActiveUser();
-        if (user != null && user.location != null) {
-            params.put("locationId", locationId);
-        }
+        Map<String, Object> params = new HashMap<>();
+        params.put("locationId", locationId);
         requestQueue.add(new RyteBytesRequest<>(Method.POST, "retrievemenu", params, "result", LocationItem.class, new JsonRequestListener<List<LocationItem>>() {
             @Override
             public Response<List<LocationItem>> onParseResponseComplete(Response<List<LocationItem>> response) {

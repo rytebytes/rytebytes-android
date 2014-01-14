@@ -2,7 +2,6 @@ package com.myrytebytes.widget;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
 import android.support.v4.util.LruCache;
 import android.util.AttributeSet;
 
@@ -11,8 +10,6 @@ import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.ImageLoader.ImageCache;
 import com.android.volley.toolbox.Volley;
 import com.myrytebytes.remote.OkHttpStack;
-
-import java.io.InputStream;
 
 public class NetworkImageView extends com.android.volley.toolbox.NetworkImageView {
 
@@ -48,30 +45,26 @@ public class NetworkImageView extends com.android.volley.toolbox.NetworkImageVie
 		});
 	}
 
-    public void setImageReference(String directory, String imageReference) {
-        try {
-            InputStream is = getContext().getAssets().open(directory + "/" + imageReference);
-            Drawable d = Drawable.createFromStream(is, null);
-            setImageDrawable(d);
-        } catch (Exception e) {
-            // We don't have this in the assets folder. Fetch remotely?
+    public void setImageFilename(String imageFilename) {
+        int resId = getResources().getIdentifier(imageFilename, "drawable", getContext().getPackageName());
+        if (resId != 0) {
+            setImageResource(resId);
+        } else {
+            setImageUrl("http://res.cloudinary.com/rytebytes/image/upload/" + imageFilename, sImageLoader);
         }
-
-        //TODO: this is how it SHOULD work. the code above is just there until we get a better system in place
-//		if (menuItem.imageResourceId != null) {
-//			setImageResource(menuItem.imageResourceId);
-//		} else {
-//			setImageUrl("http://www.myrytebytes/images/" + menuItem.imageName);
-//		}
     }
 
     @Override
     public void setImageResource(int resId) {
-        // no-op
+        if (resId != 0) {
+            super.setImageResource(resId);
+        }
     }
 
     @Override
     public void setImageBitmap(Bitmap bm) {
-        // no-op
+        if (bm != null) {
+            super.setImageBitmap(bm);
+        }
     }
 }

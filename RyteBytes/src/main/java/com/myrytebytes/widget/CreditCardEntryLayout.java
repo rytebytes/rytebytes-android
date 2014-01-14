@@ -274,20 +274,20 @@ public class CreditCardEntryLayout extends ViewGroup {
 	private int getCardRes(CardType cardType) {
 		switch (cardType) {
 			case AMEX:
-				return R.drawable.img_amex;
+				return R.drawable.ic_cc_amex;
 			case DINERS:
-				return R.drawable.img_diners;
+				return R.drawable.ic_cc_diners;
 			case DISCOVER:
-				return R.drawable.img_discover;
+				return R.drawable.ic_cc_discover;
 			case JCB_15:
 			case JCB_16:
-				return R.drawable.img_jcb;
+				return R.drawable.ic_cc_jcb;
 			case MASTERCARD:
-				return R.drawable.img_mastercard;
+				return R.drawable.ic_cc_mastercard;
 			case VISA:
-				return R.drawable.img_visa;
+				return R.drawable.ic_cc_visa;
 			default:
-				return R.drawable.img_generic_credit;
+				return R.drawable.ic_cc_default;
 		}
 	}
 
