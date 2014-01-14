@@ -85,6 +85,9 @@ public class MenuItemImageView extends NetworkImageView {
     }
 
     public void resetTextSize() {
+        if (!mDrawItemName) {
+            return;
+        }
         mTextPaint.setTextSize(mMaxTextSize);
         mShadowPaint.setTextSize(mMaxTextSize);
         mLastResizeWidth = 0;
@@ -92,6 +95,9 @@ public class MenuItemImageView extends NetworkImageView {
     }
 
     public void resizeText(final int width) {
+        if (!mDrawItemName) {
+            return;
+        }
         final String text = mItemName;
 
         if (text == null || text.length() == 0 || width <= 0) {

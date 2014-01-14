@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="96dp"
     android:minHeight="96dp"
-    android:padding="8dp" >
+    android:paddingRight="8dp">
 
     <com.myrytebytes.widget.MenuItemImageView
         android:id="@+id/img_menu_item"
@@ -14,6 +14,7 @@
         android:layout_height="match_parent"
         android:layout_centerVertical="true"
         android:layout_marginRight="8dp"
+        android:scaleType="centerCrop"
         />
 
     <com.myrytebytes.widget.AutoResizeTextView
@@ -21,6 +22,7 @@
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:layout_toRightOf="@id/img_menu_item"
+        android:layout_marginTop="8dp"
         android:gravity="center"
         rytebytes:maxTextSize="20sp"
         rytebytes:minTextSize="12sp"
