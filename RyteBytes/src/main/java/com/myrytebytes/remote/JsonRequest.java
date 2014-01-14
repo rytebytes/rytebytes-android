@@ -116,6 +116,9 @@ public class JsonRequest<T> extends Request<T> {
                         generator.writeEndObject();
                     }
                 }
+
+                generator.writeEndObject();
+                generator.close();
                 params = os.toByteArray();
             } catch (Exception e) {
                 params = null;
@@ -127,6 +130,15 @@ public class JsonRequest<T> extends Request<T> {
 			return super.getBody();
 		}
 	}
+
+    @Override
+    public String getBodyContentType() {
+        if (mParamMap != null && mEncodeAsJson) {
+            return "application/json; charset=" + getParamsEncoding();
+        } else {
+            return super.getBodyContentType();
+        }
+    }
 
 	@Override
 	protected void deliverResponse(T response) {
@@ -244,7 +256,7 @@ public class JsonRequest<T> extends Request<T> {
 		headers.put("Accept", "application/json");
 
 		if (getMethod() == Method.POST || getMethod() == Method.PUT) {
-			headers.put("Content-Type", "application/x-www-form-urlencoded; charset=utf8");
+			headers.put("Content-Type", getBodyContentType());
 		}
 
 		return headers;

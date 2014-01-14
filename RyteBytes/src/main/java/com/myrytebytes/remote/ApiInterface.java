@@ -7,6 +7,7 @@ import com.android.volley.Request.Method;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.myrytebytes.datamanagement.Log;
 import com.myrytebytes.datamanagement.MenuQuantityManager;
 import com.myrytebytes.datamanagement.UserController;
 import com.myrytebytes.datamodel.Location;
@@ -151,6 +152,7 @@ public class ApiInterface {
         requestQueue.add(new RyteBytesRequest<>(Method.POST, "getlocation", params, "result", Location.class, new JsonRequestListener<List<Location>>() {
             @Override
             public void onResponse(List<Location> response, int statusCode, VolleyError error) {
+                Log.d("sc = " + statusCode + "; loc = " + response);
                 if (response != null && response.size() > 0) {
                     listener.onComplete(response.get(0), statusCode);
                 } else {
@@ -220,7 +222,7 @@ public class ApiInterface {
 			headers.put("Accept", "application/json");
 
 			if (getMethod() == Method.POST || getMethod() == Method.PUT) {
-				headers.put("Content-Type", "application/x-www-form-urlencoded; charset=utf8");
+				headers.put("Content-Type", getBodyContentType());
 			}
 
 			return headers;

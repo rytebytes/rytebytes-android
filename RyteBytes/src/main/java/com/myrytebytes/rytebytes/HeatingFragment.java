@@ -16,18 +16,21 @@ public class HeatingFragment extends BaseFragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View rootView = inflater.inflate(R.layout.fragment_heating, container, false);
 
-        String instructions = "1.) PUT THE BAGS IN A POT  (NO MORE THAN 2 PASTA MEALS  OR 6 INDIVIDUAL COMPONENTS)\n" +
+        String instructions = "Remember - keep your items frozen until you cook them!  They should not be left out or in the fridge before cooking.  Always go from freezer to pot when heating.\n" +
                 "\n" +
-                "2.) FILL WITH HOT WATER UNTIL  BAGS ARE COVERED\n" +
+                "Heating your RyteBytes meal is as simple as heating water! \n" +
                 "\n" +
-                "3.) PUT THE POT ON YOUR BIGGEST BURNER, TURN ON HIGH AND  COVER WITH THE LID.\n" +
+                "1.) Place the bags in a pot (no more than 2 pasta meals or 6 individual components).\n" +
                 "\n" +
-                "4.) HEAT FOR THE FOLLOWING TIME, BASED ON THE NUMBER OF BAGS:\n" +
+                "2.) Fill with hot water until bags are covered.\n" +
                 "\n" +
-                "1 - 3 BAGS : 20 MINUTES\n" +
+                "3.) Put the pot on your biggest burner, turn on high and cover with the lid.\n" +
                 "\n" +
-                "4 - 6 BAGS : 25 MINUTES\n" +
-                "\n";
+                "4.) Bring the water to a boil and allow to boil for the following time:\n" +
+                "\n" +
+                "1 - 3 bags : 5 minutes\n" +
+                "\n" +
+                "4 - 6 bags : 15 minutes";
 
         TextView tvInstructions = (TextView)rootView.findViewById(R.id.tv_heating_instructions);
         tvInstructions.setText(instructions);
