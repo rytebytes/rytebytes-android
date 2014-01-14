@@ -11,6 +11,7 @@ import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.myrytebytes.datamanagement.MenuQuantityManager;
 import com.myrytebytes.datamanagement.UserController;
 import com.myrytebytes.datamodel.MenuItem;
 import com.myrytebytes.datamodel.Order;
@@ -188,7 +189,11 @@ public class CheckoutFragment extends BaseFragment {
         private final ButtonSpinnerListener mQuantitySpinnerListener = new ButtonSpinnerListener() {
             @Override
             public String[] getDropdownContents(ButtonSpinner spinner) {
-                return new String[] {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20"};
+                String[] contents = new String[MenuQuantityManager.getAvailableQuantity((MenuItem)spinner.getTag()) + 1];
+                for (int i = 0; i < contents.length; i++) {
+                    contents[i] = ""+i;
+                }
+                return contents;
             }
 
             @Override

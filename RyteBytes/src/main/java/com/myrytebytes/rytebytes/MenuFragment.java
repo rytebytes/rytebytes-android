@@ -138,6 +138,7 @@ public class MenuFragment extends BaseFragment {
 			MenuItem menuItem = new MenuItem();
 			menuItem.imageName = c.getString(c.getColumnIndex(MenuItem.Columns.IMAGE));
 			menuItem.imageResourceId = c.getInt(c.getColumnIndex(MenuItem.Columns.IMAGE_RES_ID));
+            menuItem.name = c.getString(c.getColumnIndex(MenuItem.Columns.NAME));
 			holder.imageView.setMenuItem(menuItem);
 		}
 

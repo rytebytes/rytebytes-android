@@ -11,4 +11,8 @@
         <attr name="android:text"/>
         <attr name="android:textColor"/>
     </declare-styleable>
+
+    <declare-styleable name="MenuItemImageView">
+        <attr name="drawItemName" format="boolean"/>
+    </declare-styleable>
 </resources>

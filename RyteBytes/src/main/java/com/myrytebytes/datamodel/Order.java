@@ -148,10 +148,8 @@ public class Order implements JacksonWriter {
 
 			OrderItem orderItem = (OrderItem) o;
 
-			if (!menuItem.equals(orderItem.menuItem)) { return false; }
-
-			return true;
-		}
+            return menuItem.equals(orderItem.menuItem);
+        }
 
 		@Override
 		public int hashCode() {

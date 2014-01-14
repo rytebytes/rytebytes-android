@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="rytebytes_yellow">#FFFBBF2E</color>
-    <color name="gray_background">#CFCFCF</color>
+    <color name="gray_background">#D8D8D8</color>
 
     <color name="holo_light_blue">#FF33B5E5</color>
     <color name="light_theme_text">#FF040404</color>

@@ -485,12 +485,12 @@ public class MainActivity extends ActionBarActivity implements ActivityCallbacks
 	private static class NavigationDrawerAdapter extends BaseAdapter {
 		private static final NavigationDrawerItem[] menu = new NavigationDrawerItem[] {
 				NavigationDrawerItem.headerItem(R.string.order),
-				NavigationDrawerItem.menuItem(R.string.eat_ryte, 0, ContentType.MENU),
+				NavigationDrawerItem.menuItem(R.string.eat_ryte, R.drawable.ic_menu_eat_ryte, ContentType.MENU),
 				NavigationDrawerItem.headerItem(R.string.account),
-				NavigationDrawerItem.menuItem(R.string.my_account, 0, ContentType.ACCOUNT),
+				NavigationDrawerItem.menuItem(R.string.my_account, R.drawable.ic_menu_settings, ContentType.ACCOUNT),
 				NavigationDrawerItem.headerItem(R.string.about),
-				NavigationDrawerItem.menuItem(R.string.heating, 0, ContentType.HEATING),
-				NavigationDrawerItem.menuItem(R.string.do_ryte, 0, ContentType.DO_RYTE),
+				NavigationDrawerItem.menuItem(R.string.heating, R.drawable.ic_menu_heating, ContentType.HEATING),
+				NavigationDrawerItem.menuItem(R.string.do_ryte, R.drawable.ic_menu_do_ryte, ContentType.DO_RYTE),
 		};
 
 		private final LayoutInflater mLayoutInflater;

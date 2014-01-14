@@ -7,11 +7,14 @@ import com.android.volley.Request.Method;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.myrytebytes.datamanagement.MenuQuantityManager;
 import com.myrytebytes.datamanagement.UserController;
 import com.myrytebytes.datamodel.Location;
+import com.myrytebytes.datamodel.LocationItem;
 import com.myrytebytes.datamodel.MenuItem;
 import com.myrytebytes.datamodel.Order;
 import com.myrytebytes.datamodel.StripeCustomer;
+import com.myrytebytes.datamodel.User;
 import com.myrytebytes.remote.ApiListener.CreateAccountListener;
 import com.myrytebytes.remote.ApiListener.GetLocationListener;
 import com.myrytebytes.remote.ApiListener.GetLocationsListener;
@@ -27,6 +30,7 @@ import com.parse.ParseUser;
 import com.parse.RequestPasswordResetCallback;
 import com.parse.SignUpCallback;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,21 +52,59 @@ public class ApiInterface {
 		}
 	}
 
-	public static void getMenu(final GetMenuListener listener) {
-		requestQueue.add(new RyteBytesRequest<>(Method.POST, "retrievemenu", null, "result", MenuItem.class, new JsonRequestListener<List<MenuItem>>() {
-			@Override
-			public Response<List<MenuItem>> onParseResponseComplete(Response<List<MenuItem>> response) {
-				for (MenuItem menuItem : response.result) {
-					menuItem.insertOrUpdateByObjectId(context);
-				}
-				return response;
-			}
+    public static void getMenuAtLocation(final GetMenuListener listener, String locationId) {
+        Map<String, Object> params = null;
+        User user = UserController.getActiveUser();
+        if (user != null && user.location != null) {
+            params.put("locationId", locationId);
+        }
+        requestQueue.add(new RyteBytesRequest<>(Method.POST, "retrievemenu", params, "result", LocationItem.class, new JsonRequestListener<List<LocationItem>>() {
+            @Override
+            public Response<List<LocationItem>> onParseResponseComplete(Response<List<LocationItem>> response) {
+                for (LocationItem locationItem : response.result) {
+                    locationItem.menuItem.insertOrUpdateByObjectId(context);
+                }
+                return response;
+            }
 
-			@Override
-			public void onResponse(List<MenuItem> response, int statusCode, VolleyError error) {
-				listener.onComplete(response, statusCode);
-			}
-		}));
+            @Override
+            public void onResponse(List<LocationItem> response, int statusCode, VolleyError error) {
+                List<MenuItem> menuItems;
+                if (response != null) {
+                    MenuQuantityManager.setLocationItems(response);
+                    menuItems = new ArrayList<>();
+                    for (LocationItem locationItem : response) {
+                        menuItems.add(locationItem.menuItem);
+                    }
+                } else {
+                    menuItems = null;
+                }
+                listener.onComplete(menuItems, statusCode);
+            }
+        }));
+    }
+
+	public static void getMenu(final GetMenuListener listener) {
+        Map<String, Object> params = null;
+        User user = UserController.getActiveUser();
+        if (user != null && user.location != null) {
+            getMenuAtLocation(listener, user.location.objectId);
+        } else {
+            requestQueue.add(new RyteBytesRequest<>(Method.POST, "retrievemenu", null, "result", MenuItem.class, new JsonRequestListener<List<MenuItem>>() {
+                @Override
+                public Response<List<MenuItem>> onParseResponseComplete(Response<List<MenuItem>> response) {
+                    for (MenuItem menuItem : response.result) {
+                        menuItem.insertOrUpdateByObjectId(context);
+                    }
+                    return response;
+                }
+
+                @Override
+                public void onResponse(List<MenuItem> response, int statusCode, VolleyError error) {
+                    listener.onComplete(response, statusCode);
+                }
+            }));
+        }
 	}
 
 	public static void getLocations(final GetLocationsListener listener) {
