@@ -25,6 +25,8 @@ public class MenuQuantityManager {
             }
             if (quantity > 20) {
                 quantity = 20;
+            } else if (quantity < 0) {
+                quantity = 0;
             }
             return quantity;
         }
