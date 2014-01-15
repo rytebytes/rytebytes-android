@@ -71,7 +71,7 @@ public class CheckoutFragment extends BaseFragment {
     };
     private final PurchaseListener mPurchaseListener = new PurchaseListener() {
         @Override
-        public void onComplete(boolean success, int statusCode) {
+        public void onComplete(boolean success, String errorMessage, int statusCode) {
             if (mProgressDialog != null && mProgressDialog.isShowing()) {
                 mProgressDialog.dismiss();
             }
@@ -86,8 +86,21 @@ public class CheckoutFragment extends BaseFragment {
                     }
                 });
             } else {
-                //TODO: real error messages should be shown here
-                showOkDialog("Error", "An error occurred while placing your order. Please try again soon!");
+                if (errorMessage == null) {
+                    errorMessage = "An error occurred while placing your order. Please try again soon!";
+                } else {
+                    int bracketStart = errorMessage.indexOf('<');
+                    int bracketEnd = errorMessage.indexOf('>');
+                    if (bracketEnd > 0 && bracketStart >= 0 && bracketEnd > bracketStart) {
+                        String objectId = errorMessage.substring(bracketStart + 1, bracketEnd);
+                        MenuItem menuItem = MenuItem.getByObjectId(objectId, getApplicationContext());
+                        if (menuItem != null) {
+                            errorMessage = errorMessage.replaceAll("<" + objectId + ">", menuItem.name);
+                        }
+                    }
+                }
+                showOkDialog("Error", errorMessage);
+                //TODO: refresh menu
             }
         }
     };

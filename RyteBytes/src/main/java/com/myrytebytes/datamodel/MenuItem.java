@@ -182,6 +182,25 @@ public class MenuItem extends DAObject implements JacksonParser, Parcelable {
         return objectIds;
     }
 
+    public static MenuItem getByObjectId(String objectId, Context context) {
+        SQLiteDatabase db = RyteBytesSQLiteOpenHelper.getInstance(context).getReadableDatabase();
+        Cursor c = db.query(Columns.TABLE_NAME, null, Columns.OBJECT_ID + "=?", new String[] {objectId}, null, null, null, null);
+        MenuItem item = null;
+        try {
+            if (c.moveToFirst()) {
+                item = new MenuItem(c);
+            }
+        } catch (Exception e) {
+        } finally {
+            if (c != null) {
+                try {
+                    c.close();
+                } catch (Exception e) { }
+            }
+        }
+        return item;
+    }
+
     public static void deleteByObjectId(String objectId, Context context) {
         RyteBytesSQLiteOpenHelper.getInstance(context).getWritableDatabase().delete(Columns.TABLE_NAME, Columns.OBJECT_ID + "=?", new String[] {objectId});
     }

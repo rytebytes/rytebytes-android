@@ -125,7 +125,7 @@ public class JsonRequest<T> extends Request<T> {
                 Log.e(e);
             }
 
-            Log.d("body = " + new String(body));
+//            Log.d("body = " + new String(body));
 			return body;
 		} else {
 			return super.getBody();
@@ -156,7 +156,7 @@ public class JsonRequest<T> extends Request<T> {
 		}
 
         //Uncomment to print the raw JSON response. Leaving this uncommented will break everything.
-        Log.d("error = " + new java.util.Scanner(((JsonNetworkResponse)error.networkResponse).inputStream).useDelimiter("\\A").next());
+//        Log.d("error = " + new java.util.Scanner(((JsonNetworkResponse)error.networkResponse).inputStream).useDelimiter("\\A").next());
         mListener.onResponse(null, statusCode, error);
 	}
 

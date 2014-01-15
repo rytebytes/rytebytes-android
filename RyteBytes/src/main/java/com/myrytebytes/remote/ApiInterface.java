@@ -3,12 +3,14 @@ package com.myrytebytes.remote;
 import android.content.Context;
 
 import com.android.volley.AuthFailureError;
+import com.android.volley.NetworkResponse;
 import com.android.volley.Request.Method;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.myrytebytes.datamanagement.MenuQuantityManager;
 import com.myrytebytes.datamanagement.UserController;
+import com.myrytebytes.datamodel.ErrorResponse;
 import com.myrytebytes.datamodel.Location;
 import com.myrytebytes.datamodel.LocationItem;
 import com.myrytebytes.datamodel.MenuItem;
@@ -40,20 +42,20 @@ import java.util.Map;
 
 public class ApiInterface {
 
-	private static String HOST_BASE_URL = "https://api.parse.com/1/functions/";
-	private static String PARSE_APP_ID = "zaZmkcjbGLCrEHagb8uJPt5TKyiFgCg9WffA6c6M";
-	private static String PARSE_API_KEY = "ZjCVp64qsDxYWw6PktZgc5PFZLdLmRuHe9oOF3q9";
+    private static String HOST_BASE_URL = "https://api.parse.com/1/functions/";
+    private static String PARSE_APP_ID = "zaZmkcjbGLCrEHagb8uJPt5TKyiFgCg9WffA6c6M";
+    private static String PARSE_API_KEY = "ZjCVp64qsDxYWw6PktZgc5PFZLdLmRuHe9oOF3q9";
 
-	private static Context context;
-	private static RequestQueue requestQueue;
+    private static Context context;
+    private static RequestQueue requestQueue;
 
-	public static void init(Context context) {
-		ApiInterface.context = context;
+    public static void init(Context context) {
+        ApiInterface.context = context;
 
-		if (requestQueue == null) {
-			requestQueue = JsonNetwork.newRequestQueue(context, new OkHttpStack());
-		}
-	}
+        if (requestQueue == null) {
+            requestQueue = JsonNetwork.newRequestQueue(context, new OkHttpStack());
+        }
+    }
 
     private static void updateMenuDatabase(List<MenuItem> menuItems) {
         List<String> currentObjectIds = MenuItem.getAllObjectIds(context);
@@ -100,7 +102,7 @@ public class ApiInterface {
         }));
     }
 
-	public static void getMenu(final GetMenuListener listener) {
+    public static void getMenu(final GetMenuListener listener) {
         User user = UserController.getActiveUser();
         if (user != null && user.location != null) {
             getMenuAtLocation(listener, user.location.objectId);
@@ -120,32 +122,32 @@ public class ApiInterface {
                 }
             }));
         }
-	}
+    }
 
-	public static void getLocations(final GetLocationsListener listener) {
-		requestQueue.add(new RyteBytesRequest<>(Method.POST, "location", null, "result", Location.class, new JsonRequestListener<List<Location>>() {
-			@Override
-			public void onResponse(List<Location> response, int statusCode, VolleyError error) {
-				listener.onComplete(response, statusCode);
-			}
-		}));
-	}
+    public static void getLocations(final GetLocationsListener listener) {
+        requestQueue.add(new RyteBytesRequest<>(Method.POST, "location", null, "result", Location.class, new JsonRequestListener<List<Location>>() {
+            @Override
+            public void onResponse(List<Location> response, int statusCode, VolleyError error) {
+                listener.onComplete(response, statusCode);
+            }
+        }));
+    }
 
-	public static void createUser(StripeCustomer customer, final Location location, final String password, final CreateAccountListener listener) {
+    public static void createUser(StripeCustomer customer, final Location location, final String password, final CreateAccountListener listener) {
         ParseUser parseUser = new ParseUser();
-		parseUser.setEmail(customer.email);
-		parseUser.setUsername(customer.email);
-		parseUser.setPassword(password);
-		parseUser.put("stripeId", customer.id);
+        parseUser.setEmail(customer.email);
+        parseUser.setUsername(customer.email);
+        parseUser.setPassword(password);
+        parseUser.put("stripeId", customer.id);
         parseUser.put("locationId", ParseObject.createWithoutData("Location", location.objectId));
-		parseUser.signUpInBackground(new SignUpCallback() {
-			@Override
-			public void done(ParseException e) {
-				UserController.setActiveUser(ParseUser.getCurrentUser(), location);
-				listener.onComplete(ParseUser.getCurrentUser(), e);
-			}
-		});
-	}
+        parseUser.signUpInBackground(new SignUpCallback() {
+            @Override
+            public void done(ParseException e) {
+                UserController.setActiveUser(ParseUser.getCurrentUser(), location);
+                listener.onComplete(ParseUser.getCurrentUser(), e);
+            }
+        });
+    }
 
     public static void updateUserLocation(final Location location, final UpdateUserListener listener) {
         ParseUser user = UserController.getActiveUser().parseUser;
@@ -179,29 +181,33 @@ public class ApiInterface {
         }));
     }
 
-	public static void login(final String email, final String password, final LoginListener listener) {
-		ParseUser.logInInBackground(email, password, new LogInCallback() {
-			@Override
-			public void done(ParseUser parseUser, ParseException e) {
+    public static void login(final String email, final String password, final LoginListener listener) {
+        ParseUser.logInInBackground(email, password, new LogInCallback() {
+            @Override
+            public void done(ParseUser parseUser, ParseException e) {
                 listener.onComplete(parseUser, e);
-			}
-		});
-	}
+            }
+        });
+    }
 
-	public static void placeOrder(Order order, String locationId, final PurchaseListener listener) {
+    public static void placeOrder(Order order, String locationId, final PurchaseListener listener) {
         Map<String, Object> params = new HashMap<>();
         params.put("locationId", locationId);
         params.put("totalInCents", order.getTotalPrice());
         params.put("userId", UserController.getActiveUser().parseUser.getObjectId());
         params.put("orderItemDictionary", order);
 
-		requestQueue.add(new RyteBytesRequest<>(35000, Method.POST, "order", params, null, PurchaseResponse.class, new JsonRequestListener<PurchaseResponse>() {
-			@Override
-			public void onResponse(PurchaseResponse response, int statusCode, VolleyError error) {
-				listener.onComplete(response != null && "success".equalsIgnoreCase(response.result), statusCode);
-			}
-		}));
-	}
+        requestQueue.add(new RyteBytesRequest<>(35000, Method.POST, "order", params, null, PurchaseResponse.class, new JsonRequestListener<PurchaseResponse>() {
+            @Override
+            public void onResponse(PurchaseResponse response, int statusCode, VolleyError error) {
+                String errorMessage = null;
+                if (error != null) {
+                    errorMessage = getErrorMessage(error.networkResponse);
+                }
+                listener.onComplete(response != null && "success".equalsIgnoreCase(response.result), errorMessage, statusCode);
+            }
+        }));
+    }
 
     public static void resetPassword(String username, final ResetPasswordListener listener) {
         ParseUser.requestPasswordResetInBackground(username, new RequestPasswordResetCallback() {
@@ -212,37 +218,45 @@ public class ApiInterface {
         });
     }
 
-	private static class RyteBytesRequest<T> extends JsonRequest<T> {
-		public RyteBytesRequest(int method, String endpoint, Map<String, Object> params, String returnTag, Class returnType, JsonRequestListener<T> listener) {
-			super(method, HOST_BASE_URL, endpoint, params, returnTag, returnType, true, listener);
-		}
+    private static String getErrorMessage(NetworkResponse networkResponse) {
+        try {
+            return new ErrorResponse(new SafeJsonParser(JsonRequest.JSON_FACTORY.createParser(((JsonNetworkResponse)networkResponse).inputStream)), true).message;
+        } catch (Exception e) {
+            return null;
+        }
+    }
 
-		public RyteBytesRequest(int timeout, int method, String endpoint, Map<String, Object> params, String returnTag, Class returnType, JsonRequestListener<T> listener) {
-			super(timeout, method, HOST_BASE_URL, endpoint, params, returnTag, returnType, true, listener);
-		}
+    private static class RyteBytesRequest<T> extends JsonRequest<T> {
+        public RyteBytesRequest(int method, String endpoint, Map<String, Object> params, String returnTag, Class returnType, JsonRequestListener<T> listener) {
+            super(method, HOST_BASE_URL, endpoint, params, returnTag, returnType, true, listener);
+        }
 
-		public RyteBytesRequest(int method, String endpoint, Map<String, Object> params, String returnTag, Class returnType, JsonRequestListener<T> listener, Object tag) {
-			super(method, HOST_BASE_URL, endpoint, params, returnTag, returnType, true, listener);
-			setTag(tag);
-		}
+        public RyteBytesRequest(int timeout, int method, String endpoint, Map<String, Object> params, String returnTag, Class returnType, JsonRequestListener<T> listener) {
+            super(timeout, method, HOST_BASE_URL, endpoint, params, returnTag, returnType, true, listener);
+        }
 
-		public RyteBytesRequest(int timeout, int method, String endpoint, Map<String, Object> params, String returnTag, Class returnType, JsonRequestListener<T> listener, Object tag) {
-			super(timeout, method, HOST_BASE_URL, endpoint, params, returnTag, returnType, true, listener);
-			setTag(tag);
-		}
+        public RyteBytesRequest(int method, String endpoint, Map<String, Object> params, String returnTag, Class returnType, JsonRequestListener<T> listener, Object tag) {
+            super(method, HOST_BASE_URL, endpoint, params, returnTag, returnType, true, listener);
+            setTag(tag);
+        }
 
-		@Override
-		public Map<String, String> getHeaders() throws AuthFailureError {
-			Map<String, String> headers = new HashMap<>();
-			headers.put("X-Parse-Application-Id", PARSE_APP_ID);
-			headers.put("X-Parse-REST-API-Key", PARSE_API_KEY);
-			headers.put("Accept", "application/json");
+        public RyteBytesRequest(int timeout, int method, String endpoint, Map<String, Object> params, String returnTag, Class returnType, JsonRequestListener<T> listener, Object tag) {
+            super(timeout, method, HOST_BASE_URL, endpoint, params, returnTag, returnType, true, listener);
+            setTag(tag);
+        }
 
-			if (getMethod() == Method.POST || getMethod() == Method.PUT) {
-				headers.put("Content-Type", getBodyContentType());
-			}
+        @Override
+        public Map<String, String> getHeaders() throws AuthFailureError {
+            Map<String, String> headers = new HashMap<>();
+            headers.put("X-Parse-Application-Id", PARSE_APP_ID);
+            headers.put("X-Parse-REST-API-Key", PARSE_API_KEY);
+            headers.put("Accept", "application/json");
 
-			return headers;
-		}
-	}
+            if (getMethod() == Method.POST || getMethod() == Method.PUT) {
+                headers.put("Content-Type", getBodyContentType());
+            }
+
+            return headers;
+        }
+    }
 }

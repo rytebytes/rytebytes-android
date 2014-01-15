@@ -38,7 +38,7 @@ public class ApiListener {
 	}
 
     public interface PurchaseListener {
-        public void onComplete(boolean success, int statusCode);
+        public void onComplete(boolean success, String errorMessage, int statusCode);
     }
 
     public interface ResetPasswordListener {

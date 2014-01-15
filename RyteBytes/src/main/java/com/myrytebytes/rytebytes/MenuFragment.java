@@ -14,7 +14,6 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 
-import com.myrytebytes.datamanagement.Log;
 import com.myrytebytes.datamanagement.SQLiteCursorLoader;
 import com.myrytebytes.datamanagement.UserController;
 import com.myrytebytes.datamodel.Location;
@@ -97,7 +96,6 @@ public class MenuFragment extends BaseFragment {
 		getLoaderManager().initLoader(1, null, mLoaderCallbacks);
         if (UserController.getActiveUser() != null) {
             if (!UserController.getActiveUser().location.equals(mLocation)) {
-                Log.d("onContentChanged");
                 mLocation = UserController.getActiveUser().location;
                 mMenuLoader.onContentChanged();
             }

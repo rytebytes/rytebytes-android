@@ -21,6 +21,7 @@ import com.myrytebytes.remote.ApiListener.GetLocationListener;
 import com.myrytebytes.remote.ApiListener.GetLocationsListener;
 import com.myrytebytes.remote.ApiListener.GetMenuListener;
 import com.myrytebytes.remote.ApiListener.LoginListener;
+import com.myrytebytes.remote.ApiListener.ResetPasswordListener;
 import com.myrytebytes.remote.StripeInterface;
 import com.myrytebytes.widget.ButtonSpinner;
 import com.myrytebytes.widget.ButtonSpinner.ButtonSpinnerListener;
@@ -55,6 +56,7 @@ public class LoginFragment extends BaseFragment {
     private Dialog mProgressDialog;
 
     private List<Location> mLocations;
+    private boolean mLocationFetchFailed;
 
     private String mEmailAddress;
     private String mPassword;
@@ -113,7 +115,6 @@ public class LoginFragment extends BaseFragment {
                 if (mProgressDialog.isShowing()) {
                     mProgressDialog.dismiss();
                 }
-                //TODO: better error messages
                 showOkDialog("Error", "An error occurred while logging in. Please try again.");
             }
         }
@@ -136,7 +137,6 @@ public class LoginFragment extends BaseFragment {
                 if (mProgressDialog.isShowing()) {
                     mProgressDialog.dismiss();
                 }
-                //TODO: better error messages
                 showOkDialog("Error", "An error occurred while logging in. Please try again.");
             } else {
                 ParseObject location = (ParseObject)user.get("locationId");
@@ -151,7 +151,11 @@ public class LoginFragment extends BaseFragment {
             switch (v.getId()) {
                 case R.id.spinner:
                     if (mLocations.size() == 0) {
-                        //TODO: display no locations dialog and wait for them to come down/retry
+                        mProgressDialog = HoloDialog.showProgressDialog(getActivity(), "Fetching Locations", "Please wait...");
+                        if (mLocationFetchFailed) {
+                            mLocationFetchFailed = false;
+                            ApiInterface.getLocations(mGetLocationsListener);
+                        }
                     }
                 case R.id.btn_login:
                     handleLogin();
@@ -160,7 +164,7 @@ public class LoginFragment extends BaseFragment {
                     createAccountButtonClicked();
                     break;
                 case R.id.btn_forgot_password:
-
+                    handleResetPassword();
                     break;
             }
         }
@@ -169,11 +173,28 @@ public class LoginFragment extends BaseFragment {
     private final GetLocationsListener mGetLocationsListener = new GetLocationsListener() {
         @Override
         public void onComplete(List<Location> locations, int statusCode) {
+            if (mProgressDialog != null && mProgressDialog.isShowing()) {
+                mProgressDialog.dismiss();
+            }
             if (locations != null) {
                 mLocations.clear();
                 mLocations.addAll(locations);
             } else {
-                // TODO:
+                mLocationFetchFailed = true;
+            }
+        }
+    };
+
+    private final ResetPasswordListener mResetPasswordListener = new ResetPasswordListener() {
+        @Override
+        public void onComplete(boolean success) {
+            if (mProgressDialog != null && mProgressDialog.isShowing()) {
+                mProgressDialog.dismiss();
+            }
+            if (success) {
+                showOkDialog("Success!", "You should receive an email with password reset instructions shortly.");
+            } else {
+                showOkDialog("Error", "An error occurred while resetting your password. Please try again soon.");
             }
         }
     };
@@ -211,6 +232,16 @@ public class LoginFragment extends BaseFragment {
 
     @Override
     protected void onShown() { }
+
+    public void handleResetPassword() {
+        String email = mEtEmail.getText().toString();
+        if (TextUtils.isEmpty(email)) {
+            showOkDialog("Enter Email Address", "Please enter your email address to reset your password.");
+        } else {
+            mProgressDialog = HoloDialog.showProgressDialog(getActivity(), "Resetting Password", "Please wait...");
+            ApiInterface.resetPassword(email, mResetPasswordListener);
+        }
+    }
 
     public void handleLogin() {
         if (validateInput()) {
@@ -266,11 +297,9 @@ public class LoginFragment extends BaseFragment {
                 if (customer != null) {
                     createParseUser(customer);
                 } else {
-                    //TODO: error codes
                     if (mProgressDialog.isShowing()) {
                         mProgressDialog.dismiss();
                     }
-                    Log.e("null customer!");
                 }
             }
         });

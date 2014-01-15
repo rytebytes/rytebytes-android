@@ -86,7 +86,6 @@ public class ChangeCreditCardFragment extends BaseFragment {
                 if (customer != null) {
                     showOkDialog("Success", "Your credit card has been updated.");
                 } else {
-                    //TODO: error codes
                     if (mProgressDialog.isShowing()) {
                         mProgressDialog.dismiss();
                     }

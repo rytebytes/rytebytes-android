@@ -60,7 +60,7 @@ public class DoRyteFragment extends BaseFragment {
             mTvTitle.setText(charity.name);
             mTvInfo.setText(charity.description);
             mImgLogo.setImageFilename(charity.image, 0);
-            mTvTotalDonations.setText("Total monthly donations:  " + "$120");
+            mTvTotalDonations.setText("Total monthly donations:  " + "$25");
         } else {
             mTvLoggedOut.setVisibility(View.VISIBLE);
             mTvTitle.setVisibility(View.GONE);
