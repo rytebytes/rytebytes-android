@@ -21,7 +21,7 @@ import java.util.Calendar;
 public class CreditCardEntryLayout extends ViewGroup {
 
 	public interface CreditCardEntryListener {
-		public void onCardVerified(String name, String cardNumber, String cardExpirationMonth, String cardExpirationYear);
+		public void onCardVerified(String cvc, String cardNumber, String cardExpirationMonth, String cardExpirationYear);
         public void onCardIOSelected();
 	}
 
@@ -35,7 +35,7 @@ public class CreditCardEntryLayout extends ViewGroup {
 	private final CustomFontEditText mEtCardNumber;
 	private final CustomFontEditText mEtMonth;
 	private final CustomFontEditText mEtYear;
-	private final CustomFontEditText mEtName;
+	private final CustomFontEditText mEtCVC;
 	private final CustomFontTextView mTvSlash;
 	private final CustomFontButton mBtnSubmit;
     private final ImageButton mBtnCardIO;
@@ -78,7 +78,7 @@ public class CreditCardEntryLayout extends ViewGroup {
 		mEtCardNumber = new CustomFontEditText(themedContext);
 		mEtMonth = new CustomFontEditText(themedContext);
 		mEtYear = new CustomFontEditText(themedContext);
-		mEtName = new CustomFontEditText(themedContext);
+		mEtCVC = new CustomFontEditText(themedContext);
 		mTvSlash = new CustomFontTextView(themedContext);
 		mBtnSubmit = new CustomFontButton(themedContext);
         mBtnCardIO = new ImageButton(themedContext);
@@ -99,9 +99,10 @@ public class CreditCardEntryLayout extends ViewGroup {
 		mEtYear.setFilters(new InputFilter[] { new InputFilter.LengthFilter(2)} );
 		mEtYear.addTextChangedListener(new CreditCardDetailTextWatcher(cardEntryListener, CreditCardDetailTextWatcher.TYPE_EXP_YEAR));
 
-		mEtName.setInputType(InputType.TYPE_TEXT_FLAG_CAP_WORDS);
-		mEtName.setHint("Cardholder Name");
-		mEtName.addTextChangedListener(new CreditCardDetailTextWatcher(cardEntryListener, CreditCardDetailTextWatcher.TYPE_CARDHOLDER_NAME));
+		mEtCVC.setInputType(InputType.TYPE_CLASS_NUMBER);
+		mEtCVC.setHint("CVC");
+        mEtMonth.setFilters(new InputFilter[] { new InputFilter.LengthFilter(4)} );
+		mEtCVC.addTextChangedListener(new CreditCardDetailTextWatcher(cardEntryListener, CreditCardDetailTextWatcher.TYPE_CVC));
 
 		mBtnSubmit.setText("Submit");
 		mBtnSubmit.setEnabled(false);
@@ -115,7 +116,7 @@ public class CreditCardEntryLayout extends ViewGroup {
 		addView(mEtCardNumber);
 		addView(mEtMonth);
 		addView(mEtYear);
-		addView(mEtName);
+		addView(mEtCVC);
 		addView(mTvSlash);
 		addView(mImgCard);
 		addView(mBtnSubmit);
@@ -131,9 +132,9 @@ public class CreditCardEntryLayout extends ViewGroup {
     }
 
 	/*package*/ void verifyCard() {
-		final String name = mEtName.getText().toString();
-		if (TextUtils.isEmpty(name)) {
-			mEtName.setError("The cardholder name cannot be left blank.");
+		final String cvc = mEtCVC.getText().toString();
+		if (TextUtils.isEmpty(cvc)) {
+			mEtCVC.setError("The CVC cannot be left blank.");
 			return;
 		}
 
@@ -155,7 +156,7 @@ public class CreditCardEntryLayout extends ViewGroup {
 			return;
 		}
 
-		mListener.onCardVerified(name, cardNumber, cardExpirationMonth, cardExpirationYear);
+		mListener.onCardVerified(cvc, cardNumber, cardExpirationMonth, cardExpirationYear);
 	}
 
 	@Override
@@ -167,7 +168,7 @@ public class CreditCardEntryLayout extends ViewGroup {
 		mEtMonth.measure(MeasureSpec.UNSPECIFIED, MeasureSpec.UNSPECIFIED);
 		mTvSlash.measure(MeasureSpec.UNSPECIFIED, MeasureSpec.UNSPECIFIED);
 		mEtYear.measure(MeasureSpec.UNSPECIFIED, MeasureSpec.UNSPECIFIED);
-		mEtName.measure(MeasureSpec.makeMeasureSpec(width - mPadding * 3 - mEtMonth.getMeasuredWidth() - mTvSlash.getMeasuredWidth() - mEtYear.getMeasuredWidth(), MeasureSpec.EXACTLY), MeasureSpec.UNSPECIFIED);
+		mEtCVC.measure(MeasureSpec.makeMeasureSpec(width - mPadding * 3 - mEtMonth.getMeasuredWidth() - mTvSlash.getMeasuredWidth() - mEtYear.getMeasuredWidth(), MeasureSpec.EXACTLY), MeasureSpec.UNSPECIFIED);
 		mBtnSubmit.measure(MeasureSpec.makeMeasureSpec(width - mPadding * 2, MeasureSpec.EXACTLY), MeasureSpec.UNSPECIFIED);
         mBtnCardIO.measure(MeasureSpec.makeMeasureSpec(mCardIOBtnWidth, MeasureSpec.EXACTLY), MeasureSpec.makeMeasureSpec(mEtCardNumber.getMeasuredHeight(), MeasureSpec.EXACTLY));
 
@@ -203,7 +204,7 @@ public class CreditCardEntryLayout extends ViewGroup {
 				mEtYear.layout(left, top, left + mEtYear.getMeasuredWidth(), top + mEtYear.getMeasuredHeight());
 
 				left += mEtYear.getMeasuredWidth() + mPadding;
-				mEtName.layout(left, top, left + mEtName.getMeasuredWidth(), top + mEtName.getMeasuredHeight());
+				mEtCVC.layout(left, top, left + mEtCVC.getMeasuredWidth(), top + mEtCVC.getMeasuredHeight());
 			}
 
 			mBtnSubmit.layout(mPadding, mEtCardNumber.getMeasuredHeight() * 2 + mPadding, mWidth - mPadding, mEtCardNumber.getMeasuredHeight() * 2 + mPadding + mBtnSubmit.getMeasuredHeight());
@@ -292,18 +293,19 @@ public class CreditCardEntryLayout extends ViewGroup {
 	}
 
 	public enum CardType {
-		UNDEF(16),
-		VISA(16),
-		MASTERCARD(16),
-		AMEX(15),
-		DISCOVER(16),
-		DINERS(14),
-		JCB_15(15),
-		JCB_16(16);
+		UNDEF(16, 4),
+		VISA(16, 3),
+		MASTERCARD(16, 3),
+		AMEX(15, 4),
+		DISCOVER(16, 3),
+		DINERS(14, 3),
+		JCB_15(15, 4),
+		JCB_16(16, 4);
 		
 		public int numberLength;
+        public int cvcLength;
 
-		private CardType(int length) {
+		private CardType(int length, int cvcLength) {
 			this.numberLength = length;
 		}
 	}
@@ -325,7 +327,7 @@ public class CreditCardEntryLayout extends ViewGroup {
 								ObjectAnimator.ofFloat(mEtMonth, "translationY", -mEtMonth.getMeasuredHeight(), 0),
 								ObjectAnimator.ofFloat(mTvSlash, "translationY", -mTvSlash.getMeasuredHeight(), 0),
 								ObjectAnimator.ofFloat(mEtYear, "translationY", -mEtYear.getMeasuredHeight(), 0),
-								ObjectAnimator.ofFloat(mEtName, "translationY", -mEtName.getMeasuredHeight(), 0)
+								ObjectAnimator.ofFloat(mEtCVC, "translationY", -mEtCVC.getMeasuredHeight(), 0)
 						);
 						set.setDuration(300).start();
 						requestLayout();
@@ -347,7 +349,7 @@ public class CreditCardEntryLayout extends ViewGroup {
 			if (complete && validateMonth()) {
 				mEtYear.requestFocus();
 
-				if (mEtYear.getText().length() == 2 && mEtName.getText().length() > 0) {
+				if (mEtYear.getText().length() == 2 && mEtCVC.getText().length() == mCardType.cvcLength) {
 					mBtnSubmit.setEnabled(true);
 				}
 			}
@@ -356,21 +358,25 @@ public class CreditCardEntryLayout extends ViewGroup {
 		public void onYearDigitEntered(boolean complete) {
 			mEtYear.setError(null);
 			if (complete && validateYear()) {
-				mEtName.requestFocus();
+				mEtCVC.requestFocus();
 
-				if (mEtMonth.getText().length() == 2 && mEtName.getText().length() > 0) {
+				if (mEtMonth.getText().length() == 2 && mEtCVC.getText().length() == mCardType.cvcLength) {
 					mBtnSubmit.setEnabled(true);
 				}
 			}
 		}
 
-		public void onCardholderNameLetterEntered() {
-			mEtName.setError(null);
+		public void onCVCDigitEntered(boolean complete) {
+			mEtCVC.setError(null);
 
-			if (mEtMonth.getText().length() == 2 && mEtYear.getText().length() == 2) {
+			if (complete && mEtMonth.getText().length() == 2 && mEtYear.getText().length() == 2) {
 				mBtnSubmit.setEnabled(true);
 			}
 		}
+
+        public CardType getCardType() {
+            return mCardType;
+        }
 	}
 
 	private class CreditCardNumberTextWatcher implements TextWatcher {
@@ -402,6 +408,7 @@ public class CreditCardEntryLayout extends ViewGroup {
 			boolean isNewCardType;
 			if (newCardType != mCardType) {
 				mCardType = newCardType;
+                mEtCVC.setFilters(new InputFilter[] { new InputFilter.LengthFilter(newCardType.cvcLength)} );
 				isNewCardType = true;
 			} else {
 				isNewCardType = false;
@@ -529,7 +536,7 @@ public class CreditCardEntryLayout extends ViewGroup {
 	private static class CreditCardDetailTextWatcher implements TextWatcher {
 		public static final int TYPE_EXP_MONTH = 0;
 		public static final int TYPE_EXP_YEAR = 1;
-		public static final int TYPE_CARDHOLDER_NAME = 3;
+		public static final int TYPE_CVC = 2;
 
 		private CardEntryListener mCallback;
 		private int mType;
@@ -564,8 +571,8 @@ public class CreditCardEntryLayout extends ViewGroup {
 				case TYPE_EXP_YEAR:
 					mCallback.onYearDigitEntered(s.length() == mMaxLength);
 					break;
-				case TYPE_CARDHOLDER_NAME:
-					mCallback.onCardholderNameLetterEntered();
+				case TYPE_CVC:
+					mCallback.onCVCDigitEntered(s.length() == mCallback.getCardType().cvcLength);
 					break;
 			}
 		}

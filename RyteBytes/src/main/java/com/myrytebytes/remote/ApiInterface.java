@@ -143,7 +143,9 @@ public class ApiInterface {
         parseUser.signUpInBackground(new SignUpCallback() {
             @Override
             public void done(ParseException e) {
-                UserController.setActiveUser(ParseUser.getCurrentUser(), location);
+                if (e == null && ParseUser.getCurrentUser() != null) {
+                    UserController.setActiveUser(ParseUser.getCurrentUser(), location);
+                }
                 listener.onComplete(ParseUser.getCurrentUser(), e);
             }
         });

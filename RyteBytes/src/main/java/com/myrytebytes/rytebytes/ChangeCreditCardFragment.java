@@ -24,15 +24,15 @@ public class ChangeCreditCardFragment extends BaseFragment {
     private CreditCardEntryLayout mCardEntryLayout;
     private Dialog mProgressDialog;
 
-    private String mCardholderName;
+    private String mCvc;
     private String mCardNumber;
     private String mCardExpMonth;
     private String mCardExpYear;
 
     private final CreditCardEntryListener mCreditCardEntryListener = new CreditCardEntryListener() {
         @Override
-        public void onCardVerified(String name, String cardNumber, String cardExpirationMonth, String cardExpirationYear) {
-            mCardholderName = name;
+        public void onCardVerified(String cvc, String cardNumber, String cardExpirationMonth, String cardExpirationYear) {
+            mCvc = cvc;
             mCardNumber = cardNumber;
             mCardExpMonth = cardExpirationMonth;
             mCardExpYear = cardExpirationYear;
@@ -55,7 +55,7 @@ public class ChangeCreditCardFragment extends BaseFragment {
 
         String type = "Visa";
         String last4 = "4242";
-        ((TextView) view.findViewById(R.id.tv_change_credit_card)).setText("Your account is currently setup to use the " + type + " ending in " + last4 + ". Enter a new card below to update.");
+        ((TextView)view.findViewById(R.id.tv_change_credit_card)).setText("Your account is currently setup to use the " + type + " ending in " + last4 + ". Enter a new card below to update.");
 
         mCardEntryLayout = (CreditCardEntryLayout)view.findViewById(R.id.card_entry_layout);
         mCardEntryLayout.setListener(mCreditCardEntryListener);
@@ -80,7 +80,7 @@ public class ChangeCreditCardFragment extends BaseFragment {
 
     /*package*/ void updateCreditCard() {
         String stripeId = "testStripeId";
-        StripeInterface.updateCardForUser(stripeId, mCardNumber, mCardholderName, mCardExpMonth, mCardExpYear, getApplicationContext(), new UpdateCreditCardListener() {
+        StripeInterface.updateCardForUser(stripeId, mCardNumber, mCvc, mCardExpMonth, mCardExpYear, getApplicationContext(), new UpdateCreditCardListener() {
             @Override
             public void onComplete(StripeCustomer customer, int statusCode) {
                 if (customer != null) {

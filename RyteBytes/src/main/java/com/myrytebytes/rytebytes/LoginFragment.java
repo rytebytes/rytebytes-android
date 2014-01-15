@@ -61,15 +61,15 @@ public class LoginFragment extends BaseFragment {
     private String mEmailAddress;
     private String mPassword;
     private Location mLocation;
-    private String mCardholderName;
+    private String mCvc;
     private String mCardNumber;
     private String mCardExpMonth;
     private String mCardExpYear;
 
     private final CreditCardEntryListener mCreditCardEntryListener = new CreditCardEntryListener() {
         @Override
-        public void onCardVerified(String name, String cardNumber, String cardExpirationMonth, String cardExpirationYear) {
-            mCardholderName = name;
+        public void onCardVerified(String cvc, String cardNumber, String cardExpirationMonth, String cardExpirationYear) {
+            mCvc = cvc;
             mCardNumber = cardNumber;
             mCardExpMonth = cardExpirationMonth;
             mCardExpYear = cardExpirationYear;
@@ -291,7 +291,7 @@ public class LoginFragment extends BaseFragment {
 
     public void createStripeUser() {
         mProgressDialog = HoloDialog.showProgressDialog(getActivity(), "Creating Account", "Please wait...");
-        StripeInterface.createCustomer(mEmailAddress, mCardholderName, mCardNumber, mCardExpMonth, mCardExpYear,getApplicationContext(), new CreateStripeAccountListener() {
+        StripeInterface.createCustomer(mEmailAddress, mCvc, mCardNumber, mCardExpMonth, mCardExpYear,getApplicationContext(), new CreateStripeAccountListener() {
             @Override
             public void onComplete(StripeCustomer customer, int statusCode) {
                 if (customer != null) {

@@ -7,6 +7,7 @@ import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
@@ -146,7 +147,7 @@ public class MainActivity extends ActionBarActivity implements ActivityCallbacks
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.checkout, menu);
-		mCheckoutActionItem = ((CheckoutActionItem)menu.findItem(R.id.btn_checkout).getActionView());
+		mCheckoutActionItem = ((CheckoutActionItem) MenuItemCompat.getActionView(menu.findItem(R.id.btn_checkout)));
 		mCheckoutActionItem.setListener(mCheckoutActionItemListener);
 		return true;
 	}

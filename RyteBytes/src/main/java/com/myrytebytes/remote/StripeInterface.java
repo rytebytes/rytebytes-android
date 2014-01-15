@@ -21,13 +21,13 @@ public class StripeInterface {
 
 	private static RequestQueue requestQueue;
 
-    public static void updateCardForUser(String stripeId, String cardNumber, String cardholderName, String expMonth, String expYear, Context context, final UpdateCreditCardListener listener) {
+    public static void updateCardForUser(String stripeId, String cardNumber, String cvc, String expMonth, String expYear, Context context, final UpdateCreditCardListener listener) {
         if (requestQueue == null) {
             requestQueue = JsonNetwork.newRequestQueue(context, new OkHttpStack());
         }
 
         Map<String, Object> customerMap = new HashMap<>();
-        customerMap.put("card[name]", cardholderName);
+        customerMap.put("card[cvc]", cvc);
         customerMap.put("card[number]", cardNumber);
         customerMap.put("card[exp_month]", expMonth);
         customerMap.put("card[exp_year]", expYear);
@@ -40,14 +40,14 @@ public class StripeInterface {
         }));
     }
 
-	public static void createCustomer(String email, String cardHolderName, String cardNumber, String expMonth, String expYear, Context context, final CreateStripeAccountListener listener) {
+	public static void createCustomer(String email, String cvc, String cardNumber, String expMonth, String expYear, Context context, final CreateStripeAccountListener listener) {
 		if (requestQueue == null) {
 			requestQueue = JsonNetwork.newRequestQueue(context, new OkHttpStack());
 		}
 
 		Map<String, Object> customerMap = new HashMap<>();
 		customerMap.put("email", email);
-        customerMap.put("card[name]", cardHolderName);
+        customerMap.put("card[cvc]", cvc);
 		customerMap.put("card[number]", cardNumber);
 		customerMap.put("card[exp_month]", expMonth);
 		customerMap.put("card[exp_year]", expYear);
