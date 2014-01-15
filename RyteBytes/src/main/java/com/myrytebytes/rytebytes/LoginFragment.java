@@ -19,6 +19,7 @@ import com.myrytebytes.remote.ApiListener.CreateAccountListener;
 import com.myrytebytes.remote.ApiListener.CreateStripeAccountListener;
 import com.myrytebytes.remote.ApiListener.GetLocationListener;
 import com.myrytebytes.remote.ApiListener.GetLocationsListener;
+import com.myrytebytes.remote.ApiListener.GetMenuListener;
 import com.myrytebytes.remote.ApiListener.LoginListener;
 import com.myrytebytes.remote.StripeInterface;
 import com.myrytebytes.widget.ButtonSpinner;
@@ -102,6 +103,48 @@ public class LoginFragment extends BaseFragment {
         }
     };
 
+    private final GetLocationListener mGetLocationListener = new GetLocationListener() {
+        @Override
+        public void onComplete(Location location, int statusCode) {
+            if (location != null) {
+                UserController.setActiveUser(ParseUser.getCurrentUser(), location);
+                ApiInterface.getMenu(mGetMenuListener);
+            } else {
+                if (mProgressDialog.isShowing()) {
+                    mProgressDialog.dismiss();
+                }
+                //TODO: better error messages
+                showOkDialog("Error", "An error occurred while logging in. Please try again.");
+            }
+        }
+    };
+
+    private final GetMenuListener mGetMenuListener = new GetMenuListener() {
+        @Override
+        public void onComplete(boolean success, int statusCode) {
+            if (mProgressDialog.isShowing()) {
+                mProgressDialog.dismiss();
+            }
+            mActivityCallbacks.loginWillFinish(true);
+        }
+    };
+
+    private final LoginListener mLoginListener = new LoginListener() {
+        @Override
+        public void onComplete(ParseUser user, ParseException exception) {
+            if (user == null || user.get("locationId") == null) {
+                if (mProgressDialog.isShowing()) {
+                    mProgressDialog.dismiss();
+                }
+                //TODO: better error messages
+                showOkDialog("Error", "An error occurred while logging in. Please try again.");
+            } else {
+                ParseObject location = (ParseObject)user.get("locationId");
+                ApiInterface.getLocation(location.getObjectId(), mGetLocationListener);
+            }
+        }
+    };
+
     private final OnClickListener mOnClickListener = new OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -172,37 +215,7 @@ public class LoginFragment extends BaseFragment {
     public void handleLogin() {
         if (validateInput()) {
             mProgressDialog = HoloDialog.showProgressDialog(getActivity(), "Logging In", "Please wait...");
-            ApiInterface.login(mEmailAddress, mPassword, new LoginListener() {
-                @Override
-                public void onComplete(ParseUser user, ParseException exception) {
-                    if (user == null || user.get("locationId") == null) {
-                        Log.d("null user");
-                        if (mProgressDialog.isShowing()) {
-                            mProgressDialog.dismiss();
-                        }
-                        //TODO: better error messages
-                        showOkDialog("Error", "An error occurred while logging in. Please try again.");
-                    } else {
-                        ParseObject location = (ParseObject)user.get("locationId");
-                        ApiInterface.getLocation(location.getObjectId(), new GetLocationListener() {
-                            @Override
-                            public void onComplete(Location location, int statusCode) {
-                                if (mProgressDialog.isShowing()) {
-                                    mProgressDialog.dismiss();
-                                }
-
-                                if (location != null) {
-                                    UserController.setActiveUser(ParseUser.getCurrentUser(), location);
-                                    mActivityCallbacks.loginWillFinish(true);
-                                } else {
-                                    //TODO: better error messages
-                                    showOkDialog("Error", "An error occurred while logging in. Please try again.");
-                                }
-                            }
-                        });
-                    }
-                }
-            });
+            ApiInterface.login(mEmailAddress, mPassword, mLoginListener);
         }
     }
 
@@ -272,7 +285,7 @@ public class LoginFragment extends BaseFragment {
                 }
 
                 if (user != null) {
-                    mActivityCallbacks.loginWillFinish(true);
+                    ApiInterface.getMenu(mGetMenuListener);
                 } else if (exception != null) {
                     switch (exception.getCode()) {
                         case ParseException.INVALID_EMAIL_ADDRESS:
