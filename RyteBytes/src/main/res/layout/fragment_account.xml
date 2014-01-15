@@ -9,13 +9,10 @@
     android:background="@drawable/launch_image" >
 
     <LinearLayout
-        android:id="@+id/view_signup_step_1"
-        android:layout_width="match_parent"
+        android:layout_width="282dp"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:background="#D7FFFFFF"
-        android:layout_marginLeft="24dp"
-        android:layout_marginRight="24dp"
         android:paddingTop="16dp"
         android:paddingBottom="16dp"
         android:orientation="vertical" >
