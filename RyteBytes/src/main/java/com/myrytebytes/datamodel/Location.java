@@ -67,6 +67,15 @@ public class Location implements JacksonParser {
 		}, closeWhenComplete);
 	}
 
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || !(o instanceof Location)) {
+            return false;
+        } else {
+            return objectId.equals(((Location) o).objectId);
+        }
+    }
+
     public void writeJson(JsonGenerator generator) {
         try {
             generator.writeStringField("name", name);

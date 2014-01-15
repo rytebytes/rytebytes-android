@@ -14,6 +14,8 @@ import com.myrytebytes.remote.JsonHandler.JsonHandlerListenerAdapter;
 import com.myrytebytes.remote.SafeJsonParser;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MenuItem extends DAObject implements JacksonParser, Parcelable {
 
@@ -160,6 +162,29 @@ public class MenuItem extends DAObject implements JacksonParser, Parcelable {
 			}
 		}
 	}
+
+    public static List<String> getAllObjectIds(Context context) {
+        SQLiteDatabase db = RyteBytesSQLiteOpenHelper.getInstance(context).getReadableDatabase();
+        Cursor c = db.query(Columns.TABLE_NAME, new String[] {Columns.OBJECT_ID}, null, null, null, null, null);
+        List<String> objectIds = new ArrayList<>();
+        try {
+            while (c.moveToNext()) {
+                objectIds.add(c.getString(0));
+            }
+        } catch (Exception e) {
+        } finally {
+            if (c != null) {
+                try {
+                    c.close();
+                } catch (Exception e) { }
+            }
+        }
+        return objectIds;
+    }
+
+    public static void deleteByObjectId(String objectId, Context context) {
+        RyteBytesSQLiteOpenHelper.getInstance(context).getWritableDatabase().delete(Columns.TABLE_NAME, Columns.OBJECT_ID + "=?", new String[] {objectId});
+    }
 
 	public void insert(Context context) {
 		id = RyteBytesSQLiteOpenHelper.getInstance(context).getWritableDatabase().insert(Columns.TABLE_NAME, null, toContentValues());

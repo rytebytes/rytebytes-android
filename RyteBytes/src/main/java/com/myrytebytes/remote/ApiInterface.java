@@ -7,13 +7,13 @@ import com.android.volley.Request.Method;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.myrytebytes.datamanagement.Log;
 import com.myrytebytes.datamanagement.MenuQuantityManager;
 import com.myrytebytes.datamanagement.UserController;
 import com.myrytebytes.datamodel.Location;
 import com.myrytebytes.datamodel.LocationItem;
 import com.myrytebytes.datamodel.MenuItem;
 import com.myrytebytes.datamodel.Order;
+import com.myrytebytes.datamodel.PurchaseResponse;
 import com.myrytebytes.datamodel.StripeCustomer;
 import com.myrytebytes.datamodel.User;
 import com.myrytebytes.remote.ApiListener.CreateAccountListener;
@@ -55,31 +55,47 @@ public class ApiInterface {
 		}
 	}
 
+    private static void updateMenuDatabase(List<MenuItem> menuItems) {
+        List<String> currentObjectIds = MenuItem.getAllObjectIds(context);
+        for (String objectId : currentObjectIds) {
+            boolean contains = false;
+            for (MenuItem menuItem : menuItems) {
+                if (menuItem.objectId.equals(objectId)) {
+                    contains = true;
+                    break;
+                }
+            }
+            if (!contains) {
+                MenuItem.deleteByObjectId(objectId, context);
+            }
+        }
+
+        for (MenuItem menuItem : menuItems) {
+            menuItem.insertOrUpdateByObjectId(context);
+        }
+    }
+
     public static void getMenuAtLocation(final GetMenuListener listener, String locationId) {
         Map<String, Object> params = new HashMap<>();
         params.put("locationId", locationId);
         requestQueue.add(new RyteBytesRequest<>(Method.POST, "retrievemenu", params, "result", LocationItem.class, new JsonRequestListener<List<LocationItem>>() {
             @Override
             public Response<List<LocationItem>> onParseResponseComplete(Response<List<LocationItem>> response) {
-                for (LocationItem locationItem : response.result) {
-                    locationItem.menuItem.insertOrUpdateByObjectId(context);
+                List<MenuItem> menuItems;
+                if (response != null) {
+                    MenuQuantityManager.setLocationItems(response.result);
+                    menuItems = new ArrayList<>();
+                    for (LocationItem locationItem : response.result) {
+                        menuItems.add(locationItem.menuItem);
+                    }
+                    updateMenuDatabase(menuItems);
                 }
                 return response;
             }
 
             @Override
             public void onResponse(List<LocationItem> response, int statusCode, VolleyError error) {
-                List<MenuItem> menuItems;
-                if (response != null) {
-                    MenuQuantityManager.setLocationItems(response);
-                    menuItems = new ArrayList<>();
-                    for (LocationItem locationItem : response) {
-                        menuItems.add(locationItem.menuItem);
-                    }
-                } else {
-                    menuItems = null;
-                }
-                listener.onComplete(menuItems, statusCode);
+                listener.onComplete(response != null, statusCode);
             }
         }));
     }
@@ -100,7 +116,7 @@ public class ApiInterface {
 
                 @Override
                 public void onResponse(List<MenuItem> response, int statusCode, VolleyError error) {
-                    listener.onComplete(response, statusCode);
+                    listener.onComplete(response != null, statusCode);
                 }
             }));
         }
@@ -138,7 +154,9 @@ public class ApiInterface {
             @Override
             public void done(ParseException e) {
                 if (e == null) {
-                    UserController.getActiveUser().location = location;
+                    User user = UserController.getActiveUser();
+                    user.location = location;
+                    UserController.setActiveUser(user);
                 }
                 listener.onComplete(e == null);
             }
@@ -152,7 +170,6 @@ public class ApiInterface {
         requestQueue.add(new RyteBytesRequest<>(Method.POST, "getlocation", params, "result", Location.class, new JsonRequestListener<List<Location>>() {
             @Override
             public void onResponse(List<Location> response, int statusCode, VolleyError error) {
-                Log.d("sc = " + statusCode + "; loc = " + response);
                 if (response != null && response.size() > 0) {
                     listener.onComplete(response.get(0), statusCode);
                 } else {
@@ -176,12 +193,12 @@ public class ApiInterface {
         params.put("locationId", locationId);
         params.put("totalInCents", order.getTotalPrice());
         params.put("userId", UserController.getActiveUser().parseUser.getObjectId());
-        params.put("orderItemDicionary", order);
+        params.put("orderItemDictionary", order);
 
-		requestQueue.add(new RyteBytesRequest<>(35000, Method.POST, "order", params, null, String.class, new JsonRequestListener<String>() {
+		requestQueue.add(new RyteBytesRequest<>(35000, Method.POST, "order", params, null, PurchaseResponse.class, new JsonRequestListener<PurchaseResponse>() {
 			@Override
-			public void onResponse(String response, int statusCode, VolleyError error) {
-				listener.onComplete(statusCode == 200, statusCode);
+			public void onResponse(PurchaseResponse response, int statusCode, VolleyError error) {
+				listener.onComplete(response != null && "success".equalsIgnoreCase(response.result), statusCode);
 			}
 		}));
 	}

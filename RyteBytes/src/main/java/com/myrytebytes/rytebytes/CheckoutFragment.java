@@ -40,13 +40,14 @@ public class CheckoutFragment extends BaseFragment {
 		public void onClick(View v) {
 			switch (v.getId()) {
 				case R.id.btn_place_order:
-					//TODO: add locationID
-                    User user = UserController.getActiveUser();
-                    if (user == null) {
-                        mActivityCallbacks.displayLoginFragment(false);
-                    } else {
-                        mProgressDialog = HoloDialog.showProgressDialog(getActivity(), null, "Placing order...", false);
-                        ApiInterface.placeOrder(mOrder, user.location.objectId, mPurchaseListener);
+                    if (verifyQuantitiesAvailable()) {
+                        User user = UserController.getActiveUser();
+                        if (user == null) {
+                            mActivityCallbacks.displayLoginFragment(false);
+                        } else {
+                            mProgressDialog = HoloDialog.showProgressDialog(getActivity(), null, "Placing order...", false);
+                            ApiInterface.placeOrder(mOrder, user.location.objectId, mPurchaseListener);
+                        }
                     }
 					break;
                 case R.id.btn_add_items:
@@ -76,10 +77,17 @@ public class CheckoutFragment extends BaseFragment {
             }
 
             if (success) {
-                //TODO:
                 mOrder.clear();
+                mActivityCallbacks.updateCheckoutBadge();
+                showOkDialog("Success!", "Enjoy your dinner - a receipt will be emailed to you shortly!", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        mActivityCallbacks.popToRoot(true);
+                    }
+                });
             } else {
-                //TODO:
+                //TODO: real error messages should be shown here
+                showOkDialog("Error", "An error occurred while placing your order. Please try again soon!");
             }
         }
     };
@@ -123,6 +131,29 @@ public class CheckoutFragment extends BaseFragment {
 		return rootView;
 	}
 
+    public boolean verifyQuantitiesAvailable() {
+        boolean success = true;
+
+        for (int i = 0; i < mOrder.getUniqueItemTotal(); i++) {
+            MenuItem item = mOrder.getItemAtPosition(i);
+            int quantity = mOrder.getQuantity(item);
+            int available = MenuQuantityManager.getAvailableQuantity(item);
+
+            if (available < quantity) {
+                success = false;
+                mOrder.setQuantity(item, available);
+            }
+        }
+
+        if (!success) {
+            showOkDialog("Items Unavailable", "Oh no! It looks like not all of the items you're looking for are currently available at your location. Your cart has been updated with what we have available.");
+            mOrderAdapter.notifyDataSetChanged();
+            mActivityCallbacks.updateCheckoutBadge();
+            setTotals();
+        }
+        return success;
+    }
+
 	public void setTotals() {
         if (mOrder.getItemTotal() == 0) {
             mEmptyView.setVisibility(View.VISIBLE);
@@ -153,7 +184,9 @@ public class CheckoutFragment extends BaseFragment {
 	}
 
 	@Override
-	protected void onShown() { }
+	protected void onShown() {
+        verifyQuantitiesAvailable();
+    }
 
     /*package*/ void displayRemoveItemDialog(final MenuItem menuItem) {
         new HoloDialog.Builder(getActivity())

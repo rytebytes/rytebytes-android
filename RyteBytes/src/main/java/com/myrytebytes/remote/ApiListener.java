@@ -1,7 +1,6 @@
 package com.myrytebytes.remote;
 
 import com.myrytebytes.datamodel.Location;
-import com.myrytebytes.datamodel.MenuItem;
 import com.myrytebytes.datamodel.StripeCustomer;
 import com.parse.ParseException;
 import com.parse.ParseUser;
@@ -11,7 +10,7 @@ import java.util.List;
 public class ApiListener {
 
 	public interface GetMenuListener {
-		public void onComplete(List<MenuItem> menu, int statusCode);
+		public void onComplete(boolean success, int statusCode);
 	}
 
 	public interface GetLocationsListener {

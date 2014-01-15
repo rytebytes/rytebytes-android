@@ -15,6 +15,7 @@ import com.myrytebytes.datamanagement.UserController;
 import com.myrytebytes.datamodel.Location;
 import com.myrytebytes.remote.ApiInterface;
 import com.myrytebytes.remote.ApiListener.GetLocationsListener;
+import com.myrytebytes.remote.ApiListener.GetMenuListener;
 import com.myrytebytes.remote.ApiListener.UpdateUserListener;
 import com.myrytebytes.widget.ButtonSpinner;
 import com.myrytebytes.widget.ButtonSpinner.ButtonSpinnerListener;
@@ -71,19 +72,28 @@ public class PickupLocationsFragment extends BaseFragment {
     private final UpdateUserListener mUpdateUserListener = new UpdateUserListener() {
         @Override
         public void onComplete(boolean success) {
+            if (success) {
+                ApiInterface.getMenu(mGetMenuListener);
+            } else {
+                if (mProgressDialog != null && mProgressDialog.isShowing()) {
+                    mProgressDialog.dismiss();
+                }
+                showOkDialog("Error", "An error occurred while updating your location. Please try again.");
+            }
+        }
+    };
+    private final GetMenuListener mGetMenuListener = new GetMenuListener() {
+        @Override
+        public void onComplete(boolean success, int statusCode) {
             if (mProgressDialog != null && mProgressDialog.isShowing()) {
                 mProgressDialog.dismiss();
             }
-            if (success) {
-                showOkDialog("Location Updated", "Your location has been updated to " + mLocation.name, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        finish();
-                    }
-                });
-            } else {
-                showOkDialog("Error", "An error occurred while updating your location. Please try again.");
-            }
+            showOkDialog("Location Updated", "Your location has been updated to " + mLocation.name, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    finish();
+                }
+            });
         }
     };
     private final OnClickListener mOnClickListener = new OnClickListener() {

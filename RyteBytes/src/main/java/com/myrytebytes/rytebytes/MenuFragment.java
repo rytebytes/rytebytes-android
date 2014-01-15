@@ -14,19 +14,21 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 
+import com.myrytebytes.datamanagement.Log;
 import com.myrytebytes.datamanagement.SQLiteCursorLoader;
+import com.myrytebytes.datamanagement.UserController;
+import com.myrytebytes.datamodel.Location;
 import com.myrytebytes.datamodel.MenuItem;
 import com.myrytebytes.remote.ApiInterface;
 import com.myrytebytes.remote.ApiListener.GetMenuListener;
 import com.myrytebytes.widget.MenuItemImageView;
-
-import java.util.List;
 
 public class MenuFragment extends BaseFragment {
 
 	private ListView mLvMenu;
 	private MenuAdapter mMenuAdapter;
 	private SQLiteCursorLoader mMenuLoader;
+    private Location mLocation;
 	private boolean isRemoteMenuLoaded;
 
 	private OnItemClickListener mOnItemClickListener = new OnItemClickListener() {
@@ -73,6 +75,9 @@ public class MenuFragment extends BaseFragment {
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
 		if (!isRemoteMenuLoaded) {
+            if (UserController.getActiveUser() != null) {
+                mLocation = UserController.getActiveUser().location;
+            }
 			refreshMenu();
 		}
 	}
@@ -90,13 +95,20 @@ public class MenuFragment extends BaseFragment {
 	@Override
 	protected void onShown() {
 		getLoaderManager().initLoader(1, null, mLoaderCallbacks);
+        if (UserController.getActiveUser() != null) {
+            if (!UserController.getActiveUser().location.equals(mLocation)) {
+                Log.d("onContentChanged");
+                mLocation = UserController.getActiveUser().location;
+                mMenuLoader.onContentChanged();
+            }
+        }
 	}
 
 	public void refreshMenu() {
 		ApiInterface.getMenu(new GetMenuListener() {
 			@Override
-			public void onComplete(List<MenuItem> menu, int statusCode) {
-				if (menu != null) {
+			public void onComplete(boolean success, int statusCode) {
+				if (success) {
 					isRemoteMenuLoaded = true;
 				}
 				mMenuLoader.onContentChanged();
@@ -139,6 +151,7 @@ public class MenuFragment extends BaseFragment {
 			menuItem.imageName = c.getString(c.getColumnIndex(MenuItem.Columns.IMAGE));
 			menuItem.imageResourceId = c.getInt(c.getColumnIndex(MenuItem.Columns.IMAGE_RES_ID));
             menuItem.name = c.getString(c.getColumnIndex(MenuItem.Columns.NAME));
+            holder.imageView.clearImage();
 			holder.imageView.setMenuItem(menuItem);
 		}
 

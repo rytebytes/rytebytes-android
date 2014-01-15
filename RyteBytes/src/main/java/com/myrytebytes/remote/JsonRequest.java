@@ -98,7 +98,7 @@ public class JsonRequest<T> extends Request<T> {
 	@Override
 	public byte[] getBody() throws AuthFailureError {
 		if (mParamMap != null && mEncodeAsJson) {
-            byte[] params;
+            byte[] body;
             try {
                 ByteArrayOutputStream os = new ByteArrayOutputStream();
                 JsonGenerator generator = JsonRequest.JSON_FACTORY.createGenerator(os);
@@ -119,13 +119,14 @@ public class JsonRequest<T> extends Request<T> {
 
                 generator.writeEndObject();
                 generator.close();
-                params = os.toByteArray();
+                body = os.toByteArray();
             } catch (Exception e) {
-                params = null;
+                body = null;
                 Log.e(e);
             }
 
-			return params;
+            Log.d("body = " + new String(body));
+			return body;
 		} else {
 			return super.getBody();
 		}
@@ -154,7 +155,9 @@ public class JsonRequest<T> extends Request<T> {
 			statusCode = 0;
 		}
 
-		mListener.onResponse(null, statusCode, error);
+        //Uncomment to print the raw JSON response. Leaving this uncommented will break everything.
+        Log.d("error = " + new java.util.Scanner(((JsonNetworkResponse)error.networkResponse).inputStream).useDelimiter("\\A").next());
+        mListener.onResponse(null, statusCode, error);
 	}
 
 	@Override
@@ -234,13 +237,13 @@ public class JsonRequest<T> extends Request<T> {
 	/*package*/ Object getResponseObject(SafeJsonParser jsonParser, boolean closeWhenComplete) {
 		try {
 			if (jsonParser.getCurrentToken() == JsonToken.START_OBJECT) {
-				Object data = mReturnType.newInstance();
-				if (!(data instanceof JacksonParser)) {
-					throw new Exception("Classes must implement the JacksonParser interface in order to be parsed");
-				} else {
-					((JacksonParser)data).fillFromJSON(jsonParser, closeWhenComplete);
-				}
-				return data;
+                Object data = mReturnType.newInstance();
+                if (!(data instanceof JacksonParser)) {
+                    throw new Exception("Unparsable object!");
+                } else {
+                    ((JacksonParser)data).fillFromJSON(jsonParser, closeWhenComplete);
+                }
+                return data;
 			} else {
 				return null;
 			}
