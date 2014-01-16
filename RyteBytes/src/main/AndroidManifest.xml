@@ -31,6 +31,7 @@
         <activity android:name="io.card.payment.CardIOActivity" android:configChanges="keyboardHidden|orientation" />
         <activity android:name="io.card.payment.DataEntryActivity" />
 
+        <meta-data android:name="com.crashlytics.ApiKey" android:value="e371efa75ceb0c8fcee2be8d7becc8fa12b8cb9f"/>
     </application>
 
 </manifest>
