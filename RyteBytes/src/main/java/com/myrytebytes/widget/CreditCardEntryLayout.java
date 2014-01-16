@@ -101,7 +101,7 @@ public class CreditCardEntryLayout extends ViewGroup {
 
 		mEtCVC.setInputType(InputType.TYPE_CLASS_NUMBER);
 		mEtCVC.setHint("CVC");
-        mEtMonth.setFilters(new InputFilter[] { new InputFilter.LengthFilter(4)} );
+        mEtCVC.setFilters(new InputFilter[] { new InputFilter.LengthFilter(4)} );
 		mEtCVC.addTextChangedListener(new CreditCardDetailTextWatcher(cardEntryListener, CreditCardDetailTextWatcher.TYPE_CVC));
 
 		mBtnSubmit.setText("Submit");
@@ -307,6 +307,7 @@ public class CreditCardEntryLayout extends ViewGroup {
 
 		private CardType(int length, int cvcLength) {
 			this.numberLength = length;
+            this.cvcLength = cvcLength;
 		}
 	}
 

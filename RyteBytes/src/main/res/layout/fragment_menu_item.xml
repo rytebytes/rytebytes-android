@@ -11,14 +11,29 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" >
 
+        <com.myrytebytes.widget.AutoResizeTextView
+            android:id="@+id/tv_price"
+            android:layout_width="80dp"
+            android:layout_height="110dp"
+            android:layout_alignParentRight="true"
+            android:gravity="center"
+            android:background="@color/rytebytes_yellow"
+            android:padding="4dp"
+            rytebytes:maxTextSize="20sp"
+            rytebytes:minTextSize="12dp"
+            rytebytes:maxLineCount="2"
+            rytebytes:font="bold"
+            />
+
         <com.myrytebytes.widget.CustomFontTextView
             android:id="@+id/tv_how_many"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:layout_marginBottom="8dp"
+            android:layout_toLeftOf="@id/tv_price"
             android:text="@string/how_many"
-            android:textSize="20sp"
+            android:textSize="20dp"
             android:gravity="center"
             />
 
@@ -27,6 +42,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/tv_how_many"
+            android:layout_toLeftOf="@id/tv_price"
             android:layout_marginBottom="8dp"
             android:gravity="center"
             android:orientation="horizontal" >

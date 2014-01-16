@@ -8,11 +8,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.myrytebytes.datamanagement.UserController;
 import com.myrytebytes.datamodel.StripeCustomer;
+import com.myrytebytes.remote.ApiListener.FetchCreditCardListener;
 import com.myrytebytes.remote.ApiListener.UpdateCreditCardListener;
 import com.myrytebytes.remote.StripeInterface;
 import com.myrytebytes.widget.CreditCardEntryLayout;
 import com.myrytebytes.widget.CreditCardEntryLayout.CreditCardEntryListener;
+import com.myrytebytes.widget.HoloDialog;
 
 import io.card.payment.CardIOActivity;
 import io.card.payment.CreditCard;
@@ -49,16 +52,46 @@ public class ChangeCreditCardFragment extends BaseFragment {
         }
     };
 
+    private final UpdateCreditCardListener mUpdateCreditCardListener = new UpdateCreditCardListener() {
+        @Override
+        public void onComplete(StripeCustomer customer, int statusCode) {
+            if (mProgressDialog.isShowing()) {
+                mProgressDialog.dismiss();
+            }
+            if (customer != null) {
+                showOkDialog("Success", "Your credit card has been updated.");
+            } else {
+                showOkDialog("Error", "An error occurred while updating your card. Please check your card number and try again.");
+            }
+        }
+    };
+
+    private final FetchCreditCardListener mFetchCreditCardListener = new FetchCreditCardListener() {
+        @Override
+        public void onComplete(StripeCustomer customer, int statusCode) {
+            if (mProgressDialog != null && mProgressDialog.isShowing()) {
+                mProgressDialog.dismiss();
+            }
+            if (customer != null && customer.cards != null && customer.cards.size() > 0) {
+                String type = customer.cards.get(0).type;
+                int last4 = customer.cards.get(0).last4;
+                ((TextView)getView().findViewById(R.id.tv_change_credit_card)).setText("Your account is currently setup to use the " + type + " ending in " + last4 + ". Enter a new card below to update.");
+            } else {
+                ((TextView)getView().findViewById(R.id.tv_change_credit_card)).setText("Enter a new card below to update the billing method of your account.");
+
+            }
+        }
+    };
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_change_credit_card, container, false);
 
-        String type = "Visa";
-        String last4 = "4242";
-        ((TextView)view.findViewById(R.id.tv_change_credit_card)).setText("Your account is currently setup to use the " + type + " ending in " + last4 + ". Enter a new card below to update.");
-
         mCardEntryLayout = (CreditCardEntryLayout)view.findViewById(R.id.card_entry_layout);
         mCardEntryLayout.setListener(mCreditCardEntryListener);
+
+        mProgressDialog = HoloDialog.showProgressDialog(getActivity(), "Fetching Credit Card", "Please wait...");
+        StripeInterface.fetchCardForUser(UserController.getActiveUser().stripeId, getApplicationContext(), mFetchCreditCardListener);
 
         return view;
     }
@@ -80,19 +113,8 @@ public class ChangeCreditCardFragment extends BaseFragment {
 
     /*package*/ void updateCreditCard() {
         String stripeId = "testStripeId";
-        StripeInterface.updateCardForUser(stripeId, mCardNumber, mCvc, mCardExpMonth, mCardExpYear, getApplicationContext(), new UpdateCreditCardListener() {
-            @Override
-            public void onComplete(StripeCustomer customer, int statusCode) {
-                if (customer != null) {
-                    showOkDialog("Success", "Your credit card has been updated.");
-                } else {
-                    if (mProgressDialog.isShowing()) {
-                        mProgressDialog.dismiss();
-                    }
-                    showOkDialog("Error", "An error occurred while updating your card. Please check your card number and try again.");
-                }
-            }
-        });
+        mProgressDialog = HoloDialog.showProgressDialog(getActivity(), "Updating Credit Card", "Please wait...");
+        StripeInterface.updateCardForUser(stripeId, mCardNumber, mCvc, mCardExpMonth, mCardExpYear, getApplicationContext(), mUpdateCreditCardListener);
     }
 
     @Override

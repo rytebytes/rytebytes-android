@@ -21,6 +21,10 @@ public class ApiListener {
         public void onComplete(StripeCustomer customer, int statusCode);
     }
 
+    public interface FetchCreditCardListener {
+        public void onComplete(StripeCustomer customer, int statusCode);
+    }
+
 	public interface CreateStripeAccountListener {
 		public void onComplete(StripeCustomer customer, int statusCode);
 	}

@@ -10,6 +10,7 @@ import android.widget.TextView;
 import com.myrytebytes.datamanagement.MenuQuantityManager;
 import com.myrytebytes.datamodel.MenuItem;
 import com.myrytebytes.datamodel.Order;
+import com.myrytebytes.widget.AutoResizeTextView;
 import com.myrytebytes.widget.MenuItemImageView;
 
 public class MenuItemFragment extends BaseFragment {
@@ -61,6 +62,7 @@ public class MenuItemFragment extends BaseFragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View rootView = inflater.inflate(R.layout.fragment_menu_item, container, false);
 		((TextView)rootView.findViewById(R.id.tv_description)).setText(mMenuItem.description);
+        ((AutoResizeTextView)rootView.findViewById(R.id.tv_price)).setText("$" + String.format("%.2f", mMenuItem.price / 100f) + "\neach");
 
 		String caloriesString = mMenuItem.nutritionInfo.calories != null ? ""+mMenuItem.nutritionInfo.calories : "Unknown";
 		((TextView)rootView.findViewById(R.id.tv_calories)).setText(caloriesString);

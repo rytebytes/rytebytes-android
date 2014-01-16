@@ -16,11 +16,13 @@ public class User implements JacksonParser {
 
     public String emailAddress;
     public Location location;
+    public String stripeId;
     public ParseUser parseUser;
 
     public User(ParseUser parseUser, Location location) {
         this.parseUser = parseUser;
         this.emailAddress = parseUser.getEmail();
+        this.stripeId = (String)parseUser.get("stripeId");
         this.location = location;
     }
 
@@ -33,6 +35,7 @@ public class User implements JacksonParser {
             }
             parseUser.setUsername(emailAddress);
             parseUser.setEmail(emailAddress);
+            parseUser.put("stripeId", stripeId);
             parseUser.put("locationId", ParseObject.createWithoutData("Location", location.objectId));
         } catch (IOException e) {
             Log.e("Error filling User", e);
@@ -58,6 +61,9 @@ public class User implements JacksonParser {
                     case "emailAddress":
                         emailAddress = jsonParser.getStringValue();
                         break;
+                    case "stripeId":
+                        stripeId = jsonParser.getStringValue();
+                        break;
                 }
             }
         }, closeWhenComplete);
@@ -69,6 +75,7 @@ public class User implements JacksonParser {
             JsonGenerator generator = JsonRequest.JSON_FACTORY.createGenerator(os);
             generator.writeStartObject();
             generator.writeStringField("emailAddress", emailAddress);
+            generator.writeStringField("stripeId", stripeId);
             generator.writeObjectFieldStart("location");
             location.writeJson(generator);
             generator.writeEndObject();

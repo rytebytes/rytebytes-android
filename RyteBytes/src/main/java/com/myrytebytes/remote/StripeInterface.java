@@ -8,6 +8,7 @@ import com.android.volley.RequestQueue;
 import com.android.volley.VolleyError;
 import com.myrytebytes.datamodel.StripeCustomer;
 import com.myrytebytes.remote.ApiListener.CreateStripeAccountListener;
+import com.myrytebytes.remote.ApiListener.FetchCreditCardListener;
 import com.myrytebytes.remote.ApiListener.UpdateCreditCardListener;
 import com.myrytebytes.remote.JsonRequest.JsonRequestListener;
 
@@ -59,6 +60,19 @@ public class StripeInterface {
 			}
 		}));
 	}
+
+    public static void fetchCardForUser(String stripeId, Context context, final FetchCreditCardListener listener) {
+        if (requestQueue == null) {
+            requestQueue = JsonNetwork.newRequestQueue(context, new OkHttpStack());
+        }
+
+        requestQueue.add(new StripeRequest<>(Method.GET, "v1/customers/" + stripeId, null, null, StripeCustomer.class, new JsonRequestListener<StripeCustomer>() {
+            @Override
+            public void onResponse(StripeCustomer response, int statusCode, VolleyError error) {
+                listener.onComplete(response, statusCode);
+            }
+        }));
+    }
 
 	private static class StripeRequest<T> extends JsonRequest<T> {
 		public StripeRequest(int method, String endpoint, Map<String, Object> params, String returnTag, Class returnType, JsonRequestListener<T> listener) {
