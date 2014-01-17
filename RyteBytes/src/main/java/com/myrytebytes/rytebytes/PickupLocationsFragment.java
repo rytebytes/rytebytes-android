@@ -130,6 +130,7 @@ public class PickupLocationsFragment extends BaseFragment {
         View view = inflater.inflate(R.layout.fragment_pickup_locations, container, false);
 
         ((ButtonSpinner)view.findViewById(R.id.spinner)).setListener(mButtonSpinnerListener);
+        view.findViewById(R.id.spinner).setOnClickListener(mOnClickListener);
         view.findViewById(R.id.btn_set_pickup_location).setOnClickListener(mOnClickListener);
 
         Location currentLocation = UserController.getActiveUser().location;

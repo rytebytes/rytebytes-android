@@ -17,6 +17,7 @@ import com.myrytebytes.datamodel.MenuItem;
 import com.myrytebytes.datamodel.Order;
 import com.myrytebytes.datamodel.User;
 import com.myrytebytes.remote.ApiInterface;
+import com.myrytebytes.remote.ApiListener.GetMenuListener;
 import com.myrytebytes.remote.ApiListener.PurchaseListener;
 import com.myrytebytes.widget.AutoResizeTextView;
 import com.myrytebytes.widget.ButtonSpinner;
@@ -34,13 +35,14 @@ public class CheckoutFragment extends BaseFragment {
     private OrderAdapter mOrderAdapter;
 	private Order mOrder;
     private Dialog mProgressDialog;
+    private PurchaseResponseHolder mPurchaseResponseHolder;
 
 	private final OnClickListener mOnClickListener = new OnClickListener() {
 		@Override
 		public void onClick(View v) {
 			switch (v.getId()) {
 				case R.id.btn_place_order:
-                    if (verifyQuantitiesAvailable()) {
+                    if (verifyQuantitiesAvailable(true)) {
                         User user = UserController.getActiveUser();
                         if (user == null) {
                             mActivityCallbacks.displayLoginFragment(false);
@@ -56,7 +58,7 @@ public class CheckoutFragment extends BaseFragment {
 			}
 		}
 	};
-    private final OrderAdapter.OrderAdapterListener mOrderAdapterListener = new OrderAdapter.OrderAdapterListener() {
+    private final OrderAdapterListener mOrderAdapterListener = new OrderAdapterListener() {
         @Override
         public void onQuantityChanged(MenuItem menuItem, int newQuantity) {
             if (newQuantity == 0) {
@@ -69,39 +71,49 @@ public class CheckoutFragment extends BaseFragment {
             }
         }
     };
-    private final PurchaseListener mPurchaseListener = new PurchaseListener() {
+    private final GetMenuListener mGetMenuListener = new GetMenuListener() {
         @Override
-        public void onComplete(boolean success, String errorMessage, int statusCode) {
+        public void onComplete(boolean success, int statusCode) {
             if (mProgressDialog != null && mProgressDialog.isShowing()) {
                 mProgressDialog.dismiss();
             }
 
-            if (success) {
-                mOrder.clear();
-                mActivityCallbacks.updateCheckoutBadge();
-                showOkDialog("Success!", "Enjoy your dinner - a receipt will be emailed to you shortly!", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        mActivityCallbacks.popToRoot(true);
-                    }
-                });
-            } else {
-                if (errorMessage == null) {
-                    errorMessage = "An error occurred while placing your order. Please try again soon!";
+            if (mPurchaseResponseHolder != null) {
+                if (mPurchaseResponseHolder.success) {
+                    mOrder.clear();
+                    mActivityCallbacks.updateCheckoutBadge();
+                    showOkDialog("Success!", "Enjoy your dinner - a receipt will be emailed to you shortly!", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            mActivityCallbacks.popToRoot(true);
+                        }
+                    });
                 } else {
-                    int bracketStart = errorMessage.indexOf('<');
-                    int bracketEnd = errorMessage.indexOf('>');
-                    if (bracketEnd > 0 && bracketStart >= 0 && bracketEnd > bracketStart) {
-                        String objectId = errorMessage.substring(bracketStart + 1, bracketEnd);
-                        MenuItem menuItem = MenuItem.getByObjectId(objectId, getApplicationContext());
-                        if (menuItem != null) {
-                            errorMessage = errorMessage.replaceAll("<" + objectId + ">", menuItem.name);
+                    String errorMessage = mPurchaseResponseHolder.errorMessage;
+                    if (errorMessage == null) {
+                        errorMessage = "An error occurred while placing your order. Please try again soon!";
+                    } else {
+                        int bracketStart = errorMessage.indexOf('<');
+                        int bracketEnd = errorMessage.indexOf('>');
+                        if (bracketEnd > 0 && bracketStart >= 0 && bracketEnd > bracketStart) {
+                            String objectId = errorMessage.substring(bracketStart + 1, bracketEnd);
+                            MenuItem menuItem = MenuItem.getByObjectId(objectId, getApplicationContext());
+                            if (menuItem != null) {
+                                errorMessage = errorMessage.replaceAll("<" + objectId + ">", menuItem.name);
+                            }
                         }
                     }
+                    showOkDialog("Error", errorMessage);
+                    verifyQuantitiesAvailable(false);
                 }
-                showOkDialog("Error", errorMessage);
-                //TODO: refresh menu
             }
+        }
+    };
+    private final PurchaseListener mPurchaseListener = new PurchaseListener() {
+        @Override
+        public void onComplete(boolean success, String errorMessage, int statusCode) {
+            mPurchaseResponseHolder = new PurchaseResponseHolder(success, errorMessage, statusCode);
+            ApiInterface.getMenu(mGetMenuListener);
         }
     };
 
@@ -144,10 +156,10 @@ public class CheckoutFragment extends BaseFragment {
 		return rootView;
 	}
 
-    public boolean verifyQuantitiesAvailable() {
+    public boolean verifyQuantitiesAvailable(boolean showDialog) {
         boolean success = true;
 
-        for (int i = 0; i < mOrder.getUniqueItemTotal(); i++) {
+        for (int i = mOrder.getUniqueItemTotal() - 1; i >= 0; i--) {
             MenuItem item = mOrder.getItemAtPosition(i);
             int quantity = mOrder.getQuantity(item);
             int available = MenuQuantityManager.getAvailableQuantity(item);
@@ -159,7 +171,9 @@ public class CheckoutFragment extends BaseFragment {
         }
 
         if (!success) {
-            showOkDialog("Items Unavailable", "Oh no! It looks like not all of the items you're looking for are currently available at your location. Your cart has been updated with what we have available.");
+            if (showDialog) {
+                showOkDialog("Items Unavailable", "Oh no! It looks like not all of the items you're looking for are currently available at your location. Your cart has been updated with what we have available.");
+            }
             mOrderAdapter.notifyDataSetChanged();
             mActivityCallbacks.updateCheckoutBadge();
             setTotals();
@@ -198,7 +212,7 @@ public class CheckoutFragment extends BaseFragment {
 
 	@Override
 	protected void onShown() {
-        verifyQuantitiesAvailable();
+        verifyQuantitiesAvailable(true);
     }
 
     /*package*/ void displayRemoveItemDialog(final MenuItem menuItem) {
@@ -223,12 +237,11 @@ public class CheckoutFragment extends BaseFragment {
                 .show();
     }
 
+    private interface OrderAdapterListener {
+        public void onQuantityChanged(MenuItem menuItem, int newQuantity);
+    }
+
 	private static class OrderAdapter extends BaseAdapter {
-
-        public interface OrderAdapterListener {
-            public void onQuantityChanged(MenuItem menuItem, int newQuantity);
-        }
-
 		private final LayoutInflater mLayoutInflater;
 		private final Order mOrder;
         private final OrderAdapterListener mListener;
@@ -302,4 +315,16 @@ public class CheckoutFragment extends BaseFragment {
 		public AutoResizeTextView tvPrice;
         public ButtonSpinner spinnerQuantity;
 	}
+
+    private static class PurchaseResponseHolder {
+        public boolean success;
+        public String errorMessage;
+        public int statusCode;
+
+        private PurchaseResponseHolder(boolean success, String errorMessage, int statusCode) {
+            this.success = success;
+            this.errorMessage = errorMessage;
+            this.statusCode = statusCode;
+        }
+    }
 }

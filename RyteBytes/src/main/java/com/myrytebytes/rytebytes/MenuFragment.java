@@ -30,7 +30,7 @@ public class MenuFragment extends BaseFragment {
     private Location mLocation;
 	private boolean isRemoteMenuLoaded;
 
-	private OnItemClickListener mOnItemClickListener = new OnItemClickListener() {
+	private final OnItemClickListener mOnItemClickListener = new OnItemClickListener() {
 		@Override
 		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 			Cursor cursor = (Cursor)mMenuAdapter.getItem(position);
@@ -40,6 +40,17 @@ public class MenuFragment extends BaseFragment {
 			}
 		}
 	};
+    private final GetMenuListener mGetMenuListener = new GetMenuListener() {
+        @Override
+        public void onComplete(boolean success, int statusCode) {
+            if (success) {
+                isRemoteMenuLoaded = true;
+            }
+            if (mMenuLoader != null) {
+                mMenuLoader.onContentChanged();
+            }
+        }
+    };
 
 	private final LoaderManager.LoaderCallbacks<Cursor> mLoaderCallbacks = new LoaderManager.LoaderCallbacks<Cursor>() {
 		@Override
@@ -77,7 +88,7 @@ public class MenuFragment extends BaseFragment {
             if (UserController.getActiveUser() != null) {
                 mLocation = UserController.getActiveUser().location;
             }
-			refreshMenu();
+            ApiInterface.getMenu(mGetMenuListener);
 		}
 	}
 
@@ -97,21 +108,11 @@ public class MenuFragment extends BaseFragment {
         if (UserController.getActiveUser() != null) {
             if (!UserController.getActiveUser().location.equals(mLocation)) {
                 mLocation = UserController.getActiveUser().location;
-                mMenuLoader.onContentChanged();
+                if (mMenuLoader != null) {
+                    mMenuLoader.onContentChanged();
+                }
             }
         }
-	}
-
-	public void refreshMenu() {
-		ApiInterface.getMenu(new GetMenuListener() {
-			@Override
-			public void onComplete(boolean success, int statusCode) {
-				if (success) {
-					isRemoteMenuLoaded = true;
-				}
-				mMenuLoader.onContentChanged();
-			}
-		});
 	}
 
 	private static class MenuAdapter extends CursorAdapter {

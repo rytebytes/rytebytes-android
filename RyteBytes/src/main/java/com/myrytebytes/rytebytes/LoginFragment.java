@@ -256,6 +256,7 @@ public class LoginFragment extends BaseFragment {
             mCardEntryLayout = (CreditCardEntryLayout)view.findViewById(R.id.card_entry_layout);
             mCardEntryLayout.setListener(mCreditCardEntryListener);
 
+            view.findViewById(R.id.spinner).setOnClickListener(mOnClickListener);
             ((ButtonSpinner)view.findViewById(R.id.spinner)).setListener(mButtonSpinnerListener);
 
             int viewWidth = mRootView.getMeasuredWidth();
@@ -309,28 +310,29 @@ public class LoginFragment extends BaseFragment {
         ApiInterface.createUser(customer, mLocation, mPassword, new CreateAccountListener() {
             @Override
             public void onComplete(ParseUser user, ParseException exception) {
-                if (mProgressDialog.isShowing()) {
-                    mProgressDialog.dismiss();
-                }
-
                 if (user != null) {
                     ApiInterface.getMenu(mGetMenuListener);
-                } else if (exception != null) {
-                    switch (exception.getCode()) {
-                        case ParseException.INVALID_EMAIL_ADDRESS:
-                            showOkDialog("Error", "The email address you entered is invalid.");
-                            break;
-                        case ParseException.EMAIL_TAKEN:
-                        case ParseException.USERNAME_TAKEN:
-                            showOkDialog("Error", "The email address you entered is already in use.");
-                            break;
-                        default:
-                            showOkDialog("Error", "An unknown error occurred while trying to create an account. Please try again later.");
-                            Log.e(exception);
-                            break;
-                    }
                 } else {
-                    showOkDialog("Error", "An unknown error occurred while trying to create an account. Please try again later.");
+                    if (mProgressDialog.isShowing()) {
+                        mProgressDialog.dismiss();
+                    }
+                    if (exception != null) {
+                        switch (exception.getCode()) {
+                            case ParseException.INVALID_EMAIL_ADDRESS:
+                                showOkDialog("Error", "The email address you entered is invalid.");
+                                break;
+                            case ParseException.EMAIL_TAKEN:
+                            case ParseException.USERNAME_TAKEN:
+                                showOkDialog("Error", "The email address you entered is already in use.");
+                                break;
+                            default:
+                                showOkDialog("Error", "An unknown error occurred while trying to create an account. Please try again later.");
+                                Log.e(exception);
+                                break;
+                        }
+                    } else {
+                        showOkDialog("Error", "An unknown error occurred while trying to create an account. Please try again later.");
+                    }
                 }
             }
         });
