@@ -31,7 +31,7 @@ public class CheckoutActionItem extends ImageView {
 	private final int mTextX;
 	private final int mTextY;
 
-	private OnClickListener mOnClickListener = new OnClickListener() {
+	private final OnClickListener mOnClickListener = new OnClickListener() {
 		@Override
 		public void onClick(View v) {
 			if (mListener != null) {
@@ -40,7 +40,7 @@ public class CheckoutActionItem extends ImageView {
 		}
 	};
 
-	private OnLongClickListener mOnLongClickListener = new OnLongClickListener() {
+	private final OnLongClickListener mOnLongClickListener = new OnLongClickListener() {
 		@Override
 		public boolean onLongClick(View v) {
 			final Context context = getContext();

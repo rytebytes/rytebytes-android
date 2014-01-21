@@ -12,6 +12,9 @@
 # don't obfuscate JSON responses
 -keep class com.myrytebytes.datamodel.** { *; }
 
+# don't obfuscate ActionItem
+-keep class com.myrytebytes.widget.CheckoutActionItem { *; }
+
 # Support for libs
 -dontwarn com.fasterxml.jackson.**
 -dontwarn com.parse.**
@@ -20,4 +23,5 @@
 -keep class com.fasterxml.jackson.** { *; }
 -keep class org.apache.** { *; }
 -keep class com.parse.** { *; }
--keep class net.hockeyapp.** { *; }
+-keep class io.card.** 
+-keepclassmembers class io.card.** { *; }

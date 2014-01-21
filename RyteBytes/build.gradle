@@ -70,7 +70,7 @@ dependencies {
 }
 
 gradle.taskGraph.whenReady { taskGraph ->
-    if (taskGraph.hasTask(':RyteBytes:assembleRelease')) {
+    if (taskGraph.hasTask(':RyteBytes:assembleDefaultFlavorRelease') || taskGraph.hasTask(':RyteBytes:assembleRelease')) {
         def password = ''
         if (System.console() == null) {
             new SwingBuilder().edt {
@@ -83,7 +83,7 @@ gradle.taskGraph.whenReady { taskGraph ->
                         show: true
                 ) {
                     vbox {
-                        label(text: "Please enter key passphrase:")
+                        label(text: "Please enter key password:")
                         input = passwordField()
                         button(defaultButton: true, text: 'OK', actionPerformed: {
                             password = input.password;
@@ -93,7 +93,7 @@ gradle.taskGraph.whenReady { taskGraph ->
                 }
             }
         } else {
-            password = System.console().readPassword("\nPlease enter key passphrase: ")
+            password = System.console().readPassword("\nPlease enter key password: ")
         }
 
         if (password.size() <= 0) {

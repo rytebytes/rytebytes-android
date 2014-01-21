@@ -78,6 +78,8 @@ public class LoginFragment extends BaseFragment {
 
             if (mLocation != null) {
                 createStripeToken();
+            } else {
+                showOkDialog("Location Required", "Please select the location where you will be picking up your food.");
             }
         }
 

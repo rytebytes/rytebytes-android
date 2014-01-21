@@ -21,6 +21,8 @@
         android:layout_height="wrap_content"
         android:layout_above="@id/btn_place_order"
         android:layout_marginTop="6dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
         android:gravity="center_horizontal"
         android:textSize="16sp"
         android:text="@string/checkout_do_ryte_info"
