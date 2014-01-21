@@ -14,6 +14,7 @@ import com.myrytebytes.datamanagement.Log;
 import com.myrytebytes.datamanagement.UserController;
 import com.myrytebytes.datamodel.Location;
 import com.myrytebytes.datamodel.StripeToken;
+import com.myrytebytes.datamodel.User;
 import com.myrytebytes.remote.ApiInterface;
 import com.myrytebytes.remote.ApiListener.CreateAccountListener;
 import com.myrytebytes.remote.ApiListener.CreateStripeTokenListener;
@@ -36,6 +37,7 @@ import com.nineoldandroids.view.ViewHelper;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseUser;
+import com.parse.RefreshCallback;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -200,6 +202,18 @@ public class LoginFragment extends BaseFragment {
         }
     };
 
+    private final RefreshCallback mRefreshCallback = new RefreshCallback() {
+        @Override
+        public void done(ParseObject parseObject, ParseException e) {
+            if (e == null) {
+                User user = UserController.getActiveUser();
+                user.stripeId = (String)ParseUser.getCurrentUser().get("stripeId");
+                UserController.setActiveUser(user);
+            }
+            ApiInterface.getMenu(mGetMenuListener);
+        }
+    };
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -313,7 +327,7 @@ public class LoginFragment extends BaseFragment {
             @Override
             public void onComplete(ParseUser user, ParseException exception) {
                 if (user != null) {
-                    ApiInterface.getMenu(mGetMenuListener);
+                    user.refreshInBackground(mRefreshCallback);
                 } else {
                     if (mProgressDialog.isShowing()) {
                         mProgressDialog.dismiss();
