@@ -36,3 +36,5 @@ pom.xml.*
 local.properties
 
 *.prefs
+
+*.keystore

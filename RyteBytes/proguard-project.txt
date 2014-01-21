@@ -1,0 +1,23 @@
+# we need line numbers in our stack traces otherwise they are pretty useless
+-renamesourcefileattribute SourceFile
+-keepattributes SourceFile,LineNumberTable
+
+# Jackson needs "annotations" so add this...
+-keepattributes *Annotation*
+
+# Support Library support
+-keep class android.support.v4.app.** { *; }
+-keep interface android.support.v4.app.** { *; }
+
+# don't obfuscate JSON responses
+-keep class com.myrytebytes.datamodel.** { *; }
+
+# Support for libs
+-dontwarn com.fasterxml.jackson.**
+-dontwarn com.parse.**
+-dontwarn org.apache.http.**
+-dontnote org.apache.http.**
+-keep class com.fasterxml.jackson.** { *; }
+-keep class org.apache.** { *; }
+-keep class com.parse.** { *; }
+-keep class net.hockeyapp.** { *; }

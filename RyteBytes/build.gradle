@@ -1,3 +1,5 @@
+import groovy.swing.SwingBuilder
+
 buildscript {
     repositories {
         mavenCentral()
@@ -29,12 +31,22 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_7
         targetCompatibility JavaVersion.VERSION_1_7
     }
+
+    signingConfigs {
+        release {
+            storeFile file("rytebytes-release.keystore")
+            keyAlias "rytebytes"
+        }
+    }
+
     buildTypes {
         release {
+            signingConfig signingConfigs.release
             runProguard true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), file('proguard-project.txt')
         }
     }
+    
     productFlavors {
         defaultFlavor {
             proguardFile 'proguard-rules.txt'
@@ -47,12 +59,48 @@ dependencies {
         mavenCentral()
     }
     compile fileTree(dir: 'src/main/libs', include: '*.jar')
-	compile 'com.android.support:support-v4:19.0.0'
-	compile 'com.android.support:appcompat-v7:19.0.0'
+    compile 'com.android.support:support-v4:19.0.0'
+    compile 'com.android.support:appcompat-v7:19.0.0'
     compile 'com.crashlytics.android:crashlytics:1.+'
     compile 'com.spothero.emailvalidator:EmailValidator:1.0.0@aar'
     compile 'com.fasterxml.jackson.core:jackson-core:2.2.3'
     compile 'com.nineoldandroids:library:2.4.0'
     compile 'com.squareup.okhttp:okhttp:1.2.1'
     compile project(':libraries:volley')
+}
+
+gradle.taskGraph.whenReady { taskGraph ->
+    if (taskGraph.hasTask(':RyteBytes:assembleRelease')) {
+        def password = ''
+        if (System.console() == null) {
+            new SwingBuilder().edt {
+                dialog(modal: true,
+                        title: 'Enter password',
+                        alwaysOnTop: true,
+                        resizable: false,
+                        locationRelativeTo: null,
+                        pack: true,
+                        show: true
+                ) {
+                    vbox {
+                        label(text: "Please enter key passphrase:")
+                        input = passwordField()
+                        button(defaultButton: true, text: 'OK', actionPerformed: {
+                            password = input.password;
+                            dispose();
+                        })
+                    }
+                }
+            }
+        } else {
+            password = System.console().readPassword("\nPlease enter key passphrase: ")
+        }
+
+        if (password.size() <= 0) {
+            throw new InvalidUserDataException("You must enter a password to proceed.")
+        } else {
+            android.signingConfigs.release.storePassword = new String(password)
+            android.signingConfigs.release.keyPassword = new String(password)
+        }
+    }
 }
