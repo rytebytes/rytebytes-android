@@ -9,6 +9,7 @@ import com.android.volley.VolleyError;
 import com.myrytebytes.datamodel.StripeToken;
 import com.myrytebytes.remote.ApiListener.CreateStripeTokenListener;
 import com.myrytebytes.remote.JsonRequest.JsonRequestListener;
+import com.myrytebytes.rytebytes.Config;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -16,7 +17,6 @@ import java.util.Map;
 public class StripeInterface {
 
 	private static final String API_BASE = "https://api.stripe.com/";
-	private static final String API_KEY = "sk_test_0eORjVUmVNJxwTHqMLLCogZr";
 
 	private static RequestQueue requestQueue;
 
@@ -48,7 +48,7 @@ public class StripeInterface {
 		public Map<String, String> getHeaders() throws AuthFailureError {
 			Map<String, String> headers = new HashMap<>();
 			try {
-				headers.put("Authorization", "Basic " + Base64.encodeBytes((API_KEY + ":").getBytes("UTF-8")));
+				headers.put("Authorization", "Basic " + Base64.encodeBytes((Config.STRIPE_API_KEY + ":").getBytes("UTF-8")));
 			} catch (Exception e) { }
 
 			headers.put("Accept", "application/json");
