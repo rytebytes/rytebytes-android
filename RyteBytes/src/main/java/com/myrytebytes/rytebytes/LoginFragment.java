@@ -13,10 +13,10 @@ import android.widget.EditText;
 import com.myrytebytes.datamanagement.Log;
 import com.myrytebytes.datamanagement.UserController;
 import com.myrytebytes.datamodel.Location;
-import com.myrytebytes.datamodel.StripeCustomer;
+import com.myrytebytes.datamodel.StripeToken;
 import com.myrytebytes.remote.ApiInterface;
 import com.myrytebytes.remote.ApiListener.CreateAccountListener;
-import com.myrytebytes.remote.ApiListener.CreateStripeAccountListener;
+import com.myrytebytes.remote.ApiListener.CreateStripeTokenListener;
 import com.myrytebytes.remote.ApiListener.GetLocationListener;
 import com.myrytebytes.remote.ApiListener.GetLocationsListener;
 import com.myrytebytes.remote.ApiListener.GetMenuListener;
@@ -75,7 +75,7 @@ public class LoginFragment extends BaseFragment {
             mCardExpYear = cardExpirationYear;
 
             if (mLocation != null) {
-                createStripeUser();
+                createStripeToken();
             }
         }
 
@@ -157,6 +157,7 @@ public class LoginFragment extends BaseFragment {
                             ApiInterface.getLocations(mGetLocationsListener);
                         }
                     }
+                    break;
                 case R.id.btn_login:
                     handleLogin();
                     break;
@@ -290,24 +291,25 @@ public class LoginFragment extends BaseFragment {
         }
     }
 
-    public void createStripeUser() {
+    public void createStripeToken() {
         mProgressDialog = HoloDialog.showProgressDialog(getActivity(), "Creating Account", "Please wait...");
-        StripeInterface.createCustomer(mEmailAddress, mCvc, mCardNumber, mCardExpMonth, mCardExpYear,getApplicationContext(), new CreateStripeAccountListener() {
+        StripeInterface.createToken(mCvc, mCardNumber, mCardExpMonth, mCardExpYear, getApplicationContext(), new CreateStripeTokenListener() {
             @Override
-            public void onComplete(StripeCustomer customer, int statusCode) {
-                if (customer != null) {
-                    createParseUser(customer);
+            public void onComplete(StripeToken token, int statusCode) {
+                if (token != null) {
+                    createParseUser(token);
                 } else {
                     if (mProgressDialog.isShowing()) {
                         mProgressDialog.dismiss();
                     }
+                    showOkDialog("Error", "An unknown error occurred while trying to create an account. Please try again later.");
                 }
             }
         });
     }
 
-    public void createParseUser(StripeCustomer customer) {
-        ApiInterface.createUser(customer, mLocation, mPassword, new CreateAccountListener() {
+    public void createParseUser(StripeToken token) {
+        ApiInterface.createUser(token, mEtEmail.getText().toString(), mLocation, mPassword, new CreateAccountListener() {
             @Override
             public void onComplete(ParseUser user, ParseException exception) {
                 if (user != null) {

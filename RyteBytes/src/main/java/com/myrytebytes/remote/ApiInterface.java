@@ -8,6 +8,7 @@ import com.android.volley.Request.Method;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.myrytebytes.datamanagement.Log;
 import com.myrytebytes.datamanagement.MenuQuantityManager;
 import com.myrytebytes.datamanagement.UserController;
 import com.myrytebytes.datamodel.ErrorResponse;
@@ -17,14 +18,17 @@ import com.myrytebytes.datamodel.MenuItem;
 import com.myrytebytes.datamodel.Order;
 import com.myrytebytes.datamodel.PurchaseResponse;
 import com.myrytebytes.datamodel.StripeCustomer;
+import com.myrytebytes.datamodel.StripeToken;
 import com.myrytebytes.datamodel.User;
 import com.myrytebytes.remote.ApiListener.CreateAccountListener;
 import com.myrytebytes.remote.ApiListener.GetLocationListener;
 import com.myrytebytes.remote.ApiListener.GetLocationsListener;
 import com.myrytebytes.remote.ApiListener.GetMenuListener;
+import com.myrytebytes.remote.ApiListener.GetUserInfoListener;
 import com.myrytebytes.remote.ApiListener.LoginListener;
 import com.myrytebytes.remote.ApiListener.PurchaseListener;
 import com.myrytebytes.remote.ApiListener.ResetPasswordListener;
+import com.myrytebytes.remote.ApiListener.UpdateUserInfoListener;
 import com.myrytebytes.remote.ApiListener.UpdateUserListener;
 import com.myrytebytes.remote.JsonRequest.JsonRequestListener;
 import com.parse.LogInCallback;
@@ -133,12 +137,12 @@ public class ApiInterface {
         }));
     }
 
-    public static void createUser(StripeCustomer customer, final Location location, final String password, final CreateAccountListener listener) {
+    public static void createUser(StripeToken token, String email, final Location location, final String password, final CreateAccountListener listener) {
         ParseUser parseUser = new ParseUser();
-        parseUser.setEmail(customer.email);
-        parseUser.setUsername(customer.email);
+        parseUser.setEmail(email);
+        parseUser.setUsername(email);
         parseUser.setPassword(password);
-        parseUser.put("stripeId", customer.id);
+        parseUser.put("stripeId", token.id);
         parseUser.put("locationId", ParseObject.createWithoutData("Location", location.objectId));
         parseUser.signUpInBackground(new SignUpCallback() {
             @Override
@@ -149,6 +153,33 @@ public class ApiInterface {
                 listener.onComplete(ParseUser.getCurrentUser(), e);
             }
         });
+    }
+
+    public static void getUserInfo(final GetUserInfoListener listener) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("userId", UserController.getActiveUser().parseUser.getObjectId());
+        requestQueue.add(new RyteBytesRequest<>(Method.POST, "userinfo", params, "result", StripeCustomer.class, new JsonRequestListener<StripeCustomer>() {
+            @Override
+            public void onResponse(StripeCustomer response, int statusCode, VolleyError error) {
+                listener.onComplete(response, statusCode);
+            }
+        }));
+    }
+
+    public static void updateUserStripeToken(StripeToken stripeToken, final UpdateUserInfoListener listener) {
+        User user = UserController.getActiveUser();
+        Map<String, Object> params = new HashMap<>();
+        params.put("userId", user.parseUser.getObjectId());
+        params.put("stripeId", user.stripeId);
+        params.put("token", stripeToken.id);
+        Log.d("userId = " + params.get("userId") + "; stripeId = " + params.get("stripeId") + "; tokenId = " + params.get("token"));
+        requestQueue.add(new RyteBytesRequest<>(Method.POST, "updateuser", params, null, StripeCustomer.class, new JsonRequestListener<StripeCustomer>() {
+            @Override
+            public void onResponse(StripeCustomer response, int statusCode, VolleyError error) {
+                Log.d("sc = " + statusCode);
+                listener.onComplete(error == null, statusCode);
+            }
+        }));
     }
 
     public static void updateUserLocation(final Location location, final UpdateUserListener listener) {

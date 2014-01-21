@@ -6,10 +6,8 @@ import com.android.volley.AuthFailureError;
 import com.android.volley.Request.Method;
 import com.android.volley.RequestQueue;
 import com.android.volley.VolleyError;
-import com.myrytebytes.datamodel.StripeCustomer;
-import com.myrytebytes.remote.ApiListener.CreateStripeAccountListener;
-import com.myrytebytes.remote.ApiListener.FetchCreditCardListener;
-import com.myrytebytes.remote.ApiListener.UpdateCreditCardListener;
+import com.myrytebytes.datamodel.StripeToken;
+import com.myrytebytes.remote.ApiListener.CreateStripeTokenListener;
 import com.myrytebytes.remote.JsonRequest.JsonRequestListener;
 
 import java.util.HashMap;
@@ -22,53 +20,20 @@ public class StripeInterface {
 
 	private static RequestQueue requestQueue;
 
-    public static void updateCardForUser(String stripeId, String cardNumber, String cvc, String expMonth, String expYear, Context context, final UpdateCreditCardListener listener) {
+    public static void createToken(String cvc, String cardNumber, String expMonth, String expYear, Context context, final CreateStripeTokenListener listener) {
         if (requestQueue == null) {
             requestQueue = JsonNetwork.newRequestQueue(context, new OkHttpStack());
         }
 
-        Map<String, Object> customerMap = new HashMap<>();
-        customerMap.put("card[cvc]", cvc);
-        customerMap.put("card[number]", cardNumber);
-        customerMap.put("card[exp_month]", expMonth);
-        customerMap.put("card[exp_year]", expYear);
+        Map<String, Object> cardMap = new HashMap<>();
+        cardMap.put("card[cvc]", cvc);
+        cardMap.put("card[number]", cardNumber);
+        cardMap.put("card[exp_month]", expMonth);
+        cardMap.put("card[exp_year]", expYear);
 
-        requestQueue.add(new StripeRequest<>(Method.POST, "v1/customers/" + stripeId, customerMap, null, StripeCustomer.class, new JsonRequestListener<StripeCustomer>() {
+        requestQueue.add(new StripeRequest<>(Method.POST, "v1/tokens", cardMap, null, StripeToken.class, new JsonRequestListener<StripeToken>() {
             @Override
-            public void onResponse(StripeCustomer response, int statusCode, VolleyError error) {
-                listener.onComplete(response, statusCode);
-            }
-        }));
-    }
-
-	public static void createCustomer(String email, String cvc, String cardNumber, String expMonth, String expYear, Context context, final CreateStripeAccountListener listener) {
-		if (requestQueue == null) {
-			requestQueue = JsonNetwork.newRequestQueue(context, new OkHttpStack());
-		}
-
-		Map<String, Object> customerMap = new HashMap<>();
-		customerMap.put("email", email);
-        customerMap.put("card[cvc]", cvc);
-		customerMap.put("card[number]", cardNumber);
-		customerMap.put("card[exp_month]", expMonth);
-		customerMap.put("card[exp_year]", expYear);
-
-		requestQueue.add(new StripeRequest<>(Method.POST, "v1/customers", customerMap, null, StripeCustomer.class, new JsonRequestListener<StripeCustomer>() {
-			@Override
-			public void onResponse(StripeCustomer response, int statusCode, VolleyError error) {
-				listener.onComplete(response, statusCode);
-			}
-		}));
-	}
-
-    public static void fetchCardForUser(String stripeId, Context context, final FetchCreditCardListener listener) {
-        if (requestQueue == null) {
-            requestQueue = JsonNetwork.newRequestQueue(context, new OkHttpStack());
-        }
-
-        requestQueue.add(new StripeRequest<>(Method.GET, "v1/customers/" + stripeId, null, null, StripeCustomer.class, new JsonRequestListener<StripeCustomer>() {
-            @Override
-            public void onResponse(StripeCustomer response, int statusCode, VolleyError error) {
+            public void onResponse(StripeToken response, int statusCode, VolleyError error) {
                 listener.onComplete(response, statusCode);
             }
         }));

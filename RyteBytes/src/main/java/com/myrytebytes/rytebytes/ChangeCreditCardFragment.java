@@ -1,6 +1,7 @@
 package com.myrytebytes.rytebytes;
 
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -8,10 +9,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.myrytebytes.datamanagement.UserController;
 import com.myrytebytes.datamodel.StripeCustomer;
-import com.myrytebytes.remote.ApiListener.FetchCreditCardListener;
-import com.myrytebytes.remote.ApiListener.UpdateCreditCardListener;
+import com.myrytebytes.datamodel.StripeToken;
+import com.myrytebytes.remote.ApiInterface;
+import com.myrytebytes.remote.ApiListener.CreateStripeTokenListener;
+import com.myrytebytes.remote.ApiListener.GetUserInfoListener;
+import com.myrytebytes.remote.ApiListener.UpdateUserInfoListener;
 import com.myrytebytes.remote.StripeInterface;
 import com.myrytebytes.widget.CreditCardEntryLayout;
 import com.myrytebytes.widget.CreditCardEntryLayout.CreditCardEntryListener;
@@ -27,19 +30,11 @@ public class ChangeCreditCardFragment extends BaseFragment {
     private CreditCardEntryLayout mCardEntryLayout;
     private Dialog mProgressDialog;
 
-    private String mCvc;
-    private String mCardNumber;
-    private String mCardExpMonth;
-    private String mCardExpYear;
-
     private final CreditCardEntryListener mCreditCardEntryListener = new CreditCardEntryListener() {
         @Override
         public void onCardVerified(String cvc, String cardNumber, String cardExpirationMonth, String cardExpirationYear) {
-            mCvc = cvc;
-            mCardNumber = cardNumber;
-            mCardExpMonth = cardExpirationMonth;
-            mCardExpYear = cardExpirationYear;
-            updateCreditCard();
+            mProgressDialog = HoloDialog.showProgressDialog(getActivity(), "Updating Credit Card", "Please wait...");
+            StripeInterface.createToken(cvc, cardNumber, cardExpirationMonth, cardExpirationYear, getApplicationContext(), mCreateStripeTokenListener);
         }
 
         @Override
@@ -52,21 +47,40 @@ public class ChangeCreditCardFragment extends BaseFragment {
         }
     };
 
-    private final UpdateCreditCardListener mUpdateCreditCardListener = new UpdateCreditCardListener() {
+    private final CreateStripeTokenListener mCreateStripeTokenListener = new CreateStripeTokenListener() {
         @Override
-        public void onComplete(StripeCustomer customer, int statusCode) {
+        public void onComplete(StripeToken token, int statusCode) {
+            if (token != null) {
+                updateCreditCard(token);
+            } else {
+                if (mProgressDialog != null && mProgressDialog.isShowing()) {
+                    mProgressDialog.dismiss();
+                }
+                showOkDialog("Error", "An error occurred while updating your card. Please check your card number and try again.");
+            }
+        }
+    };
+
+    private final UpdateUserInfoListener mUpdateUserInfoListener = new UpdateUserInfoListener() {
+        @Override
+        public void onComplete(boolean success, int statusCode) {
             if (mProgressDialog.isShowing()) {
                 mProgressDialog.dismiss();
             }
-            if (customer != null) {
-                showOkDialog("Success", "Your credit card has been updated.");
+            if (success) {
+                showOkDialog("Success", "Your credit card has been updated.", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        finish();
+                    }
+                });
             } else {
                 showOkDialog("Error", "An error occurred while updating your card. Please check your card number and try again.");
             }
         }
     };
 
-    private final FetchCreditCardListener mFetchCreditCardListener = new FetchCreditCardListener() {
+    private final GetUserInfoListener mGetUserInfoListener = new GetUserInfoListener() {
         @Override
         public void onComplete(StripeCustomer customer, int statusCode) {
             if (mProgressDialog != null && mProgressDialog.isShowing()) {
@@ -91,7 +105,7 @@ public class ChangeCreditCardFragment extends BaseFragment {
         mCardEntryLayout.setListener(mCreditCardEntryListener);
 
         mProgressDialog = HoloDialog.showProgressDialog(getActivity(), "Fetching Credit Card", "Please wait...");
-        StripeInterface.fetchCardForUser(UserController.getActiveUser().stripeId, getApplicationContext(), mFetchCreditCardListener);
+        ApiInterface.getUserInfo(mGetUserInfoListener);
 
         return view;
     }
@@ -111,10 +125,8 @@ public class ChangeCreditCardFragment extends BaseFragment {
         }
     }
 
-    /*package*/ void updateCreditCard() {
-        String stripeId = "testStripeId";
-        mProgressDialog = HoloDialog.showProgressDialog(getActivity(), "Updating Credit Card", "Please wait...");
-        StripeInterface.updateCardForUser(stripeId, mCardNumber, mCvc, mCardExpMonth, mCardExpYear, getApplicationContext(), mUpdateCreditCardListener);
+    /*package*/ void updateCreditCard(StripeToken token) {
+        ApiInterface.updateUserStripeToken(token, mUpdateUserInfoListener);
     }
 
     @Override
