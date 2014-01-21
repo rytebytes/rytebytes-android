@@ -24,6 +24,10 @@ import com.myrytebytes.widget.ButtonSpinner;
 import com.myrytebytes.widget.ButtonSpinner.ButtonSpinnerListener;
 import com.myrytebytes.widget.HoloDialog;
 import com.myrytebytes.widget.MenuItemImageView;
+import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.ParseUser;
+import com.parse.RefreshCallback;
 
 public class CheckoutFragment extends BaseFragment {
 
@@ -42,15 +46,7 @@ public class CheckoutFragment extends BaseFragment {
 		public void onClick(View v) {
 			switch (v.getId()) {
 				case R.id.btn_place_order:
-                    if (verifyQuantitiesAvailable(true)) {
-                        User user = UserController.getActiveUser();
-                        if (user == null) {
-                            mActivityCallbacks.displayLoginFragment(false);
-                        } else {
-                            mProgressDialog = HoloDialog.showProgressDialog(getActivity(), null, "Placing order...", false);
-                            ApiInterface.placeOrder(mOrder, user.location.objectId, mPurchaseListener);
-                        }
-                    }
+                    placeOrder();
 					break;
                 case R.id.btn_add_items:
                     mActivityCallbacks.popToRoot(true);
@@ -116,6 +112,22 @@ public class CheckoutFragment extends BaseFragment {
             ApiInterface.getMenu(mGetMenuListener);
         }
     };
+    private final RefreshCallback mRefreshCallback = new RefreshCallback() {
+        @Override
+        public void done(ParseObject parseObject, ParseException e) {
+            if (e == null) {
+                User user = UserController.getActiveUser();
+                user.stripeId = (String) ParseUser.getCurrentUser().get("stripeId");
+                UserController.setActiveUser(user);
+                ApiInterface.placeOrder(mOrder, user.location.objectId, mPurchaseListener);
+            } else {
+                if (mProgressDialog != null && mProgressDialog.isShowing()) {
+                    mProgressDialog.dismiss();
+                }
+                showOkDialog("Error", "An error occurred while placing your order. Please try again soon!");
+            }
+        }
+    };
 
 	public static CheckoutFragment newInstance() {
 		return new CheckoutFragment();
@@ -155,6 +167,22 @@ public class CheckoutFragment extends BaseFragment {
 
 		return rootView;
 	}
+
+    public void placeOrder() {
+        if (verifyQuantitiesAvailable(true)) {
+            User user = UserController.getActiveUser();
+            if (user == null || user.stripeId == null) {
+                mActivityCallbacks.displayLoginFragment(false);
+            } else {
+                mProgressDialog = HoloDialog.showProgressDialog(getActivity(), null, "Placing order...", false);
+                if (user.stripeId.startsWith("tok")) {
+                    user.parseUser.refreshInBackground(mRefreshCallback);
+                } else {
+                    ApiInterface.placeOrder(mOrder, user.location.objectId, mPurchaseListener);
+                }
+            }
+        }
+    }
 
     public boolean verifyQuantitiesAvailable(boolean showDialog) {
         boolean success = true;
