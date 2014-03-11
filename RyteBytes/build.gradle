@@ -6,7 +6,7 @@ buildscript {
         maven { url 'http://download.crashlytics.com/maven' }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:0.7.+'
+        classpath 'com.android.tools.build:gradle:0.9.+'
         classpath 'com.crashlytics.tools.gradle:crashlytics-gradle:1.+'
     }
 }
@@ -20,7 +20,7 @@ repositories {
 
 android {
     compileSdkVersion 19
-    buildToolsVersion "19.0.0"
+    buildToolsVersion "19.0.3"
 
     defaultConfig {
         minSdkVersion 9
@@ -59,8 +59,8 @@ dependencies {
         mavenCentral()
     }
     compile fileTree(dir: 'src/main/libs', include: '*.jar')
-    compile 'com.android.support:support-v4:19.0.0'
-    compile 'com.android.support:appcompat-v7:19.0.0'
+    compile 'com.android.support:support-v4:19.0.1'
+    compile 'com.android.support:appcompat-v7:19.0.1'
     compile 'com.crashlytics.android:crashlytics:1.+'
     compile 'com.spothero.emailvalidator:EmailValidator:1.0.0@aar'
     compile 'com.fasterxml.jackson.core:jackson-core:2.2.3'
