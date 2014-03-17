@@ -1,7 +1,7 @@
 package com.myrytebytes.datamodel;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import com.myrytebytes.datamanagement.Log;
+import com.myrytebytes.datamanagement.Logr;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -124,7 +124,7 @@ public class Order implements JacksonWriter {
                 generator.writeEndObject();
 			}
 		} catch (Exception e) {
-			Log.e(e);
+			Logr.e(e);
 		}
 	}
 

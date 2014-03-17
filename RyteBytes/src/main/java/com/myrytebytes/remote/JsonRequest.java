@@ -11,7 +11,7 @@ import com.android.volley.toolbox.HttpHeaderParser;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonToken;
-import com.myrytebytes.datamanagement.Log;
+import com.myrytebytes.datamanagement.Logr;
 import com.myrytebytes.datamodel.JacksonParser;
 import com.myrytebytes.datamodel.JacksonWriter;
 import com.myrytebytes.remote.JsonHandler.JsonHandlerListenerAdapter;
@@ -122,7 +122,7 @@ public class JsonRequest<T> extends Request<T> {
                 body = os.toByteArray();
             } catch (Exception e) {
                 body = null;
-                Log.e(e);
+                Logr.e(e);
             }
 
 //            Log.d("body = " + new String(body));
@@ -174,7 +174,7 @@ public class JsonRequest<T> extends Request<T> {
 					parseJson(jsonParser);
                 }
 			} catch (Exception e) {
-				Log.e("An error occurred while parsing network response:", e);
+				Logr.e("An error occurred while parsing network response:", e);
 				e.printStackTrace();
 				return Response.error(new ParseError(networkResponse));
 			}
@@ -220,7 +220,7 @@ public class JsonRequest<T> extends Request<T> {
 				assignResponseObject(getResponseObject(jsonParser, true));
 			}
 		} catch (Exception e) {
-			Log.e("Exception parsing json:", e);
+			Logr.e("Exception parsing json:", e);
 		}
 	}
 
@@ -248,7 +248,7 @@ public class JsonRequest<T> extends Request<T> {
 				return null;
 			}
 		} catch (Exception e) {
-			Log.e(e);
+			Logr.e(e);
 			return null;
 		}
 	}

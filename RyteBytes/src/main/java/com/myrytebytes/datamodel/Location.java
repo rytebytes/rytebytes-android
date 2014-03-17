@@ -1,11 +1,13 @@
 package com.myrytebytes.datamodel;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import com.myrytebytes.datamanagement.Log;
+import com.myrytebytes.datamanagement.Logr;
 import com.myrytebytes.remote.JsonHandler;
 import com.myrytebytes.remote.JsonHandler.JsonHandlerListenerAdapter;
+import com.myrytebytes.remote.JsonRequest;
 import com.myrytebytes.remote.SafeJsonParser;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 public class Location implements JacksonParser {
@@ -24,7 +26,7 @@ public class Location implements JacksonParser {
 		try {
 			fillFromJSON(jsonParser, closeWhenComplete);
 		} catch (IOException e) {
-			Log.e("Error filling Location", e);
+			Logr.e("Error filling Location", e);
 		}
 	}
 
@@ -76,6 +78,20 @@ public class Location implements JacksonParser {
         }
     }
 
+    public String toJSON() {
+        try {
+            ByteArrayOutputStream os = new ByteArrayOutputStream();
+            JsonGenerator generator = JsonRequest.JSON_FACTORY.createGenerator(os);
+            generator.writeStartObject();
+            writeJson(generator);
+            generator.writeEndObject();
+            generator.close();
+            return os.toString();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
     public void writeJson(JsonGenerator generator) {
         try {
             generator.writeStringField("name", name);
@@ -88,7 +104,7 @@ public class Location implements JacksonParser {
             charity.writeJson(generator);
             generator.writeEndObject();
         } catch (Exception e) {
-            Log.e(e);
+            Logr.e(e);
         }
     }
 }

@@ -1,6 +1,6 @@
 package com.myrytebytes.datamodel;
 
-import com.myrytebytes.datamanagement.Log;
+import com.myrytebytes.datamanagement.Logr;
 import com.myrytebytes.remote.JsonHandler;
 import com.myrytebytes.remote.JsonHandler.JsonHandlerListenerAdapter;
 import com.myrytebytes.remote.SafeJsonParser;
@@ -18,7 +18,7 @@ public class StripeToken implements JacksonParser {
 		try {
 			fillFromJSON(jsonParser, closeWhenComplete);
 		} catch (IOException e) {
-			Log.e("Error filling StripeToken", e);
+			Logr.e("Error filling StripeToken", e);
 		}
 	}
 

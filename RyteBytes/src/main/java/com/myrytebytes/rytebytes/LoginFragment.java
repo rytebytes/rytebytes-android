@@ -10,7 +10,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.EditText;
 
-import com.myrytebytes.datamanagement.Log;
+import com.myrytebytes.datamanagement.Logr;
 import com.myrytebytes.datamanagement.UserController;
 import com.myrytebytes.datamodel.Location;
 import com.myrytebytes.datamodel.StripeToken;
@@ -345,7 +345,7 @@ public class LoginFragment extends BaseFragment {
                                 break;
                             default:
                                 showOkDialog("Error", "An unknown error occurred while trying to create an account. Please try again later.");
-                                Log.e(exception);
+                                Logr.e(exception);
                                 break;
                         }
                     } else {

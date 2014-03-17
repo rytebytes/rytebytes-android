@@ -1,7 +1,7 @@
 package com.myrytebytes.datamodel;
 
 import com.fasterxml.jackson.core.JsonToken;
-import com.myrytebytes.datamanagement.Log;
+import com.myrytebytes.datamanagement.Logr;
 import com.myrytebytes.remote.JsonHandler;
 import com.myrytebytes.remote.JsonHandler.JsonHandlerListenerAdapter;
 import com.myrytebytes.remote.SafeJsonParser;
@@ -23,7 +23,7 @@ public class StripeCustomer implements JacksonParser {
 		try {
 			fillFromJSON(jsonParser, closeWhenComplete);
 		} catch (IOException e) {
-			Log.e("Error filling StripeCustomer", e);
+			Logr.e("Error filling StripeCustomer", e);
 		}
 	}
 
@@ -64,7 +64,7 @@ public class StripeCustomer implements JacksonParser {
 			try {
 				fillFromJSON(jsonParser, false);
 			} catch (Exception e) {
-				Log.e("Error filling StripeCustomer", e);
+				Logr.e("Error filling StripeCustomer", e);
 			}
 		}
 

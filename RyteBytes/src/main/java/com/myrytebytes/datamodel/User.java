@@ -1,7 +1,7 @@
 package com.myrytebytes.datamodel;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import com.myrytebytes.datamanagement.Log;
+import com.myrytebytes.datamanagement.Logr;
 import com.myrytebytes.remote.JsonHandler;
 import com.myrytebytes.remote.JsonHandler.JsonHandlerListenerAdapter;
 import com.myrytebytes.remote.JsonRequest;
@@ -38,7 +38,7 @@ public class User implements JacksonParser {
             parseUser.put("stripeId", stripeId);
             parseUser.put("locationId", ParseObject.createWithoutData("Location", location.objectId));
         } catch (IOException e) {
-            Log.e("Error filling User", e);
+            Logr.e("Error filling User", e);
         }
     }
 

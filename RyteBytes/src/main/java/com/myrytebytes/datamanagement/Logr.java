@@ -1,6 +1,6 @@
 package com.myrytebytes.datamanagement;
 
-public class Log {
+public class Logr {
 
 	private static final String TAG = "RyteBytes";
 

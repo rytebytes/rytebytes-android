@@ -1,7 +1,7 @@
 package com.myrytebytes.datamodel;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import com.myrytebytes.datamanagement.Log;
+import com.myrytebytes.datamanagement.Logr;
 import com.myrytebytes.remote.JsonHandler;
 import com.myrytebytes.remote.JsonHandler.JsonHandlerListenerAdapter;
 import com.myrytebytes.remote.SafeJsonParser;
@@ -26,7 +26,7 @@ public class Charity implements JacksonParser {
 		try {
 			fillFromJSON(jsonParser, closeWhenComplete);
 		} catch (IOException e) {
-			Log.e("Error filling Charity", e);
+			Logr.e("Error filling Charity", e);
 		}
 	}
 
@@ -79,7 +79,7 @@ public class Charity implements JacksonParser {
             generator.writeStringField("picture", image);
             generator.writeStringField("description", description);
         } catch (Exception e) {
-            Log.e(e);
+            Logr.e(e);
         }
     }
 }

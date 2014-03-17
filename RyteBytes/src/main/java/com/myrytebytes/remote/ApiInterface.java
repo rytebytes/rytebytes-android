@@ -8,7 +8,7 @@ import com.android.volley.Request.Method;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.myrytebytes.datamanagement.Log;
+import com.myrytebytes.datamanagement.Logr;
 import com.myrytebytes.datamanagement.MenuQuantityManager;
 import com.myrytebytes.datamanagement.UserController;
 import com.myrytebytes.datamodel.ErrorResponse;
@@ -31,6 +31,7 @@ import com.myrytebytes.remote.ApiListener.ResetPasswordListener;
 import com.myrytebytes.remote.ApiListener.UpdateUserInfoListener;
 import com.myrytebytes.remote.ApiListener.UpdateUserListener;
 import com.myrytebytes.remote.JsonRequest.JsonRequestListener;
+import com.myrytebytes.rytebytes.Config;
 import com.parse.LogInCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
@@ -47,8 +48,6 @@ import java.util.Map;
 public class ApiInterface {
 
     private static String HOST_BASE_URL = "https://api.parse.com/1/functions/";
-    private static String PARSE_APP_ID = "zaZmkcjbGLCrEHagb8uJPt5TKyiFgCg9WffA6c6M";
-    private static String PARSE_API_KEY = "ZjCVp64qsDxYWw6PktZgc5PFZLdLmRuHe9oOF3q9";
 
     private static Context context;
     private static RequestQueue requestQueue;
@@ -81,7 +80,7 @@ public class ApiInterface {
         }
     }
 
-    public static void getMenuAtLocation(final GetMenuListener listener, String locationId) {
+    private static void getMenuAtLocation(final GetMenuListener listener, String locationId) {
         Map<String, Object> params = new HashMap<>();
         params.put("locationId", locationId);
         requestQueue.add(new RyteBytesRequest<>(Method.POST, "retrievemenu", params, "result", LocationItem.class, new JsonRequestListener<List<LocationItem>>() {
@@ -107,9 +106,8 @@ public class ApiInterface {
     }
 
     public static void getMenu(final GetMenuListener listener) {
-        User user = UserController.getActiveUser();
-        if (user != null && user.location != null) {
-            getMenuAtLocation(listener, user.location.objectId);
+        if (UserController.getPickupLocation() != null) {
+            getMenuAtLocation(listener, UserController.getPickupLocation().objectId);
         } else {
             requestQueue.add(new RyteBytesRequest<>(Method.POST, "retrievemenu", null, "result", MenuItem.class, new JsonRequestListener<List<MenuItem>>() {
                 @Override
@@ -172,11 +170,11 @@ public class ApiInterface {
         params.put("userId", user.parseUser.getObjectId());
         params.put("stripeId", user.stripeId);
         params.put("token", stripeToken.id);
-        Log.d("userId = " + params.get("userId") + "; stripeId = " + params.get("stripeId") + "; tokenId = " + params.get("token"));
+        Logr.d("userId = " + params.get("userId") + "; stripeId = " + params.get("stripeId") + "; tokenId = " + params.get("token"));
         requestQueue.add(new RyteBytesRequest<>(Method.POST, "updateuser", params, null, StripeCustomer.class, new JsonRequestListener<StripeCustomer>() {
             @Override
             public void onResponse(StripeCustomer response, int statusCode, VolleyError error) {
-                Log.d("sc = " + statusCode);
+                Logr.d("sc = " + statusCode);
                 listener.onComplete(error == null, statusCode);
             }
         }));
@@ -281,8 +279,8 @@ public class ApiInterface {
         @Override
         public Map<String, String> getHeaders() throws AuthFailureError {
             Map<String, String> headers = new HashMap<>();
-            headers.put("X-Parse-Application-Id", PARSE_APP_ID);
-            headers.put("X-Parse-REST-API-Key", PARSE_API_KEY);
+            headers.put("X-Parse-Application-Id", Config.PARSE_APP_ID);
+            headers.put("X-Parse-REST-API-Key", Config.PARSE_API_KEY);
             headers.put("Accept", "application/json");
 
             if (getMethod() == Method.POST || getMethod() == Method.PUT) {

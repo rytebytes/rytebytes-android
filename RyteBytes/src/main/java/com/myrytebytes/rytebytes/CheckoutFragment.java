@@ -117,9 +117,9 @@ public class CheckoutFragment extends BaseFragment {
         public void done(ParseObject parseObject, ParseException e) {
             if (e == null) {
                 User user = UserController.getActiveUser();
-                user.stripeId = (String) ParseUser.getCurrentUser().get("stripeId");
+                user.stripeId = (String)ParseUser.getCurrentUser().get("stripeId");
                 UserController.setActiveUser(user);
-                ApiInterface.placeOrder(mOrder, user.location.objectId, mPurchaseListener);
+                ApiInterface.placeOrder(mOrder, UserController.getPickupLocation().objectId, mPurchaseListener);
             } else {
                 if (mProgressDialog != null && mProgressDialog.isShowing()) {
                     mProgressDialog.dismiss();
@@ -158,7 +158,7 @@ public class CheckoutFragment extends BaseFragment {
 
         User user = UserController.getActiveUser();
         if (user != null) {
-            mTvPickupLocation.setText("Pickup Location: " + user.location.name);
+            mTvPickupLocation.setText("Pickup Location: " + UserController.getPickupLocation().name);
         } else {
             mTvPickupLocation.setText("");
         }
@@ -178,7 +178,7 @@ public class CheckoutFragment extends BaseFragment {
                 if (user.stripeId.startsWith("tok")) {
                     user.parseUser.refreshInBackground(mRefreshCallback);
                 } else {
-                    ApiInterface.placeOrder(mOrder, user.location.objectId, mPurchaseListener);
+                    ApiInterface.placeOrder(mOrder, UserController.getPickupLocation().objectId, mPurchaseListener);
                 }
             }
         }

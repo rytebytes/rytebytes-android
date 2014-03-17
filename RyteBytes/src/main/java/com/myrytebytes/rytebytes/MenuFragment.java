@@ -86,7 +86,7 @@ public class MenuFragment extends BaseFragment {
 		super.onAttach(activity);
 		if (!isRemoteMenuLoaded) {
             if (UserController.getActiveUser() != null) {
-                mLocation = UserController.getActiveUser().location;
+                mLocation = UserController.getPickupLocation();
             }
             ApiInterface.getMenu(mGetMenuListener);
 		}
@@ -106,8 +106,8 @@ public class MenuFragment extends BaseFragment {
 	protected void onShown() {
 		getLoaderManager().initLoader(1, null, mLoaderCallbacks);
         if (UserController.getActiveUser() != null) {
-            if (!UserController.getActiveUser().location.equals(mLocation)) {
-                mLocation = UserController.getActiveUser().location;
+            if (!UserController.getPickupLocation().equals(mLocation)) {
+                mLocation = UserController.getPickupLocation();
                 if (mMenuLoader != null) {
                     mMenuLoader.onContentChanged();
                 }

@@ -50,7 +50,7 @@ public class DoRyteFragment extends BaseFragment {
 	protected void onShown() {
         User user = UserController.getActiveUser();
         if (user != null) {
-            Charity charity = UserController.getActiveUser().location.charity;
+            Charity charity = UserController.getPickupLocation().charity;
             mTvLoggedOut.setVisibility(View.GONE);
             mTvTitle.setVisibility(View.VISIBLE);
             mTvInfo.setVisibility(View.VISIBLE);

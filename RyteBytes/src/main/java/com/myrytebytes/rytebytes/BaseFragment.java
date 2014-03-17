@@ -15,6 +15,7 @@ import com.myrytebytes.widget.HoloDialog;
 public abstract class BaseFragment extends Fragment {
 
 	public enum ContentType {
+        INTRO(false, true),
 		MENU(false, false),
 		MENU_ITEM(false, false),
 		CHECKOUT(false, false),
@@ -45,6 +46,7 @@ public abstract class BaseFragment extends Fragment {
 		public boolean isLoginFragmentShowing();
 		public void loginWillFinish(boolean loggedIn);
 		public void updateCheckoutBadge();
+        public void replaceContent(ContentType contentType);
 	}
 
 	private static final ActivityCallbacks DUMMY_CALLBACKS = new ActivityCallbacks() {
@@ -77,6 +79,9 @@ public abstract class BaseFragment extends Fragment {
 
 		@Override
 		public void updateCheckoutBadge() { }
+
+        @Override
+        public void replaceContent(ContentType contentType) { }
 	};
 
 	public static boolean animationsDisabled;

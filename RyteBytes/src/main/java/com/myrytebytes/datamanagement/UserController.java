@@ -1,6 +1,7 @@
 package com.myrytebytes.datamanagement;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
 import com.myrytebytes.datamodel.Location;
@@ -12,18 +13,34 @@ import com.parse.ParseUser;
 public class UserController {
 
     private static final String PREF_ACTIVE_USER = "active_user";
+    private static final String PREF_DEFAULT_LOCATION = "default_location";
 	private static final Object LOGIN_LOCK = new Object();
 
 	private static User user;
+    private static Location defaultLocation;
 	private static Context context;
 
 	public static void init(Context context) {
 		UserController.context = context;
-        String userJSON = PreferenceManager.getDefaultSharedPreferences(context).getString(PREF_ACTIVE_USER, null);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        String userJSON = prefs.getString(PREF_ACTIVE_USER, null);
         if (userJSON != null) {
             try {
                 user = new User(new SafeJsonParser(JsonRequest.JSON_FACTORY.createParser(userJSON)), true);
+                defaultLocation = user.location;
             } catch (Exception e) { }
+        }
+
+        if (defaultLocation == null) {
+            String locationJSON = prefs.getString(PREF_DEFAULT_LOCATION, null);
+            Logr.d("locationJson = " + locationJSON);
+            if (locationJSON != null) {
+                try {
+                    defaultLocation = new Location(new SafeJsonParser(JsonRequest.JSON_FACTORY.createParser(locationJSON)), true);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
         }
 	}
 
@@ -50,4 +67,19 @@ public class UserController {
 			user = null;
 		}
 	}
+
+    public static void setDefaultPickupLocation(Location location) {
+        defaultLocation = location;
+        if (location != null) {
+            PreferenceManager.getDefaultSharedPreferences(context).edit().putString(PREF_DEFAULT_LOCATION, location.toJSON()).commit();
+        }
+    }
+
+    public static Location getPickupLocation() {
+        if (user == null) {
+            return defaultLocation;
+        } else {
+            return user.location;
+        }
+    }
 }

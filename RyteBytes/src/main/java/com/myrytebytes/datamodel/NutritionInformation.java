@@ -3,7 +3,7 @@ package com.myrytebytes.datamodel;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.myrytebytes.datamanagement.Log;
+import com.myrytebytes.datamanagement.Logr;
 import com.myrytebytes.remote.JsonHandler;
 import com.myrytebytes.remote.JsonHandler.JsonHandlerListenerAdapter;
 import com.myrytebytes.remote.SafeJsonParser;
@@ -24,7 +24,7 @@ public class NutritionInformation implements JacksonParser, Parcelable {
 		try {
 			fillFromJSON(jsonParser, closeWhenComplete);
 		} catch (IOException e) {
-			Log.e("Error filling NutritionInformation", e);
+			Logr.e("Error filling NutritionInformation", e);
 		}
 	}
 

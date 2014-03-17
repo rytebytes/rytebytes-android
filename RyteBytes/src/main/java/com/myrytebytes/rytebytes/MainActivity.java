@@ -130,7 +130,11 @@ public class MainActivity extends ActionBarActivity implements ActivityCallbacks
 		actionBar.setDisplayHomeAsUpEnabled(true);
 
 		if (savedInstanceState == null) {
-			switchContent(ContentType.MENU, true);
+            if (UserController.getPickupLocation() == null) {
+                switchContent(ContentType.INTRO, true);
+            } else {
+                switchContent(ContentType.MENU, true);
+            }
 		} else {
 			mBackstackEntryCount = getSupportFragmentManager().getBackStackEntryCount();
 		}
@@ -234,7 +238,21 @@ public class MainActivity extends ActionBarActivity implements ActivityCallbacks
 		transaction.commitAllowingStateLoss();
 	}
 
-	private void switchContent(ContentType contentType, boolean onLaunch) {
+    @Override
+    public void replaceContent(ContentType contentType) {
+        BaseFragment fragment = getFragmentForType(contentType);
+
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+        transaction.setCustomAnimations(0, 0, 0, R.anim.fragment_pop_exit_root);
+
+        transaction.replace(R.id.container, fragment);
+
+        transaction.commitAllowingStateLoss();
+        fragmentManager.executePendingTransactions();
+    }
+
+	public void switchContent(ContentType contentType, boolean onLaunch) {
 		if (contentType.requiresLogin && UserController.getActiveUser() == null) {
 			displayLoginFragment(new PostLoginContainer(null, contentType, null, true, false));
 		} else if (mContent == null || contentType != mContent.getContentType()) {
@@ -404,6 +422,8 @@ public class MainActivity extends ActionBarActivity implements ActivityCallbacks
 
 	private BaseFragment getFragmentForType(ContentType fragmentType) {
 		switch (fragmentType) {
+            case INTRO:
+                return new IntroFragment();
 			case MENU:
 				return new MenuFragment();
 			case MENU_ITEM:

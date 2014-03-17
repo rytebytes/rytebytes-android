@@ -1,7 +1,7 @@
 package com.myrytebytes.remote;
 
 import com.android.volley.toolbox.HurlStack;
-import com.myrytebytes.datamanagement.Log;
+import com.myrytebytes.datamanagement.Logr;
 import com.squareup.okhttp.OkHttpClient;
 
 import java.io.IOException;
@@ -22,7 +22,7 @@ public class OkHttpStack extends HurlStack {
 			sslContext.init(null, null, null);
 			client.setSslSocketFactory(sslContext.getSocketFactory());
 		} catch (GeneralSecurityException e) {
-			Log.e(e);
+			Logr.e(e);
 		}
 	}
 

@@ -60,4 +60,8 @@
 
     <!-- Do Ryte Fragment -->
     <string name="do_ryte_logged_out">The information for the food bank associated with your location will be displayed when you sign in to your account.</string>
+
+    <!-- Intro Fragment -->
+    <string name="get_started">Get Started</string>
+    <string name="intro_description">Hi! Welcome to RyteBytes - the easiest way to get a delicious, wholesome meal - no cooking required! Check out our menu to see which items you want, add them to your cart, select your pickup location and that\'s it!</string>
 </resources>

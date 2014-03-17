@@ -3,7 +3,7 @@ package com.myrytebytes.remote;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.myrytebytes.datamanagement.DateFormatters;
-import com.myrytebytes.datamanagement.Log;
+import com.myrytebytes.datamanagement.Logr;
 
 import java.io.IOException;
 import java.util.Date;
@@ -160,7 +160,7 @@ public class SafeJsonParser {
 		try {
 			return DateFormatters.formatWithFormatter(dateFormatter).parse(stringValue);
 		} catch (Exception e) {
-			Log.e("Unable to parse date " + stringValue + " for " + getCurrentName());
+			Logr.e("Unable to parse date " + stringValue + " for " + getCurrentName());
 			e.printStackTrace();
 			return null;
 		}

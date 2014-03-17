@@ -133,7 +133,7 @@ public class PickupLocationsFragment extends BaseFragment {
         view.findViewById(R.id.spinner).setOnClickListener(mOnClickListener);
         view.findViewById(R.id.btn_set_pickup_location).setOnClickListener(mOnClickListener);
 
-        Location currentLocation = UserController.getActiveUser().location;
+        Location currentLocation = UserController.getPickupLocation();
 
         Spanned htmlText = Html.fromHtml("Your pickup location is currently set to:<br><br><b>" + currentLocation.name + "<br>" + currentLocation.streetAddress + "</b><br><br>Use the button below to change locations if needed.");
         ((TextView)view.findViewById(R.id.tv_current_location)).setText(htmlText);
