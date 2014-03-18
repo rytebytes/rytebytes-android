@@ -53,4 +53,8 @@ public class ApiListener {
     public interface UpdateUserInfoListener {
         public void onComplete(boolean success, int statusCode);
     }
+
+    public interface UpdateHeatingInstructionsListener {
+        public void onComplete(boolean updated);
+    }
 }

@@ -1,6 +1,7 @@
 package com.myrytebytes.remote;
 
 import android.content.Context;
+import android.text.TextUtils;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.NetworkResponse;
@@ -12,6 +13,7 @@ import com.myrytebytes.datamanagement.Logr;
 import com.myrytebytes.datamanagement.MenuQuantityManager;
 import com.myrytebytes.datamanagement.UserController;
 import com.myrytebytes.datamodel.ErrorResponse;
+import com.myrytebytes.datamodel.HeatingInstructions;
 import com.myrytebytes.datamodel.Location;
 import com.myrytebytes.datamodel.LocationItem;
 import com.myrytebytes.datamodel.MenuItem;
@@ -28,6 +30,7 @@ import com.myrytebytes.remote.ApiListener.GetUserInfoListener;
 import com.myrytebytes.remote.ApiListener.LoginListener;
 import com.myrytebytes.remote.ApiListener.PurchaseListener;
 import com.myrytebytes.remote.ApiListener.ResetPasswordListener;
+import com.myrytebytes.remote.ApiListener.UpdateHeatingInstructionsListener;
 import com.myrytebytes.remote.ApiListener.UpdateUserInfoListener;
 import com.myrytebytes.remote.ApiListener.UpdateUserListener;
 import com.myrytebytes.remote.JsonRequest.JsonRequestListener;
@@ -247,6 +250,37 @@ public class ApiInterface {
                 listener.onComplete(e == null);
             }
         });
+    }
+
+    public static void updateHeatingInstructions(final UpdateHeatingInstructionsListener listener) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("heating", "heating");
+        params.put("content", "heating");
+
+        requestQueue.add(new RyteBytesRequest<>(35000, Method.GET, "content", params, null, HeatingInstructions.class, new JsonRequestListener<HeatingInstructions>() {
+            boolean updated;
+            @Override
+            public Response<HeatingInstructions> onParseResponseComplete(Response<HeatingInstructions> response) {
+                if (response.result != null && !TextUtils.isEmpty(response.result.text)) {
+                    Logr.d("text = " + response.result.text);
+                    updated = response.result.persistIfNeeded(context);
+                }
+                return response;
+            }
+
+            @Override
+            public void onResponse(HeatingInstructions response, int statusCode, VolleyError error) {
+                Logr.d("sc = " + statusCode);
+                Logr.d("onResponse: " + response);
+                if (response != null) {
+                    Logr.d("text: " + response.text);
+                }
+                if (error != null) {
+                    error.printStackTrace();
+                }
+                listener.onComplete(updated);
+            }
+        }));
     }
 
     private static String getErrorMessage(NetworkResponse networkResponse) {
