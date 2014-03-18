@@ -115,9 +115,6 @@ public class MenuItem extends DAObject implements JacksonParser, Parcelable {
 					case "picture":
 						imageName = jsonParser.getStringValue();
 						break;
-					case "costInCents":
-						price = jsonParser.getIntValue();
-						break;
 					case "objectId":
 						objectId = jsonParser.getStringValue();
 						break;

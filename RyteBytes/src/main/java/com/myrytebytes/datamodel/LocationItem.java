@@ -13,6 +13,7 @@ public class LocationItem implements JacksonParser {
     public Location location;
     public MenuItem menuItem;
     public int quantity;
+    private int price;
 
 	public LocationItem() { }
 
@@ -64,8 +65,15 @@ public class LocationItem implements JacksonParser {
                     case "quantity":
                         quantity = jsonParser.getIntValue();
                         break;
+                    case "costInCents":
+                        price = jsonParser.getIntValue();
+                        break;
 				}
 			}
 		}, closeWhenComplete);
+
+        if (menuItem != null) {
+            menuItem.price = price;
+        }
 	}
 }
