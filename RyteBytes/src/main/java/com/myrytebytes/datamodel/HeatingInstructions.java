@@ -49,7 +49,7 @@ public class HeatingInstructions implements JacksonParser {
         JsonHandler.handleJson(jsonParser, new JsonHandlerListenerAdapter() {
             @Override
             public void onField(String tag, SafeJsonParser jsonParser) throws IOException {
-                if (tag.equals("text")) {
+                if (tag.equals("content")) {
                     text = jsonParser.getStringValue();
                 }
             }

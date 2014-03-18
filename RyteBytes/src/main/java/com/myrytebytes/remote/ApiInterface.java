@@ -1,7 +1,6 @@
 package com.myrytebytes.remote;
 
 import android.content.Context;
-import android.text.TextUtils;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.NetworkResponse;
@@ -9,7 +8,6 @@ import com.android.volley.Request.Method;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.myrytebytes.datamanagement.Logr;
 import com.myrytebytes.datamanagement.MenuQuantityManager;
 import com.myrytebytes.datamanagement.UserController;
 import com.myrytebytes.datamodel.ErrorResponse;
@@ -173,11 +171,9 @@ public class ApiInterface {
         params.put("userId", user.parseUser.getObjectId());
         params.put("stripeId", user.stripeId);
         params.put("token", stripeToken.id);
-        Logr.d("userId = " + params.get("userId") + "; stripeId = " + params.get("stripeId") + "; tokenId = " + params.get("token"));
         requestQueue.add(new RyteBytesRequest<>(Method.POST, "updateuser", params, null, StripeCustomer.class, new JsonRequestListener<StripeCustomer>() {
             @Override
             public void onResponse(StripeCustomer response, int statusCode, VolleyError error) {
-                Logr.d("sc = " + statusCode);
                 listener.onComplete(error == null, statusCode);
             }
         }));
@@ -254,15 +250,13 @@ public class ApiInterface {
 
     public static void updateHeatingInstructions(final UpdateHeatingInstructionsListener listener) {
         Map<String, Object> params = new HashMap<>();
-        params.put("heating", "heating");
-        params.put("content", "heating");
+        params.put("name", "heating");
 
-        requestQueue.add(new RyteBytesRequest<>(35000, Method.GET, "content", params, null, HeatingInstructions.class, new JsonRequestListener<HeatingInstructions>() {
+        requestQueue.add(new RyteBytesRequest<>(35000, Method.POST, "content", params, "result", HeatingInstructions.class, new JsonRequestListener<HeatingInstructions>() {
             boolean updated;
             @Override
             public Response<HeatingInstructions> onParseResponseComplete(Response<HeatingInstructions> response) {
-                if (response.result != null && !TextUtils.isEmpty(response.result.text)) {
-                    Logr.d("text = " + response.result.text);
+                if (response.result != null) {
                     updated = response.result.persistIfNeeded(context);
                 }
                 return response;
@@ -270,14 +264,6 @@ public class ApiInterface {
 
             @Override
             public void onResponse(HeatingInstructions response, int statusCode, VolleyError error) {
-                Logr.d("sc = " + statusCode);
-                Logr.d("onResponse: " + response);
-                if (response != null) {
-                    Logr.d("text: " + response.text);
-                }
-                if (error != null) {
-                    error.printStackTrace();
-                }
                 listener.onComplete(updated);
             }
         }));

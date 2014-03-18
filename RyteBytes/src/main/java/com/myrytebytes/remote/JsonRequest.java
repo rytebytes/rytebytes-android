@@ -168,7 +168,7 @@ public class JsonRequest<T> extends Request<T> {
 			try {
 				if (networkResponse.statusCode >= 200 && networkResponse.statusCode < 300) {
 					//Uncomment to print the raw JSON response. Leaving this uncommented will break everything.
-//					Log.d("json = " + new java.util.Scanner(((JsonNetworkResponse)networkResponse).inputStream).useDelimiter("\\A").next());
+//					Logr.d("json = " + new java.util.Scanner(((JsonNetworkResponse) networkResponse).inputStream).useDelimiter("\\A").next());
 
 					SafeJsonParser jsonParser = new SafeJsonParser(JSON_FACTORY.createParser(((JsonNetworkResponse)networkResponse).inputStream));
 					parseJson(jsonParser);
