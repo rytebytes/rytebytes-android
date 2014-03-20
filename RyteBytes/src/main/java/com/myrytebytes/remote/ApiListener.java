@@ -3,6 +3,7 @@ package com.myrytebytes.remote;
 import com.myrytebytes.datamodel.Location;
 import com.myrytebytes.datamodel.StripeCustomer;
 import com.myrytebytes.datamodel.StripeToken;
+import com.myrytebytes.datamodel.ValidateCouponResponse;
 import com.parse.ParseException;
 import com.parse.ParseUser;
 
@@ -36,6 +37,10 @@ public class ApiListener {
 
     public interface PurchaseListener {
         public void onComplete(boolean success, String errorMessage, int statusCode);
+    }
+
+    public interface ValidateCouponListener {
+        public void onComplete(boolean success, ValidateCouponResponse response, int statusCode);
     }
 
     public interface ResetPasswordListener {

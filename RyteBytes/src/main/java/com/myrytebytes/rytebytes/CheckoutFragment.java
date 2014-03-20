@@ -3,6 +3,10 @@ package com.myrytebytes.rytebytes;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.TextUtils;
+import android.text.style.ForegroundColorSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -16,9 +20,11 @@ import com.myrytebytes.datamanagement.UserController;
 import com.myrytebytes.datamodel.MenuItem;
 import com.myrytebytes.datamodel.Order;
 import com.myrytebytes.datamodel.User;
+import com.myrytebytes.datamodel.ValidateCouponResponse;
 import com.myrytebytes.remote.ApiInterface;
 import com.myrytebytes.remote.ApiListener.GetMenuListener;
 import com.myrytebytes.remote.ApiListener.PurchaseListener;
+import com.myrytebytes.remote.ApiListener.ValidateCouponListener;
 import com.myrytebytes.widget.AutoResizeTextView;
 import com.myrytebytes.widget.ButtonSpinner;
 import com.myrytebytes.widget.ButtonSpinner.ButtonSpinnerListener;
@@ -112,6 +118,27 @@ public class CheckoutFragment extends BaseFragment {
             ApiInterface.getMenu(mGetMenuListener);
         }
     };
+    private final ValidateCouponListener mValidateCouponListener = new ValidateCouponListener() {
+        @Override
+        public void onComplete(boolean success, ValidateCouponResponse response, int statusCode) {
+            if (mProgressDialog != null && mProgressDialog.isShowing()) {
+                mProgressDialog.dismiss();
+            }
+            if (!success || !response.valid || response.amount <= 0) {
+                String errorMessage;
+                if (response != null && !TextUtils.isEmpty(response.message)) {
+                    errorMessage = response.message;
+                } else {
+                    errorMessage = "An unknown error occurred while applying your coupon. Please try again!";
+                }
+                showOkDialog("Error", errorMessage);
+            } else {
+                mOrder.setCouponDiscount(response.amount);
+                showOkDialog("Success", "Your discount has been applied.");
+                updateUIForPromoCode();
+            }
+        }
+    };
     private final RefreshCallback mRefreshCallback = new RefreshCallback() {
         @Override
         public void done(ParseObject parseObject, ParseException e) {
@@ -167,6 +194,24 @@ public class CheckoutFragment extends BaseFragment {
 
 		return rootView;
 	}
+
+    public void updateUIForPromoCode() {
+        setTotals();
+    }
+
+    public void validateCoupon() {
+        String valid = "testing-valid";
+        String invalid = "testing-invalid";
+        String today = "testing-today";
+        mOrder.setCouponCode(valid);
+        User user = UserController.getActiveUser();
+        if (user == null || user.stripeId == null) {
+            mActivityCallbacks.displayLoginFragment(false);
+        } else {
+            mProgressDialog = HoloDialog.showProgressDialog(getActivity(), null, "Applying Coupon...", false);
+            ApiInterface.validateCoupon(mOrder, UserController.getPickupLocation().objectId, mValidateCouponListener);
+        }
+    }
 
     public void placeOrder() {
         if (verifyQuantitiesAvailable(true)) {
@@ -224,7 +269,14 @@ public class CheckoutFragment extends BaseFragment {
             mBtnPlaceOrder.setVisibility(View.VISIBLE);
 
             final float orderTotal = mOrder.getTotalPrice() / 100f;
-            mTvOrderTotal.setText("Order Total: $" + String.format("%.2f", orderTotal));
+            final float discount = mOrder.getCouponDiscount() / 100f;
+            if (discount > 0) {
+                Spannable spannableString = new SpannableString(String.format("Order Total: $%.2f (after $%.2f coupon)", orderTotal, discount));
+                spannableString.setSpan(new ForegroundColorSpan(0xFF028132), 13, spannableString.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                mTvOrderTotal.setText(spannableString);
+            } else {
+                mTvOrderTotal.setText(String.format("Order Total: $%.2f", orderTotal));
+            }
         }
 	}
 

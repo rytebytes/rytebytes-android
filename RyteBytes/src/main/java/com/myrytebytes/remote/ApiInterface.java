@@ -20,6 +20,7 @@ import com.myrytebytes.datamodel.PurchaseResponse;
 import com.myrytebytes.datamodel.StripeCustomer;
 import com.myrytebytes.datamodel.StripeToken;
 import com.myrytebytes.datamodel.User;
+import com.myrytebytes.datamodel.ValidateCouponResponse;
 import com.myrytebytes.remote.ApiListener.CreateAccountListener;
 import com.myrytebytes.remote.ApiListener.GetLocationListener;
 import com.myrytebytes.remote.ApiListener.GetLocationsListener;
@@ -31,6 +32,7 @@ import com.myrytebytes.remote.ApiListener.ResetPasswordListener;
 import com.myrytebytes.remote.ApiListener.UpdateHeatingInstructionsListener;
 import com.myrytebytes.remote.ApiListener.UpdateUserInfoListener;
 import com.myrytebytes.remote.ApiListener.UpdateUserListener;
+import com.myrytebytes.remote.ApiListener.ValidateCouponListener;
 import com.myrytebytes.remote.JsonRequest.JsonRequestListener;
 import com.myrytebytes.rytebytes.Config;
 import com.parse.LogInCallback;
@@ -226,6 +228,7 @@ public class ApiInterface {
         params.put("totalInCents", order.getTotalPrice());
         params.put("userId", UserController.getActiveUser().parseUser.getObjectId());
         params.put("orderItemDictionary", order);
+        params.put("couponCode", order.getCouponCode());
 
         requestQueue.add(new RyteBytesRequest<>(35000, Method.POST, "order", params, null, PurchaseResponse.class, new JsonRequestListener<PurchaseResponse>() {
             @Override
@@ -235,6 +238,26 @@ public class ApiInterface {
                     errorMessage = getErrorMessage(error.networkResponse);
                 }
                 listener.onComplete(response != null && "success".equalsIgnoreCase(response.result), errorMessage, statusCode);
+            }
+        }));
+    }
+
+    public static void validateCoupon(Order order, String locationId, final ValidateCouponListener listener) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("locationId", locationId);
+        params.put("totalInCents", order.getTotalPrice());
+        params.put("userId", UserController.getActiveUser().parseUser.getObjectId());
+        params.put("orderItemDictionary", order);
+        params.put("couponCode", order.getCouponCode());
+
+        requestQueue.add(new RyteBytesRequest<>(35000, Method.POST, "coupon", params, "result", ValidateCouponResponse.class, new JsonRequestListener<ValidateCouponResponse>() {
+            @Override
+            public void onResponse(ValidateCouponResponse response, int statusCode, VolleyError error) {
+                if (response != null) {
+                    listener.onComplete(true, response, statusCode);
+                } else {
+                    listener.onComplete(false, null, statusCode);
+                }
             }
         }));
     }

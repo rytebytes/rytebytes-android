@@ -9,6 +9,8 @@ import java.util.List;
 public class Order implements JacksonWriter {
 
 	private final List<OrderItem> mOrderItems;
+    private String mCouponCode;
+    private int mCouponDiscount;
 
 	private static Order sharedOrder;
 
@@ -24,7 +26,9 @@ public class Order implements JacksonWriter {
 	}
 
 	public void clear() {
-		mOrderItems.clear();
+        mOrderItems.clear();
+        mCouponCode = null;
+        mCouponDiscount = 0;
 	}
 
 	public int getQuantity(MenuItem menuItem) {
@@ -55,6 +59,13 @@ public class Order implements JacksonWriter {
 		for (OrderItem orderItem : mOrderItems) {
 			total += orderItem.menuItem.price * orderItem.quantity;
 		}
+        if (mCouponDiscount > 0) {
+            total -= mCouponDiscount;
+        }
+        if (total < 0) {
+            total = 0;
+        }
+
 		return total;
 	}
 
@@ -111,7 +122,23 @@ public class Order implements JacksonWriter {
 		}
 	}
 
-	public MenuItem getItemAtPosition(int position) {
+    public void setCouponCode(String couponCode) {
+        mCouponCode = couponCode;
+    }
+
+    public void setCouponDiscount(int couponDiscount) {
+        mCouponDiscount = couponDiscount;
+    }
+
+    public String getCouponCode() {
+        return mCouponCode;
+    }
+
+    public int getCouponDiscount() {
+        return mCouponDiscount;
+    }
+
+    public MenuItem getItemAtPosition(int position) {
 		return mOrderItems.get(position).menuItem;
 	}
 
