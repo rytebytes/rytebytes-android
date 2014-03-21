@@ -150,7 +150,7 @@ public class MainActivity extends ActionBarActivity implements ActivityCallbacks
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		getMenuInflater().inflate(R.menu.checkout, menu);
+		getMenuInflater().inflate(R.menu.main, menu);
 		mCheckoutActionItem = ((CheckoutActionItem)MenuItemCompat.getActionView(menu.findItem(R.id.btn_checkout)));
 		mCheckoutActionItem.setListener(mCheckoutActionItemListener);
 		return true;

@@ -39,6 +39,7 @@
     <string name="order_empty_text">It looks like you haven\'t added any food to your cart yet. Add a few now to start enjoying our delicious meals at home!</string>
     <string name="add_items">Add Items</string>
     <string name="checkout_do_ryte_info">A portion of every sale is donated to the food bank partnered with your location!</string>
+    <string name="coupon">Coupon</string>
 
     <!-- Heating Fragment -->
     <string name="heating_instructions">Heating Instructions</string>

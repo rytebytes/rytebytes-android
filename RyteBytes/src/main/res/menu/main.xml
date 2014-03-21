@@ -1,0 +1,15 @@
+<menu
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:rytebytes="http://schemas.android.com/apk/res-auto">
+
+    <item
+            android:id="@+id/btn_checkout"
+            android:actionViewClass="com.myrytebytes.widget.CheckoutActionItem"
+            rytebytes:actionViewClass="com.myrytebytes.widget.CheckoutActionItem"
+            android:showAsAction="always"
+            rytebytes:showAsAction="always"
+            android:title="@string/checkout"
+            android:orderInCategory="2"
+            />
+
+</menu>

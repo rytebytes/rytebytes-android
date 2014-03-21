@@ -8,13 +8,17 @@ import android.text.SpannableString;
 import android.text.TextUtils;
 import android.text.style.ForegroundColorSpan;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.myrytebytes.datamanagement.Logr;
 import com.myrytebytes.datamanagement.MenuQuantityManager;
 import com.myrytebytes.datamanagement.UserController;
 import com.myrytebytes.datamodel.MenuItem;
@@ -164,6 +168,7 @@ public class CheckoutFragment extends BaseFragment {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		mOrder = Order.getSharedOrder();
+        setHasOptionsMenu(true);
 	}
 
 	@Override
@@ -195,15 +200,49 @@ public class CheckoutFragment extends BaseFragment {
 		return rootView;
 	}
 
-    public void updateUIForPromoCode() {
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.checkout, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(android.view.MenuItem item) {
+        final int itemId = item.getItemId();
+        if (itemId == R.id.coupon) {
+            Logr.d("coupon tapped");
+            displayCouponEntryDialog();
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private void displayCouponEntryDialog() {
+        Logr.d("display dialog");
+        new HoloDialog.Builder(getActivity())
+                .setTitle("Enter Coupon Code")
+                .setView(R.layout.dialog_edit_text)
+                .setNegativeButton(android.R.string.cancel, null)
+                .setPositiveButton("Apply", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String text = ((EditText) ((HoloDialog) dialog).getCustomView()).getText().toString();
+                        if (!TextUtils.isEmpty(text)) {
+                            validateCoupon(text);
+                        } else {
+                            showOkDialog("No Coupon Code", "Please enter a coupon code before applying.");
+                        }
+                    }
+                })
+                .show();
+    }
+
+    /*package*/ void updateUIForPromoCode() {
         setTotals();
     }
 
-    public void validateCoupon() {
-        String valid = "testing-valid";
-        String invalid = "testing-invalid";
-        String today = "testing-today";
-        mOrder.setCouponCode(valid);
+    public void validateCoupon(String couponCode) {
+        mOrder.setCouponCode(couponCode);
         User user = UserController.getActiveUser();
         if (user == null || user.stripeId == null) {
             mActivityCallbacks.displayLoginFragment(false);
