@@ -14,7 +14,7 @@ public class RyteBytesApplication extends Application {
 	public void onCreate() {
 		super.onCreate();
         Crashlytics.start(this);
-		Parse.initialize(this, "zaZmkcjbGLCrEHagb8uJPt5TKyiFgCg9WffA6c6M", "DltIu9MSxC9k1ly58gpdpXMkGlPI6KkfSeTkjwYa");
+		Parse.initialize(this, Config.PARSE_APP_ID, Config.PARSE_CLIENT_KEY);
 		ApiInterface.init(this);
 		NetworkImageView.init(this);
         UserController.init(this);
