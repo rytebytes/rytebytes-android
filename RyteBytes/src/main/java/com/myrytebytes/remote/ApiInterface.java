@@ -132,6 +132,21 @@ public class ApiInterface {
     public static void getLocations(final GetLocationsListener listener) {
         requestQueue.add(new RyteBytesRequest<>(Method.POST, "location", null, "result", Location.class, new JsonRequestListener<List<Location>>() {
             @Override
+            public Response<List<Location>> onParseResponseComplete(Response<List<Location>> response) {
+                User user = UserController.getActiveUser();
+                if (user == null || (!"nick@myrytebytes.com".equals(user.emailAddress) && !"geoff@myrytebytes.com".equals(user.emailAddress))) {
+                    // Remove the inventory location if this isn't nick or geoff
+                    for (int i = 0; i < response.result.size(); i++) {
+                        if ("4LlYqSRdc2".equals(response.result.get(i).objectId)) {
+                            response.result.remove(i);
+                            break;
+                        }
+                    }
+                }
+                return response;
+            }
+
+            @Override
             public void onResponse(List<Location> response, int statusCode, VolleyError error) {
                 listener.onComplete(response, statusCode);
             }

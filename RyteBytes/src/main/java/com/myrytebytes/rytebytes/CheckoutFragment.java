@@ -3,22 +3,20 @@ package com.myrytebytes.rytebytes;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.TextUtils;
 import android.text.style.ForegroundColorSpan;
+import android.text.style.UnderlineSpan;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.myrytebytes.datamanagement.Logr;
 import com.myrytebytes.datamanagement.MenuQuantityManager;
 import com.myrytebytes.datamanagement.UserController;
 import com.myrytebytes.datamodel.MenuItem;
@@ -46,6 +44,7 @@ public class CheckoutFragment extends BaseFragment {
     private TextView mTvPickupLocation;
     private TextView mTvDoRyte;
     private View mBtnPlaceOrder;
+    private Button mBtnApplyCoupon;
     private OrderAdapter mOrderAdapter;
 	private Order mOrder;
     private Dialog mProgressDialog;
@@ -60,6 +59,9 @@ public class CheckoutFragment extends BaseFragment {
 					break;
                 case R.id.btn_add_items:
                     mActivityCallbacks.popToRoot(true);
+                    break;
+                case R.id.btn_coupon:
+                    displayCouponEntryDialog();
                     break;
 			}
 		}
@@ -168,7 +170,6 @@ public class CheckoutFragment extends BaseFragment {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		mOrder = Order.getSharedOrder();
-        setHasOptionsMenu(true);
 	}
 
 	@Override
@@ -185,6 +186,9 @@ public class CheckoutFragment extends BaseFragment {
         mBtnPlaceOrder = rootView.findViewById(R.id.btn_place_order);
 		mBtnPlaceOrder.setOnClickListener(mOnClickListener);
 
+        mBtnApplyCoupon = (Button)rootView.findViewById(R.id.btn_coupon);
+        mBtnApplyCoupon.setOnClickListener(mOnClickListener);
+
         mOrderAdapter = new OrderAdapter(mOrder, mOrderAdapterListener, inflater);
 		((ListView)rootView.findViewById(R.id.lv_checkout)).setAdapter(mOrderAdapter);
 
@@ -200,28 +204,10 @@ public class CheckoutFragment extends BaseFragment {
 		return rootView;
 	}
 
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.checkout, menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(android.view.MenuItem item) {
-        final int itemId = item.getItemId();
-        if (itemId == R.id.coupon) {
-            Logr.d("coupon tapped");
-            displayCouponEntryDialog();
-            return true;
-        } else {
-            return false;
-        }
-    }
-
     private void displayCouponEntryDialog() {
-        Logr.d("display dialog");
         new HoloDialog.Builder(getActivity())
                 .setTitle("Enter Coupon Code")
-                .setView(R.layout.dialog_edit_text)
+                .setView(R.layout.dialog_promo_code)
                 .setNegativeButton(android.R.string.cancel, null)
                 .setPositiveButton("Apply", new DialogInterface.OnClickListener() {
                     @Override
@@ -300,22 +286,28 @@ public class CheckoutFragment extends BaseFragment {
             mTvPickupLocation.setVisibility(View.GONE);
             mTvDoRyte.setVisibility(View.GONE);
             mBtnPlaceOrder.setVisibility(View.GONE);
+            mBtnApplyCoupon.setVisibility(View.GONE);
         } else {
             mEmptyView.setVisibility(View.GONE);
             mTvOrderTotal.setVisibility(View.VISIBLE);
             mTvPickupLocation.setVisibility(View.VISIBLE);
             mTvDoRyte.setVisibility(View.VISIBLE);
             mBtnPlaceOrder.setVisibility(View.VISIBLE);
+            mBtnApplyCoupon.setVisibility(View.VISIBLE);
 
-            final float orderTotal = mOrder.getTotalPrice() / 100f;
-            final float discount = mOrder.getCouponDiscount() / 100f;
-            if (discount > 0) {
-                Spannable spannableString = new SpannableString(String.format("Order Total: $%.2f (after $%.2f coupon)", orderTotal, discount));
-                spannableString.setSpan(new ForegroundColorSpan(0xFF028132), 13, spannableString.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                mTvOrderTotal.setText(spannableString);
+            if (mOrder.getCouponDiscount() > 0) {
+                SpannableString content = new SpannableString(String.format("after $%.2f coupon", (mOrder.getCouponDiscount() / 100f)));
+                content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
+                content.setSpan(new ForegroundColorSpan(0xFF028132), 0, content.length(), 0);
+                mBtnApplyCoupon.setText(content);
             } else {
-                mTvOrderTotal.setText(String.format("Order Total: $%.2f", orderTotal));
+                SpannableString content = new SpannableString("Apply Coupon");
+                content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
+                content.setSpan(new ForegroundColorSpan(0xFF006AB4), 0, content.length(), 0);
+                mBtnApplyCoupon.setText(content);
             }
+
+            mTvOrderTotal.setText(String.format("Order Total: $%.2f", mOrder.getTotalPrice() / 100f));
         }
 	}
 
