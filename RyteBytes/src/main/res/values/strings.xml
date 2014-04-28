@@ -65,5 +65,5 @@
 
     <!-- Intro Fragment -->
     <string name="get_started">Get Started</string>
-    <string name="intro_description">Hi! Welcome to RyteBytes - the easiest way to get a delicious, wholesome meal - no cooking required! Check out our menu to see which items you want, add them to your cart, select your pickup location and that\'s it!</string>
+    <string name="intro_description">Welcome to RyteBytes! You\'re just a couple taps away from an all-natural, perfectly balanced meal!\n\n1) Select your pickup location\n2) Pick your food\n3) Place your order, grab your food, and relax. Your meal is served!\n\nIt\’s always as easy as order, pickup, heat.</string>
 </resources>
