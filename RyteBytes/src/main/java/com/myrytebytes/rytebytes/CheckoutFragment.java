@@ -131,6 +131,8 @@ public class CheckoutFragment extends BaseFragment {
                 mProgressDialog.dismiss();
             }
             if (!success || !response.valid || response.amount <= 0) {
+                mOrder.setCouponCode(null);
+                mOrder.setCouponDiscount(0);
                 String errorMessage;
                 if (response != null && !TextUtils.isEmpty(response.message)) {
                     errorMessage = response.message;
@@ -138,6 +140,7 @@ public class CheckoutFragment extends BaseFragment {
                     errorMessage = "An unknown error occurred while applying your coupon. Please try again!";
                 }
                 showOkDialog("Error", errorMessage);
+                updateUIForPromoCode();
             } else {
                 mOrder.setCouponDiscount(response.amount);
                 showOkDialog("Success", "Your discount has been applied.");
